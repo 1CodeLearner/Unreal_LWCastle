@@ -26,4 +26,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	UPROPERTY(VisibleAnywhere, Category=Camera)
+	class USpringArmComponent* springArmComp;
+	UPROPERTY(VisibleAnywhere, Category=Camera)
+	class UCameraComponent* tpsCamComp;
 };
