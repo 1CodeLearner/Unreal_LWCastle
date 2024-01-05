@@ -4,6 +4,8 @@
 #include "Uwol/uwol_test.h"
 #include <GameFramework/SpringArmComponent.h>
 #include <Camera/CameraComponent.h>
+#include "Uwol/DefaultMagic.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 Auwol_test::Auwol_test()
@@ -21,15 +23,17 @@ Auwol_test::Auwol_test()
 	// Set Camera
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->SetRelativeLocation(FVector(0, 70, 90));
+	springArmComp->SetRelativeLocation(FVector(0, 0, 90));
 	springArmComp->TargetArmLength = 400;
 	springArmComp->bUsePawnControlRotation = true;
-
+	//springArmComp->bUsePawnControlRotation = false;
+	
 	tpsCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TpsCamComp"));
 	tpsCamComp->SetupAttachment(springArmComp);
 	tpsCamComp->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = true;
+	//bUseControllerRotationYaw = false;
 
 	// Default Magic 스켈레탈메시 컴포넌트 등록
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
@@ -41,13 +45,14 @@ Auwol_test::Auwol_test()
 	if (TempGunMesh.Succeeded())
 	{
 		// 스켈레탈 메시 데이터 할당
-		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object)
-			;
+		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
 		// 위치 조정
-		gunMeshComp->SetRelativeLocation(FVector(-14, 52, 120));
+		gunMeshComp->SetRelativeLocation(FVector(-38, -2, 30));
+		// 방향 조정
+		gunMeshComp->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 	}
-
 }
+
 
 // Called when the game starts or when spawned
 void Auwol_test::BeginPlay()
@@ -61,7 +66,7 @@ void Auwol_test::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Move();
+	Move(DeltaTime);
 
 }
 
@@ -80,6 +85,9 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// Jump binding
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &Auwol_test::InputJump);
+
+	// Fire binding
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &Auwol_test::InputFire);
 
 }
 
@@ -108,20 +116,45 @@ void Auwol_test::InputJump()
 	Jump();
 }
 
-void Auwol_test::Move()
+void Auwol_test::Move(float DeltaTime)
 {
+
 	// 이동방향을 상대좌표계로 변환
 	direction = FTransform(GetControlRotation()).TransformVector(direction);
 
 	// Player movement
-	/*
+	
 	FVector P0 = GetActorLocation();
 	FVector vt = direction * walkSpeed * DeltaTime;
 	FVector P = P0 + vt;
 	SetActorLocation(P);
-	*/
-
-
-	AddMovementInput(direction);
+	
+	if (!direction.IsNearlyZero())
+	{
+		// 카메라 방향 기준으로 캐릭터 회전
+		FRotator camRot = vt.ToOrientationRotator();
+		SetActorRotation(camRot);
+	}
+	//AddMovementInput(direction);
 	direction = FVector::ZeroVector;
+}
+
+void Auwol_test::InputFire()
+{
+	// 현재 방향
+	FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+	UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>();
+	FVector CameraForwardVector;
+	if (CameraComponent)
+	{
+		CameraForwardVector = CameraComponent->GetForwardVector();
+		// CameraForwardVector를 사용하여 원하는 작업 수행
+	}
+	UGameplayStatics::GetPlayerController(this, 0);
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, fireposition.GetLocation(), CameraForwardVector, ECC_GameTraceChannel1);
+
+
+	GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
+
 }

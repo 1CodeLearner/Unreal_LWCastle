@@ -39,7 +39,7 @@ public:
 
 	// moving velocity
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed = 600;
+	float walkSpeed = 1000;
 	// direction
 	FVector direction;
 
@@ -52,10 +52,17 @@ public:
 	void InputJump();
 
 	// Player movement
-	void Move();
+	void Move(float DeltaTime);
 
 	// DefaultMagic skeletal mesh
 	UPROPERTY(VisibleAnywhere, Category = GunMesh)
 	class USkeletalMeshComponent* gunMeshComp;
+
+	// DafulatMagic factory
+	UPROPERTY(EditDefaultsOnly, Category=MagicFactory)
+	TSubclassOf<class ADefaultMagic> defaultmagicfac;
+
+	// fire
+	void InputFire();
 
 };

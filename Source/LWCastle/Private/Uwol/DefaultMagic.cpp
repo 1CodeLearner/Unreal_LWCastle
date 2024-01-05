@@ -12,7 +12,7 @@ ADefaultMagic::ADefaultMagic()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Mesh
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/InfinityBladeEffects/Enemy/Enemy_Chicken/Meshes/S_Survival_CA_Chicken_02.S_Survival_CA_Chicken_02'"));
+	//ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/InfinityBladeEffects/Enemy/Enemy_Chicken/Meshes/S_Survival_CA_Chicken_02.S_Survival_CA_Chicken_02'"));
 
 	// 충돌체 등록
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
@@ -29,7 +29,7 @@ ADefaultMagic::ADefaultMagic()
 	// 충돌 비활성화
 	bodyMehsComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// 외관크기 설정
-	bodyMehsComp->SetRelativeScale3D(FVector(1.0f));
+	bodyMehsComp->SetRelativeScale3D(FVector(0.3f));
 	// 발사체 컴포넌트
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComp"));
 	// movement 컴포넌트가 갱신시킬 컴포넌트 지정
@@ -42,6 +42,8 @@ ADefaultMagic::ADefaultMagic()
 	movementComp->bShouldBounce = true;
 	// 반동 값
 	movementComp->Bounciness = 0.3f;
+	// life cycle
+	InitialLifeSpan = 2.0f;
 
 }
 
@@ -49,6 +51,13 @@ ADefaultMagic::ADefaultMagic()
 void ADefaultMagic::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FTimerHandle deathTimer;
+	//GetWorld()->GetTimerManager().SetTimer(deathTimer, this, &ADefaultMagic::Die, 2.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(deathTimer, FTimerDelegate::CreateLambda([this]()->void
+		{
+			Destroy();
+		}), 2.0f, false);
 	
 }
 
@@ -57,5 +66,10 @@ void ADefaultMagic::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ADefaultMagic::Die()
+{
+	Destroy();
 }
 

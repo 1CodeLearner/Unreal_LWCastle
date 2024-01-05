@@ -36,4 +36,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category=BodyMesh)
 	class UStaticMeshComponent* bodyMehsComp;
 
+	// ÃÑ¾ËÁ¦°Å
+	void Die();
+
 };
