@@ -31,4 +31,31 @@ public:
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class UCameraComponent* tpsCamComp;
+
+	// Horizontal rotation
+	void Turn(float value);
+	// Vertical rotation
+	void LookUp(float value);
+
+	// moving velocity
+	UPROPERTY(EditAnywhere, Category = PlayerSetting)
+	float walkSpeed = 600;
+	// direction
+	FVector direction;
+
+	// Horizontal movement
+	void InputHorizontal(float value);
+	// Vertical movement
+	void InputVertical(float value);
+
+	// Jump
+	void InputJump();
+
+	// Player movement
+	void Move();
+
+	// DefaultMagic skeletal mesh
+	UPROPERTY(VisibleAnywhere, Category = GunMesh)
+	class USkeletalMeshComponent* gunMeshComp;
+
 };
