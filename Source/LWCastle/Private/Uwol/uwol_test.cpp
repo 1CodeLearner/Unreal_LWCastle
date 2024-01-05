@@ -30,6 +30,23 @@ Auwol_test::Auwol_test()
 	tpsCamComp->bUsePawnControlRotation = false;
 
 	bUseControllerRotationYaw = true;
+
+	// Default Magic 스켈레탈메시 컴포넌트 등록
+	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
+	// 부모 컴포넌트를 Mesh 컴포넌트로 설정
+	gunMeshComp->SetupAttachment(GetMesh());
+	// 스켈레탈메시 데이터 로드
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/untitled_category/untitled_asset/Nobeta_Staff_mesh.Nobeta_Staff_mesh'"));
+	// 데이터로드 성공
+	if (TempGunMesh.Succeeded())
+	{
+		// 스켈레탈 메시 데이터 할당
+		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object)
+			;
+		// 위치 조정
+		gunMeshComp->SetRelativeLocation(FVector(-14, 52, 120));
+	}
+
 }
 
 // Called when the game starts or when spawned

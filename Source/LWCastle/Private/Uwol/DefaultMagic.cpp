@@ -11,6 +11,9 @@ ADefaultMagic::ADefaultMagic()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Mesh
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.StaticMesh'/Game/InfinityBladeEffects/Enemy/Enemy_Chicken/Meshes/S_Survival_CA_Chicken_02.S_Survival_CA_Chicken_02'"));
+
 	// 충돌체 등록
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	// 충돌프로파일 설정
