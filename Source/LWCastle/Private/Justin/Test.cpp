@@ -2,6 +2,7 @@
 
 
 #include "Justin/Test.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATest::ATest()
@@ -16,6 +17,9 @@ void ATest::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
+
+
 }
 
 // Called every frame
