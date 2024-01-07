@@ -11,6 +11,11 @@ UCPlayerAttributeComp::UCPlayerAttributeComp()
 	StaminaSpendRate = .5;
 }
 
+void UCPlayerAttributeComp::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
