@@ -7,10 +7,8 @@
 #include "CPlayerAttributeManager.generated.h"
 
 class UDataTable;
-/**
- * 
- */
-UCLASS()
+
+UCLASS(Blueprintable)
 class LWCASTLE_API UCPlayerAttributeManager : public UObject
 {
 	GENERATED_BODY()
@@ -18,7 +16,4 @@ public:
 	UCPlayerAttributeManager();
 
 protected:
-	TObjectPtr<UDataTable> DT_PlayerHealth;
-	TObjectPtr<UDataTable> DT_PlayerMana;
-	TObjectPtr<UDataTable> DT_PlayerStamina;
 };

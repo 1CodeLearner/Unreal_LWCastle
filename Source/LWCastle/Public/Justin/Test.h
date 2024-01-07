@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Test.generated.h"
 
+
 class UCPlayerAttributeComp;
 
 UCLASS()
@@ -24,7 +25,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

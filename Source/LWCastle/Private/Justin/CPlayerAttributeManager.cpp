@@ -3,3 +3,6 @@
 
 #include "Justin/CPlayerAttributeManager.h"
 
+UCPlayerAttributeManager::UCPlayerAttributeManager()
+{
+}
