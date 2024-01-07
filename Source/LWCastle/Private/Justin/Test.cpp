@@ -18,9 +18,6 @@ ATest::ATest()
 void ATest::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
-
 
 }
 

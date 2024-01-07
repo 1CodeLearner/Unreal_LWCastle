@@ -7,15 +7,14 @@
 #include "CPlayerAttributeComp.generated.h"
 
 /**
- * 
+ *
  */
-
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaDepletedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManaDepletedDelegate);
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCPlayerAttributeComp : public UCAttributeComponent
 {
 	GENERATED_BODY()

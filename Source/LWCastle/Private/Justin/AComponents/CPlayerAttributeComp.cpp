@@ -14,6 +14,7 @@ UCPlayerAttributeComp::UCPlayerAttributeComp()
 void UCPlayerAttributeComp::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
