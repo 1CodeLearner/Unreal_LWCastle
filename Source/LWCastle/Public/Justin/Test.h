@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Test.generated.h"
 
+class UCPlayerAttributeComp;
+
 UCLASS()
 class LWCASTLE_API ATest : public ACharacter
 {
@@ -18,6 +20,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
 
 public:	
 	// Called every frame
