@@ -10,9 +10,6 @@
  * 
  */
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerStatUpdatedDelegate, FStruct_PlayerLevel, UpdatedLevel);
-
 UCLASS()
 class LWCASTLE_API ACPlayerController : public APlayerController
 {
@@ -20,8 +17,6 @@ class LWCASTLE_API ACPlayerController : public APlayerController
 	
 public:
 	ACPlayerController();
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, BlueprintReadWrite)
-	FPlayerStatUpdatedDelegate OnPlayerStatUpdated;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Manager")
 	TObjectPtr<UCPlayerAttributeManagerComp> StatManagerComp;

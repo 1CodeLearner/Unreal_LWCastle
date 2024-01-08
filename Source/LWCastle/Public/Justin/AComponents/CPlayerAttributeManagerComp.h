@@ -54,12 +54,16 @@ struct FStatProgressConversion
 
 	FStatProgressConversion() = default; 
 	FStatProgressConversion(TMap<FName, FStruct_PlayerAttribute> _Holder) {
-		Holder = _Holder;
+		ProgressionHolder = _Holder;
 	}
 
 	UPROPERTY()
-	TMap<FName, FStruct_PlayerAttribute> Holder;
+	TMap<FName, FStruct_PlayerAttribute> ProgressionHolder;
 };
+
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerStatUpdatedDelegate);
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -69,8 +73,17 @@ class LWCASTLE_API UCPlayerAttributeManagerComp : public UActorComponent
 
 public:
 	UCPlayerAttributeManagerComp();
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, BlueprintReadWrite)
+	FPlayerStatUpdatedDelegate OnPlayerStatUpdated;
 
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void UpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel);
+
+	UFUNCTION(BlueprintCallable)
+	int GetLevel(FName StatName) const;
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealthLevel() const;
@@ -88,11 +101,12 @@ public:
 
 protected:
 
-	UFUNCTION(BlueprintCallable)
-	int GetLevel(FName StatName) const;
+	//bool CanLevelUp(FString StatName);
 
-	UFUNCTION()
-	void OnPlayerStatUpdated(FStruct_PlayerLevel UpdatedLevel);
+	//FStruct_PlayerAttribute GetCurrentAttributeOf(FString StatName);
+	//FStruct_PlayerAttribute GetLastAttributeOf(FString StatName);
+	//FName GetCurrentProgressionKey(FString StatName);
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStruct_PlayerLevel> PlayerLevelMap;

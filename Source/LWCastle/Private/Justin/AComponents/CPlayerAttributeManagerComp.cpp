@@ -14,12 +14,6 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ACPlayerController* PlayerPC = Cast<ACPlayerController>(GetOwner());
-	if (ensure(PlayerPC))
-	{
-		PlayerPC->OnPlayerStatUpdated.AddDynamic(this, &UCPlayerAttributeManagerComp::OnPlayerStatUpdated);
-	}
-
 	PlayerLevelMap.Add("Health", { "Health", 3 });
 	PlayerLevelMap.Add("Mana", { "Mana", 1 });
 	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
@@ -46,7 +40,7 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 		for (int i = 0; i < ManaProgRows.Num(); ++i)
 		{
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
-			FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]-> LevelupCost };
+			FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]->LevelupCost };
 
 			ManaProgressionMap.Add(FName(RowName), ManaProgressionRow);
 		}
@@ -72,6 +66,22 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 		PlayerProgressionMap.Add("Stamina", Holder);
 	}
 
+}
+
+void UCPlayerAttributeManagerComp::UpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel)
+{
+	int result = GetLevel(UpdatedLevel.StatName);
+	if (ensureMsgf((result != -1), TEXT("StatName for updated level not valid!")) &&
+		ensureMsgf((PlayerLevelMap[UpdatedLevel.StatName].Level + 1 == UpdatedLevel.Level), TEXT("Can only increment level by one!"))
+		)
+	{
+		PlayerLevelMap[UpdatedLevel.StatName] = UpdatedLevel;
+		OnPlayerStatUpdated.Broadcast();
+	}
+	else
+	{
+		return;
+	}
 }
 
 int UCPlayerAttributeManagerComp::GetLevel(FName StatName) const
@@ -146,22 +156,32 @@ int UCPlayerAttributeManagerComp::GetStaminaLevelupCost() const
 		const FString StringContext(TEXT("PlayerStamina String Context"));
 		auto PlayerStamina = DT_PlayerStaminaList->FindRow<FStruct_PlayerAttribute>(*Level, StringContext);
 
-		return PlayerStamina->LevelupCost;
+		if (PlayerStamina) {
+			return PlayerStamina->LevelupCost;
+		}
 	}
 	return -1;
 }
 
-void UCPlayerAttributeManagerComp::OnPlayerStatUpdated(FStruct_PlayerLevel UpdatedLevel)
-{
-	/*int result = GetLevel(UpdatedLevel.StatName);
-	if (ensureMsgf((result != -1), TEXT("StatName for updated level not valid!")))
-	{
-		FString UpdatedProgressionRow = FString::Printf(TEXT("%s_%d"), *UpdatedLevel.StatName.ToString(), UpdatedLevel.Level);
-		FStruct_PlayerAttribute UpdatedStat = PlayerProgressionMap[UpdatedLevel.StatName].Holder[FName(UpdatedProgressionRow)];
-
-	}
-	else
-	{
-		return;
-	}*/
-}
+//bool UCPlayerAttributeManagerComp::CanLevelUp(FString StatName)
+//{
+//	FStruct_PlayerAttribute CurrAttribute = GetCurrentAttributeOf(StatName);
+//	
+//}
+//
+//FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentAttributeOf(FString StatName)
+//{
+//	return PlayerProgressionMap[FName(StatName)].ProgressionHolder[GetCurrentProgressionKey(StatName)];
+//}
+//
+//FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetLastAttributeOf(FString StatName)
+//{
+//	return PlayerProgressionMap[FName(StatName)].ProgressionHolder.end()[GetCurrentProgressionKey(StatName)];
+//}
+//
+//FName UCPlayerAttributeManagerComp::GetCurrentProgressionKey(FString StatName)
+//{
+//	int CurrentLevel = PlayerLevelMap[FName(StatName)].Level;
+//
+//	return FName(FString::Printf(TEXT("%s_%d"), *StatName, CurrentLevel - 1));
+//}
