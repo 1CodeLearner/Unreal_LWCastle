@@ -14,9 +14,9 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerLevelMap.Add("Health", { "Health", 3});
-	PlayerLevelMap.Add("Mana", { "Mana", 1});
-	PlayerLevelMap.Add("Stamina", { "Stamina", 2});
+	PlayerLevelMap.Add("Health", { "Health", 3 });
+	PlayerLevelMap.Add("Mana", { "Mana", 1 });
+	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
 
 	{
 		TArray<FStruct_PlayerAttribute> HealthProgressionArr;
@@ -66,34 +66,21 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	}
 }
 
-void UCPlayerAttributeManagerComp::TryUpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel)
+void UCPlayerAttributeManagerComp::TryUpdatePlayerStat(EPlayerStat PlayerStatType)
 {
-	int result = GetLevel(UpdatedLevel.StatName);
-	if (ensureMsgf( (result != -1), TEXT( "StatName for updated level not valid!" ) ) ) 
-	{
-		OnStatUpdateFailed.Broadcast(EFailReason::NOSTATNAME);
-		return;
-	}
-	else if (ensureMsgf((PlayerLevelMap[UpdatedLevel.StatName].Level + 1 == UpdatedLevel.Level), TEXT("Can only increment level by one!")) )
-	{
-		OnStatUpdateFailed.Broadcast(EFailReason::NOTINCREMENTING);
-		return;
-	}
-	else if (IsMaxReached(UpdatedLevel.StatName))
+	if (IsMaxReached(GetStatName(PlayerStatType)))
 	{
 		OnStatUpdateFailed.Broadcast(EFailReason::MAXREACHED);
+		return;
 	}
 	//else if (HasNoCurrency()) 
 	//{
-
+		
 	//}
-	else{
-		PlayerLevelMap[UpdatedLevel.StatName] = UpdatedLevel;
-		//switch () 
-		//{
-		//OnPlayerStatUpdated.Broadcast()
-		//}
-		//OnPlayerStatUpdated.Broadcast(EPlayerStat::);
+	else {
+		IncrementStatLevel(GetStatName(PlayerStatType));
+		FStruct_PlayerAttribute	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
+		OnPlayerStatUpdated.Broadcast(PlayerStatType, UpdatedStat.Level, UpdatedStat.LevelupCost);
 	}
 }
 
@@ -180,7 +167,7 @@ bool UCPlayerAttributeManagerComp::IsMaxReached(FName StatName)
 {
 	FStruct_PlayerAttribute CurrProgressionLevel = GetCurrentProgressionOf(StatName);
 	FStruct_PlayerAttribute LastProgressionLevel = GetLastProgressionOf(StatName);
-	return CurrProgressionLevel.Level != LastProgressionLevel.Level;
+	return CurrProgressionLevel.Level == LastProgressionLevel.Level;
 }
 
 FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName)
@@ -198,4 +185,33 @@ int UCPlayerAttributeManagerComp::GetCurrentProgressionIndex(FName StatName)
 	int CurrentLevel = PlayerLevelMap[StatName].Level;
 
 	return CurrentLevel - 1;
+}
+
+FName UCPlayerAttributeManagerComp::GetStatName(EPlayerStat PlayerStatEnum)
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
+	}
+}
+
+void UCPlayerAttributeManagerComp::IncrementStatLevel(FName StatName)
+{
+	FStruct_PlayerLevel CurrPlayerLevel = PlayerLevelMap[StatName];
+	PlayerLevelMap[StatName].Level = CurrPlayerLevel.Level + 1;
 }
