@@ -6,19 +6,38 @@
 #include "Components/ActorComponent.h"
 #include "CPlayerAttributeManagerComp.generated.h"
 
-USTRUCT()
-struct FPlayerLevel : public FTableRowBase
+USTRUCT(BlueprintType)
+struct FStruct_PlayerLevel : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	FStruct_PlayerLevel() = default;
+
+	FStruct_PlayerLevel(FName name, int level)
+	{
+		StatName = name;
+		Level = level;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName StatName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Level = 1;
 };
 
 USTRUCT()
-struct FStruct_PlayerAttribute: public FTableRowBase
+struct FStruct_PlayerAttribute : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	FStruct_PlayerAttribute() = default;
+	FStruct_PlayerAttribute(int level, float amount, int levelUpCost) 
+	{
+		Level = level;
+		Amount = amount; 
+		LevelupCost = levelUpCost;
+	}
 
 	UPROPERTY(EditAnywhere)
 	int Level = 0;
@@ -26,6 +45,20 @@ struct FStruct_PlayerAttribute: public FTableRowBase
 	float Amount = 0.f;
 	UPROPERTY(EditAnywhere)
 	int LevelupCost = 0;
+};
+
+USTRUCT()
+struct FStatProgressConversion
+{
+	GENERATED_BODY()
+
+	FStatProgressConversion() = default; 
+	FStatProgressConversion(TMap<FName, FStruct_PlayerAttribute> _Holder) {
+		Holder = _Holder;
+	}
+
+	UPROPERTY()
+	TMap<FName, FStruct_PlayerAttribute> Holder;
 };
 
 
@@ -36,6 +69,8 @@ class LWCASTLE_API UCPlayerAttributeManagerComp : public UActorComponent
 
 public:
 	UCPlayerAttributeManagerComp();
+
+	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealthLevel() const;
@@ -50,10 +85,21 @@ public:
 	int GetManaLevelupCost() const;
 	UFUNCTION(BlueprintCallable)
 	int GetStaminaLevelupCost() const;
+
 protected:
 
+	UFUNCTION(BlueprintCallable)
+	int GetLevel(FName StatName) const;
+
+	UFUNCTION()
+	void OnPlayerStatUpdated(FStruct_PlayerLevel UpdatedLevel);
+
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
-	TObjectPtr<UDataTable> DT_PlayerLevels;
+	TMap<FName, FStruct_PlayerLevel> PlayerLevelMap;
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
+	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
+
+
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TObjectPtr<UDataTable> DT_PlayerHealthList;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
