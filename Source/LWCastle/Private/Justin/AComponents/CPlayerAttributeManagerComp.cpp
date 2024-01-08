@@ -14,27 +14,26 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerLevelMap.Add("Health", { "Health", 3 });
-	PlayerLevelMap.Add("Mana", { "Mana", 1 });
-	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
+	PlayerLevelMap.Add("Health", { "Health", 3});
+	PlayerLevelMap.Add("Mana", { "Mana", 1});
+	PlayerLevelMap.Add("Stamina", { "Stamina", 2});
 
 	{
-		TMap<FName, FStruct_PlayerAttribute> HealthProgressionMap;
+		TArray<FStruct_PlayerAttribute> HealthProgressionArr;
 		TArray<FStruct_PlayerAttribute*> HealthProgRows;
-		DT_PlayerHealthList->GetAllRows < FStruct_PlayerAttribute>("String", HealthProgRows);
+		DT_PlayerHealthList->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
 		for (int i = 0; i < HealthProgRows.Num(); ++i)
 		{
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
 			FStruct_PlayerAttribute HealthProgressionRow = { HealthProgRows[i]->Level, HealthProgRows[i]->Amount,HealthProgRows[i]->LevelupCost };
 
-			HealthProgressionMap.Add(FName(RowName), HealthProgressionRow);
+			HealthProgressionArr.Add(HealthProgressionRow);
 		}
-
-		FStatProgressConversion Holder = { HealthProgressionMap };
+		FStatProgressConversion Holder = { HealthProgressionArr };
 		PlayerProgressionMap.Add("Health", Holder);
 	}
 	{
-		TMap<FName, FStruct_PlayerAttribute> ManaProgressionMap;
+		TArray<FStruct_PlayerAttribute> ManaProgressionArr;
 		TArray<FStruct_PlayerAttribute*> ManaProgRows;
 		DT_PlayerManaList->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
 		for (int i = 0; i < ManaProgRows.Num(); ++i)
@@ -42,16 +41,16 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
 			FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]->LevelupCost };
 
-			ManaProgressionMap.Add(FName(RowName), ManaProgressionRow);
+			ManaProgressionArr.Add(ManaProgressionRow);
 		}
 
-		FStatProgressConversion Holder = { ManaProgressionMap };
+		FStatProgressConversion Holder = { ManaProgressionArr };
 		PlayerProgressionMap.Add("Mana", Holder);
 	}
 
 	{
 
-		TMap<FName, FStruct_PlayerAttribute> StaminaProgressionMap;
+		TArray<FStruct_PlayerAttribute> StaminaProgressionArr;
 		TArray<FStruct_PlayerAttribute*> StaminaProgRows;
 		DT_PlayerStaminaList->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
 		for (int i = 0; i < StaminaProgRows.Num(); ++i)
@@ -59,28 +58,42 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
 			FStruct_PlayerAttribute StaminaProgressionRow = { StaminaProgRows[i]->Level, StaminaProgRows[i]->Amount,StaminaProgRows[i]->LevelupCost };
 
-			StaminaProgressionMap.Add(FName(RowName), StaminaProgressionRow);
+			StaminaProgressionArr.Add(StaminaProgressionRow);
 		}
 
-		FStatProgressConversion Holder = { StaminaProgressionMap };
+		FStatProgressConversion Holder = { StaminaProgressionArr };
 		PlayerProgressionMap.Add("Stamina", Holder);
 	}
-
 }
 
-void UCPlayerAttributeManagerComp::UpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel)
+void UCPlayerAttributeManagerComp::TryUpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel)
 {
 	int result = GetLevel(UpdatedLevel.StatName);
-	if (ensureMsgf((result != -1), TEXT("StatName for updated level not valid!")) &&
-		ensureMsgf((PlayerLevelMap[UpdatedLevel.StatName].Level + 1 == UpdatedLevel.Level), TEXT("Can only increment level by one!"))
-		)
+	if (ensureMsgf( (result != -1), TEXT( "StatName for updated level not valid!" ) ) ) 
 	{
-		PlayerLevelMap[UpdatedLevel.StatName] = UpdatedLevel;
-		OnPlayerStatUpdated.Broadcast();
-	}
-	else
-	{
+		OnStatUpdateFailed.Broadcast(EFailReason::NOSTATNAME);
 		return;
+	}
+	else if (ensureMsgf((PlayerLevelMap[UpdatedLevel.StatName].Level + 1 == UpdatedLevel.Level), TEXT("Can only increment level by one!")) )
+	{
+		OnStatUpdateFailed.Broadcast(EFailReason::NOTINCREMENTING);
+		return;
+	}
+	else if (IsMaxReached(UpdatedLevel.StatName))
+	{
+		OnStatUpdateFailed.Broadcast(EFailReason::MAXREACHED);
+	}
+	//else if (HasNoCurrency()) 
+	//{
+
+	//}
+	else{
+		PlayerLevelMap[UpdatedLevel.StatName] = UpdatedLevel;
+		//switch () 
+		//{
+		//OnPlayerStatUpdated.Broadcast()
+		//}
+		//OnPlayerStatUpdated.Broadcast(EPlayerStat::);
 	}
 }
 
@@ -163,25 +176,26 @@ int UCPlayerAttributeManagerComp::GetStaminaLevelupCost() const
 	return -1;
 }
 
-//bool UCPlayerAttributeManagerComp::CanLevelUp(FString StatName)
-//{
-//	FStruct_PlayerAttribute CurrAttribute = GetCurrentAttributeOf(StatName);
-//	
-//}
-//
-//FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentAttributeOf(FString StatName)
-//{
-//	return PlayerProgressionMap[FName(StatName)].ProgressionHolder[GetCurrentProgressionKey(StatName)];
-//}
-//
-//FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetLastAttributeOf(FString StatName)
-//{
-//	return PlayerProgressionMap[FName(StatName)].ProgressionHolder.end()[GetCurrentProgressionKey(StatName)];
-//}
-//
-//FName UCPlayerAttributeManagerComp::GetCurrentProgressionKey(FString StatName)
-//{
-//	int CurrentLevel = PlayerLevelMap[FName(StatName)].Level;
-//
-//	return FName(FString::Printf(TEXT("%s_%d"), *StatName, CurrentLevel - 1));
-//}
+bool UCPlayerAttributeManagerComp::IsMaxReached(FName StatName)
+{
+	FStruct_PlayerAttribute CurrProgressionLevel = GetCurrentProgressionOf(StatName);
+	FStruct_PlayerAttribute LastProgressionLevel = GetLastProgressionOf(StatName);
+	return CurrProgressionLevel.Level != LastProgressionLevel.Level;
+}
+
+FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName)
+{
+	return PlayerProgressionMap[StatName].ProgressionHolder[GetCurrentProgressionIndex(StatName)];
+}
+
+FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetLastProgressionOf(FName StatName)
+{
+	return PlayerProgressionMap[StatName].ProgressionHolder.Last();
+}
+
+int UCPlayerAttributeManagerComp::GetCurrentProgressionIndex(FName StatName)
+{
+	int CurrentLevel = PlayerLevelMap[StatName].Level;
+
+	return CurrentLevel - 1;
+}

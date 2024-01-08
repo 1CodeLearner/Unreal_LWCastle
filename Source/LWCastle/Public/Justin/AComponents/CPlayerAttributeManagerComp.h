@@ -6,6 +6,26 @@
 #include "Components/ActorComponent.h"
 #include "CPlayerAttributeManagerComp.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerStat : uint8
+{
+	NONE,
+	HEALTH, 
+	MANA, 
+	STAMINA
+};
+
+UENUM(BlueprintType)
+enum class EFailReason : uint8
+{
+	NONE,
+	NOCURRENCY, 
+	NOSTATNAME,
+	NOTINCREMENTING,
+	MAXREACHED
+};
+
+//Store current player level 
 USTRUCT(BlueprintType)
 struct FStruct_PlayerLevel : public FTableRowBase
 {
@@ -26,6 +46,7 @@ struct FStruct_PlayerLevel : public FTableRowBase
 	int Level = 1;
 };
 
+//Store player progression data
 USTRUCT()
 struct FStruct_PlayerAttribute : public FTableRowBase
 {
@@ -53,17 +74,17 @@ struct FStatProgressConversion
 	GENERATED_BODY()
 
 	FStatProgressConversion() = default; 
-	FStatProgressConversion(TMap<FName, FStruct_PlayerAttribute> _Holder) {
+	FStatProgressConversion(TArray<FStruct_PlayerAttribute> _Holder) {
 		ProgressionHolder = _Holder;
 	}
 
 	UPROPERTY()
-	TMap<FName, FStruct_PlayerAttribute> ProgressionHolder;
+	TArray<FStruct_PlayerAttribute> ProgressionHolder;
 };
 
-
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerStatUpdatedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPlayerStatUpdatedDelegate, EPlayerStat, PlayerStatEnum, int, Level, int, Cost);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMaxReachedDelegate, EPlayerStat, PlayerStatEnum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStatUpdateFailedDelegate, EFailReason, FailReason);
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -76,11 +97,15 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, BlueprintReadWrite)
 	FPlayerStatUpdatedDelegate OnPlayerStatUpdated;
+	UPROPERTY(BlueprintAssignable,  BlueprintReadWrite)
+	FMaxReachedDelegate OnMaxReached;
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
+	FStatUpdateFailedDelegate OnStatUpdateFailed;
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel);
+	void TryUpdatePlayerStat(FStruct_PlayerLevel UpdatedLevel);
 
 	UFUNCTION(BlueprintCallable)
 	int GetLevel(FName StatName) const;
@@ -100,19 +125,12 @@ public:
 	int GetStaminaLevelupCost() const;
 
 protected:
-
-	//bool CanLevelUp(FString StatName);
-
-	//FStruct_PlayerAttribute GetCurrentAttributeOf(FString StatName);
-	//FStruct_PlayerAttribute GetLastAttributeOf(FString StatName);
-	//FName GetCurrentProgressionKey(FString StatName);
-
+	bool IsMaxReached(FName StatName);
 
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStruct_PlayerLevel> PlayerLevelMap;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
-
 
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TObjectPtr<UDataTable> DT_PlayerHealthList;
@@ -121,4 +139,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TObjectPtr<UDataTable> DT_PlayerStaminaList;
 
+private:
+	FStruct_PlayerAttribute GetCurrentProgressionOf(FName StatName);
+	FStruct_PlayerAttribute GetLastProgressionOf(FName StatName);
+	int GetCurrentProgressionIndex(FName StatName);
 };
