@@ -3,6 +3,7 @@
 
 #include "Justin/AComponents/CPlayerAttributeManagerComp.h"
 #include "Justin/CPlayerController.h"
+#include "Justin/AComponents/CInventoryComponent.h"
 
 UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
 {
@@ -64,34 +65,48 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 		FStatProgressConversion Holder = { StaminaProgressionArr };
 		PlayerProgressionMap.Add("Stamina", Holder);
 	}
+
+	InventoryComp = Cast<APlayerController>(GetOwner())->GetPawn()->GetComponentByClass<UCInventoryComponent>();
+	if (ensureAlwaysMsgf(InventoryComp, TEXT("Inventory Missing! Add Inventory Component to controlled Character!"))) {
+		UE_LOG(LogTemp, Warning, TEXT("SUCCESS"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("FAIL"));
+	}
 }
 
-void UCPlayerAttributeManagerComp::TryUpdatePlayerStat(EPlayerStat PlayerStatType)
+void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 {
-	if (IsMaxReached(GetStatName(PlayerStatType)))
+	if (!ensure(InventoryComp->HasEnoughCurrency(GetLevelupCostFor(GetStatName(PlayerStatType))))) 
 	{
-		OnStatUpdateFailed.Broadcast(EFailReason::MAXREACHED);
 		return;
 	}
-	//else if (HasNoCurrency()) 
-	//{
-		
-	//}
-	else {
-		IncrementStatLevel(GetStatName(PlayerStatType));
-		FStruct_PlayerAttribute	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
-		OnPlayerStatUpdated.Broadcast(PlayerStatType, UpdatedStat.Level, UpdatedStat.LevelupCost);
+	
+	if (!ensure(PlayerStatType != EPlayerStat::NONE)) {
+		return;
 	}
+
+	InventoryComp->SpendCurrency(GetLevelupCostFor(GetStatName(PlayerStatType))	);
+	IncrementStatLevel(GetStatName(PlayerStatType));
+	FStruct_PlayerAttribute	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
+	OnPlayerStatUpdated.Broadcast(
+		{
+			PlayerStatType,
+			UpdatedStat.Level,
+			UpdatedStat.LevelupCost,
+			CheckIsMaxFor(GetStatName(PlayerStatType))
+		}
+	);
 }
 
-int UCPlayerAttributeManagerComp::GetLevel(FName StatName) const
+FStatInfo UCPlayerAttributeManagerComp::GetStatInfo(EPlayerStat StatType) const
 {
-	if (ensure(StatName != NAME_None))
+	if (ensure(StatType != EPlayerStat::NONE))
 	{
-		FStruct_PlayerLevel StatLevel = PlayerLevelMap[StatName];
-		return StatLevel.Level;
+		FStruct_PlayerAttribute CurrStat = GetCurrentProgressionOf(GetStatName(StatType));
+		return { StatType, CurrStat.Level, CurrStat.LevelupCost, CheckIsMaxFor(GetStatName(StatType)) };
 	}
-	return -1;
+	return FStatInfo();
 }
 
 int UCPlayerAttributeManagerComp::GetHealthLevel() const
@@ -112,57 +127,6 @@ int UCPlayerAttributeManagerComp::GetStaminaLevel() const
 	return HealthLevel.Level;
 }
 
-int UCPlayerAttributeManagerComp::GetHealthLevelupCost() const
-{
-	if (ensure(DT_PlayerHealthList))
-	{
-		FStruct_PlayerLevel HealthLevel = PlayerLevelMap["Health"];
-
-		FString Level(FString::Printf(TEXT("Health_%d"), HealthLevel.Level - 1));
-
-		const FString StringContext(TEXT("PlayerHealth String Context"));
-		auto PlayerHealth = DT_PlayerHealthList->FindRow<FStruct_PlayerAttribute>(*Level, StringContext);
-
-		return PlayerHealth->LevelupCost;
-	}
-
-	return -1;
-}
-
-int UCPlayerAttributeManagerComp::GetManaLevelupCost() const
-{
-	if (ensure(DT_PlayerManaList))
-	{
-		FStruct_PlayerLevel ManaLevel = PlayerLevelMap["Mana"];
-
-		FString Level(FString::Printf(TEXT("Mana_%d"), ManaLevel.Level - 1));
-
-		const FString StringContext(TEXT("PlayerMana String Context"));
-		auto PlayerMana = DT_PlayerManaList->FindRow<FStruct_PlayerAttribute>(*Level, StringContext);
-
-		return PlayerMana->LevelupCost;
-	}
-	return -1;
-}
-
-int UCPlayerAttributeManagerComp::GetStaminaLevelupCost() const
-{
-	if (ensure(DT_PlayerStaminaList))
-	{
-		FStruct_PlayerLevel StaminaLevel = PlayerLevelMap["Stamina"];
-
-		FString Level(FString::Printf(TEXT("Stamina_%d"), StaminaLevel.Level - 1));
-
-		const FString StringContext(TEXT("PlayerStamina String Context"));
-		auto PlayerStamina = DT_PlayerStaminaList->FindRow<FStruct_PlayerAttribute>(*Level, StringContext);
-
-		if (PlayerStamina) {
-			return PlayerStamina->LevelupCost;
-		}
-	}
-	return -1;
-}
-
 bool UCPlayerAttributeManagerComp::IsMaxReached(FName StatName)
 {
 	FStruct_PlayerAttribute CurrProgressionLevel = GetCurrentProgressionOf(StatName);
@@ -171,6 +135,11 @@ bool UCPlayerAttributeManagerComp::IsMaxReached(FName StatName)
 }
 
 FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName)
+{
+	return PlayerProgressionMap[StatName].ProgressionHolder[GetCurrentProgressionIndex(StatName)];
+}
+
+FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName) const
 {
 	return PlayerProgressionMap[StatName].ProgressionHolder[GetCurrentProgressionIndex(StatName)];
 }
@@ -187,7 +156,54 @@ int UCPlayerAttributeManagerComp::GetCurrentProgressionIndex(FName StatName)
 	return CurrentLevel - 1;
 }
 
+int UCPlayerAttributeManagerComp::GetCurrentProgressionIndex(FName StatName) const
+{
+	int CurrentLevel = PlayerLevelMap[StatName].Level;
+
+	return CurrentLevel - 1;
+}
+
+int UCPlayerAttributeManagerComp::GetLevelupCostFor(FName StatName)
+{
+	FStruct_PlayerAttribute PlayerProgression = GetCurrentProgressionOf(StatName);
+	return PlayerProgression.LevelupCost;
+}
+
+bool UCPlayerAttributeManagerComp::CheckIsMaxFor(FName StatName)
+{
+	return GetCurrentProgressionOf(StatName).LevelupCost == 0;
+}
+
+bool UCPlayerAttributeManagerComp::CheckIsMaxFor(FName StatName) const
+{
+	return GetCurrentProgressionOf(StatName).LevelupCost == 0;
+}
+
+
 FName UCPlayerAttributeManagerComp::GetStatName(EPlayerStat PlayerStatEnum)
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
+	}
+}
+
+FName UCPlayerAttributeManagerComp::GetStatName(EPlayerStat PlayerStatEnum) const
 {
 	switch (PlayerStatEnum)
 	{

@@ -15,12 +15,19 @@ enum class EPlayerStat : uint8
 	STAMINA
 };
 
-UENUM(BlueprintType)
-enum class EFailReason : uint8
+USTRUCT(BlueprintType)
+struct FStatInfo
 {
-	NONE,
-	NOCURRENCY,
-	MAXREACHED
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EPlayerStat PlayerStatEnum = EPlayerStat::NONE;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int Level = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int Cost = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bIsMax = false;
 };
 
 //Store current player level 
@@ -80,10 +87,10 @@ struct FStatProgressConversion
 	TArray<FStruct_PlayerAttribute> ProgressionHolder;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPlayerStatUpdatedDelegate, EPlayerStat, PlayerStatEnum, int, Level, int, Cost);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerStatUpdatedDelegate, FStatInfo, StatInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMaxReachedDelegate, EPlayerStat, PlayerStatEnum);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStatUpdateFailedDelegate, EFailReason, FailReason);
 
+class UCInventoryComponent;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCPlayerAttributeManagerComp : public UActorComponent
@@ -97,16 +104,14 @@ public:
 	FPlayerStatUpdatedDelegate OnPlayerStatUpdated;
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FMaxReachedDelegate OnMaxReached;
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
-	FStatUpdateFailedDelegate OnStatUpdateFailed;
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void TryUpdatePlayerStat(EPlayerStat PlayerStatType);
+	void UpdatePlayerStat(EPlayerStat PlayerStatType);
 
 	UFUNCTION(BlueprintCallable)
-	int GetLevel(FName StatName) const;
+	FStatInfo GetStatInfo(EPlayerStat StatType) const;
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealthLevel() const;
@@ -114,13 +119,6 @@ public:
 	int GetManaLevel() const;
 	UFUNCTION(BlueprintCallable)
 	int GetStaminaLevel() const;
-
-	UFUNCTION(BlueprintCallable)
-	int GetHealthLevelupCost() const;
-	UFUNCTION(BlueprintCallable)
-	int GetManaLevelupCost() const;
-	UFUNCTION(BlueprintCallable)
-	int GetStaminaLevelupCost() const;
 
 protected:
 
@@ -132,18 +130,29 @@ protected:
 	TObjectPtr<UDataTable> DT_PlayerStaminaList;
 
 private:
-	//<StatName, Current Stat Level>
+
+	UPROPERTY()
+	TObjectPtr<UCInventoryComponent> InventoryComp;
+	//Later add Elemental Magic Manager Component
+
+	//StatName, Current Stat Level
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStruct_PlayerLevel> PlayerLevelMap;
-	//<StatName, Stat Progression> 
+	//StatName, Stat Progression
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
 
 	FName GetStatName(EPlayerStat PlayerStatEnum);
+	FName GetStatName(EPlayerStat PlayerStatEnum) const;
 	void IncrementStatLevel(FName StatName);
 	bool IsMaxReached(FName StatName);
 
 	FStruct_PlayerAttribute GetCurrentProgressionOf(FName StatName);
+	FStruct_PlayerAttribute GetCurrentProgressionOf(FName StatName) const;
 	FStruct_PlayerAttribute GetLastProgressionOf(FName StatName);
 	int GetCurrentProgressionIndex(FName StatName);
+	int GetCurrentProgressionIndex(FName StatName) const;
+	int GetLevelupCostFor(FName StatName);
+	bool CheckIsMaxFor(FName StatName);
+	bool CheckIsMaxFor(FName StatName) const;
 };
