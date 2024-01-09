@@ -77,12 +77,19 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 
 void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 {
+	//Not enough currency
 	if (!ensure(InventoryComp->HasEnoughCurrency(GetLevelupCostFor(GetStatName(PlayerStatType))))) 
 	{
 		return;
 	}
-	
+	//PlayerStatType is NONE
 	if (!ensure(PlayerStatType != EPlayerStat::NONE)) {
+		return;	
+	}
+
+	//Is Max Level
+	if (!ensure(!CheckIsMaxFor(GetStatName(PlayerStatType)))) 
+	{
 		return;
 	}
 
