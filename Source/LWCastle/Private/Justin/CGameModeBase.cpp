@@ -12,8 +12,9 @@ void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 	{
 		if (ItemBaseClass) 
 		{
-			UCItemBase* tempItem = NewObject<UCItemBase>(this, ItemBaseClass);
-			ItemBaseMap[tempItem->TagName] = ItemBaseClass;
+			//UCItemBase* tempItem = NewObject<UCItemBase>(this, ItemBaseClass);
+			UCItemBase* tempItem = ItemBaseClass.GetDefaultObject();
+			ItemBaseMap.Add(tempItem->TagName, tempItem->GetClass());
 		}
 	}
 }

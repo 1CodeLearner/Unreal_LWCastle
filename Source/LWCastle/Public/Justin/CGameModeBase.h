@@ -17,9 +17,9 @@ class LWCASTLE_API ACGameModeBase : public AGameModeBase
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, Category = "Item")
 	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Item")
 	TMap<FName, TSubclassOf<UCItemBase>> ItemBaseMap;
 };
 	

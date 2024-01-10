@@ -20,19 +20,19 @@ public:
 	void Stop_Implementation(AActor* InstigatorActor);
 	void Pause_Implementation(AActor* InstigatorActor);
 public:
-	UPROPERTY(EditAnywhere)
-	FText DisplayName;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText DisplayText;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName TagName;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Value;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int Cost;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMesh> SMesh;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsPersistent;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTexture2D> DisplayTexture;
 protected:
 	virtual UWorld* GetWorld() const override;
