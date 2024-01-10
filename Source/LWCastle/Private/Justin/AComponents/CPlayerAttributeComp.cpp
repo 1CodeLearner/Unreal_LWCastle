@@ -2,6 +2,8 @@
 
 
 #include "Justin/AComponents/CPlayerAttributeComp.h"
+#include "Justin/AComponents/CPlayerAttributeManagerComp.h"
+#include "kismet/GameplayStatics.h"
 
 UCPlayerAttributeComp::UCPlayerAttributeComp()
 {
@@ -14,6 +16,18 @@ UCPlayerAttributeComp::UCPlayerAttributeComp()
 void UCPlayerAttributeComp::BeginPlay()
 {
 	Super::BeginPlay();
+	auto PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (PC)
+	{
+		auto ActorComponent = PC->GetComponentByClass<UCPlayerAttributeManagerComp>();
+		if (ActorComponent)
+		{
+			ActorComponent->OnPlayerStatUpdated.AddDynamic(this, &UCPlayerAttributeComp::OnStatUpdated);
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Player Controller not found!"));
+	}
 }
 
 void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -70,5 +84,28 @@ void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 {
 	SetComponentTickEnabled(bIsEnabled);
+}
+
+void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
+{
+	switch (StatInfo.PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		MaxHealth += 0;
+		break;
+	}
+	case EPlayerStat::MANA:
+	{
+		ManaPoints += 0;
+		break;
+	}
+	case EPlayerStat::STAMINA:
+	{
+		Stamina += 0;
+		break;
+	}
+	}
+
 }
 

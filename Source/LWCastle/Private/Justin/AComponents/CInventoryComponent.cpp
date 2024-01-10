@@ -32,7 +32,7 @@ void UCInventoryComponent::SpendCurrency(int AmountToSpend)
 	OnCurrencySpent.Broadcast(Currency);
 }
 
-bool UCInventoryComponent::HasEnoughCurrency(int AmountToSpend)
+bool UCInventoryComponent::HasEnoughCurrency(int AmountToSpend) const
 {
 	return (Currency - AmountToSpend) >= 0;
 }

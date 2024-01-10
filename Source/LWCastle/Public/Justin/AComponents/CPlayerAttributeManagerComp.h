@@ -120,28 +120,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetStaminaLevel() const;
 
-protected:
-
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
-	TObjectPtr<UDataTable> DT_PlayerHealthList;
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
-	TObjectPtr<UDataTable> DT_PlayerManaList;
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
-	TObjectPtr<UDataTable> DT_PlayerStaminaList;
-
 private:
 
 	UPROPERTY()
 	TObjectPtr<UCInventoryComponent> InventoryComp;
 	//Later add Elemental Magic Manager Component
 
-	//StatName, Current Stat Level
+	//Container for Storing player's current level for each attributes
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStruct_PlayerLevel> PlayerLevelMap;
 	//StatName, Stat Progression
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
 
+		UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_HealthProgression;
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_ManaProgression;
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_StaminaProgression;
+
+private:
 	FName GetStatName(EPlayerStat PlayerStatEnum);
 	FName GetStatName(EPlayerStat PlayerStatEnum) const;
 	void IncrementStatLevel(FName StatName);

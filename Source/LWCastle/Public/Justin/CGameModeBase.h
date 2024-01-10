@@ -14,6 +14,16 @@ UCLASS()
 class LWCASTLE_API ACGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintCallable)
+	UClass* GetItemClassByName(FName ItemName);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<TSubclassOf<UCItemBase>> GetItems();
+
+	/*UFUNCTION()
+	UDataTable* GetProgressionTableOf(EPlayerStat StatType);*/
+
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
@@ -21,5 +31,7 @@ protected:
 	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	TMap<FName, TSubclassOf<UCItemBase>> ItemBaseMap;
+
+
 };
 	

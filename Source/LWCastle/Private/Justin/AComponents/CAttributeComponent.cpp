@@ -12,6 +12,7 @@ UCAttributeComponent::UCAttributeComponent()
 
 void UCAttributeComponent::BeginPlay()
 {
+	Super::BeginPlay();
 	CurrentHealth = MaxHealth;
 }
 

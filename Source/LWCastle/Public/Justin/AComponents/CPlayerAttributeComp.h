@@ -47,6 +47,9 @@ protected:
 	void EnableSpendingStaminaByRate(bool bIsEnabled);
 
 protected:
+
+	UFUNCTION()
+	void OnStatUpdated(FStatInfo StatInfo);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerAttribute")
 	int ManaPoints;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerAttribute")

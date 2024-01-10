@@ -4,6 +4,8 @@
 #include "Justin/AComponents/CPlayerAttributeManagerComp.h"
 #include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CInventoryComponent.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Justin/CGameModeBase.h"
 
 UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
 {
@@ -19,10 +21,16 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	PlayerLevelMap.Add("Mana", { "Mana", 1 });
 	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
 
+	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(this);
+	ACGameModeBase* CGameMode = Cast<ACGameModeBase>(GameMode);
+	if (CGameMode) 
+	{
+
+	}
 	{
 		TArray<FStruct_PlayerAttribute> HealthProgressionArr;
 		TArray<FStruct_PlayerAttribute*> HealthProgRows;
-		DT_PlayerHealthList->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
+		DT_HealthProgression->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
 		for (int i = 0; i < HealthProgRows.Num(); ++i)
 		{
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
@@ -36,7 +44,7 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	{
 		TArray<FStruct_PlayerAttribute> ManaProgressionArr;
 		TArray<FStruct_PlayerAttribute*> ManaProgRows;
-		DT_PlayerManaList->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
+		DT_ManaProgression->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
 		for (int i = 0; i < ManaProgRows.Num(); ++i)
 		{
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);
@@ -53,7 +61,7 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 
 		TArray<FStruct_PlayerAttribute> StaminaProgressionArr;
 		TArray<FStruct_PlayerAttribute*> StaminaProgRows;
-		DT_PlayerStaminaList->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
+		DT_StaminaProgression->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
 		for (int i = 0; i < StaminaProgRows.Num(); ++i)
 		{
 			FString RowName = FString::Printf(TEXT("Health_%d"), i);

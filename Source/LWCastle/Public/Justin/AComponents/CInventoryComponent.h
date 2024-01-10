@@ -23,7 +23,10 @@ public:
 	int GetCurrency() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
-	bool HasEnoughCurrency(int AmountToSpend);
+	bool HasEnoughCurrency(int AmountToSpend) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
+	void SpendCurrency(int AmountToSpend);
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,11 +35,6 @@ protected:
 	friend class UCPlayerAttributeManagerComp;
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
 	void AddCurrency(int AmountToAdd);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
-	void SpendCurrency(int AmountToSpend);
-
-
 
 private:
 

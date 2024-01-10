@@ -4,6 +4,37 @@
 #include "Justin/CGameModeBase.h"
 #include "Justin/CItemBase.h"
 
+UClass* ACGameModeBase::GetItemClassByName(FName ItemName)
+{
+	FString Msg;
+	if (ensure(!ItemName.IsNone()))
+	{
+		if (ensure(ItemBaseMap.Contains(ItemName))) {
+			return ItemBaseMap[ItemName]/*->GetClass()*/;
+		}
+		else
+		{
+			Msg = FString::Printf(TEXT("ItemMap in CGameModeBase does not contain Key, %s"), *ItemName.ToString());
+		}
+	}
+	else
+	{
+		Msg = FString::Printf(TEXT("Name was not passed in! ItemName is Empty!"));
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Msg, true);
+	return nullptr;
+}
+
+TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
+{
+	return ItemBaseClasses;
+}
+
+//UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
+//{
+//
+//}
+
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
