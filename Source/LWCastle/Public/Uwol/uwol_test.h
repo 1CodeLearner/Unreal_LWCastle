@@ -29,7 +29,7 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* springArmComp;
-	UPROPERTY(VisibleAnywhere, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
 	class UCameraComponent* tpsCamComp;
 
 	// Horizontal rotation
@@ -64,5 +64,20 @@ public:
 
 	// fire
 	void InputFire();
+
+	// CrossHair
+	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
+	TSubclassOf<class UUserWidget> crosshairUIFactory;
+	// CrossHair Instance
+	class UUserWidget* _crosshairUI;
+
+	void SniperAim();
+	bool bSniperAim = false;
+
+	UPROPERTY(EditDefaultsOnly, Category=FocusUI)
+	TSubclassOf<class UUserWidget> sniperFac;
+	class UUserWidget* _FocusUI;
+
+	void CastR();
 
 };
