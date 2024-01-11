@@ -8,6 +8,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 Auwol_test::Auwol_test()
@@ -73,7 +74,7 @@ void Auwol_test::BeginPlay()
 void Auwol_test::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	Move(DeltaTime);
 
 }
@@ -104,6 +105,13 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// Rkey
 	PlayerInputComponent->BindAction(TEXT("R"), IE_Pressed, this, &Auwol_test::CastR);
+
+	// Dodge Binding
+	PlayerInputComponent->BindAction(TEXT("Dodge"), IE_Pressed, this, &Auwol_test::Dodge);
+	
+	// Run Binding
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &Auwol_test::RunP);
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
 
 }
 
@@ -138,30 +146,10 @@ void Auwol_test::Move(float DeltaTime)
 	FRotator rot = GetControlRotation();
 	FVector forward = UKismetMathLibrary::GetForwardVector(rot);
 	FVector right = UKismetMathLibrary::GetRightVector(rot);
-	//direction = direction.Y * right + direction.X * forward;
+	direction = direction.Y * right + direction.X * forward;
 	direction.Normalize();
-	// 이동방향을 상대좌표계로 변환
-	//direction = FTransform(GetControlRotation()).TransformVector(direction);
-	//direction.Z = 0;
-	
-	
-	//FVector P0 = GetActorLocation();
-	//FVector vt = direction * walkSpeed * DeltaTime;
-	//FVector P = P0 + vt;
-	//SetActorLocation(P);
 
-	//FRotator meshRot = UKismetMathLibrary::MakeRotFromYZ(direction, FVector::UpVector);
-	//GetMesh()->SetRelativeRotation(meshRot);
-	
-	//if (!direction.IsNearlyZero())
-	//{
-	//	// 카메라 방향 기준으로 캐릭터 회전
-	//	FRotator camRot = vt.ToOrientationRotator();
-	//	// Yaw축으로만 회전
-	//	FRotator YawOnly = FRotator(0, camRot.Yaw, 0);
-	//	SetActorRotation(YawOnly);
-	//}
-	AddMovementInput(direction);
+	AddMovementInput(direction, movespeed);
 	direction = FVector::ZeroVector;
 }
 
@@ -203,4 +191,30 @@ void Auwol_test::SniperAim()
 
 void Auwol_test::CastR()
 {
+	movespeed = 0.5f;
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
+}
+
+void Auwol_test::speedchange()
+{
+	movespeed = 1.0f;
+}
+
+void Auwol_test::Dodge()
+{
+	LaunchCharacter(GetActorForwardVector() * 2500, true, true);
+}
+
+void Auwol_test::RunP()
+{
+	//movespeed = 1.5f;
+	GetCharacterMovement()->MaxWalkSpeed *= 2.0;
+	
+}
+
+void Auwol_test::RunR()
+{
+	//movespeed = 1.0f;
+	GetCharacterMovement()->MaxWalkSpeed /= 2.0;
 }

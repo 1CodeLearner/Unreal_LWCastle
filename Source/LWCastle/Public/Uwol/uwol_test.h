@@ -32,6 +32,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
 	class UCameraComponent* tpsCamComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	UAnimMontage* m_pDodgeMomtage;
+
+	void Dodge();
+	bool m_bIsDodging = false;
+
+
 	// Horizontal rotation
 	void Turn(float value);
 	// Vertical rotation
@@ -80,4 +87,9 @@ public:
 
 	void CastR();
 
+	float movespeed = 1.0;
+
+	void speedchange();
+	void RunP();
+	void RunR();
 };
