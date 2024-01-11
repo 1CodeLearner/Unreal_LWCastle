@@ -22,9 +22,9 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	int GetCurrentHealth() const;
+	float GetCurrentHealth() const;
 	UFUNCTION(BlueprintCallable)
-	int GetMaxHealth() const;
+	float GetMaxHealth() const;
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamage(const int Damage);
 	UFUNCTION(BlueprintCallable)
@@ -39,8 +39,8 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Attribute")
 	int Currency;
 	UPROPERTY(Transient, BlueprintReadWrite, Category = "Attribute")
-	int CurrentHealth;
+	float CurrentHealth;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attribute")
-	int MaxHealth;
+	float MaxHealth;
 
 };

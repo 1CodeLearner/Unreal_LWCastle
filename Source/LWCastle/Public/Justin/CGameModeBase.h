@@ -18,13 +18,16 @@ class LWCASTLE_API ACGameModeBase : public AGameModeBase
 public:
 	UFUNCTION(BlueprintCallable)
 	UClass* GetItemClassByName(FName ItemName);
-
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<UCItemBase>> GetItems();
 
 	UFUNCTION()
-	UDataTable* GetProgressionTableOf(EPlayerStat StatType);
+	UDataTable* GetCurrentLevelsTable();
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	UDataTable* DT_CurrentLevels;
 
+	UFUNCTION()
+	UDataTable* GetProgressionTableOf(EPlayerStat StatType);
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_HealthProgression;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
@@ -34,6 +37,7 @@ public:
 
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void InitGameState() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Item")
 	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;

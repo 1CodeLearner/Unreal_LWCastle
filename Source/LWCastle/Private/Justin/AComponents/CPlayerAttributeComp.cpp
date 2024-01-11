@@ -10,10 +10,52 @@ UCPlayerAttributeComp::UCPlayerAttributeComp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	MaxMana = 100;
-	CurrentMana = MaxMana; 
+	CurrentMana = MaxMana;
 	MaxStamina = 80;
 	CurrentMana = MaxStamina;
 	StaminaSpendRate = .5;
+}
+
+void UCPlayerAttributeComp::UpdateStats()
+{
+	/*ACGameModeBase* PlayerGM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (PlayerGM)
+	{
+		UDataTable* DT_Progress = PlayerGM->GetProgressionTableOf(PlayerGM->);
+
+		TArray<FStruct_Progression*> Rows;
+		FString str("Context");
+		DT_Progress->GetAllRows<FStruct_Progression>(*str, Rows);
+
+		float UpdatedValue = 0.f;
+		for (auto Attribute : Rows)
+		{
+			if (Attribute->Level == StatInfo.Level)
+				UpdatedValue = Attribute->Amount;
+		}
+
+		switch (StatInfo.PlayerStatEnum)
+		{
+		case EPlayerStat::HEALTH:
+		{
+			MaxHealth += UpdatedValue;
+			break;
+		}
+		case EPlayerStat::MANA:
+		{
+			MaxMana += UpdatedValue;
+			break;
+		}
+		case EPlayerStat::STAMINA:
+		{
+			MaxStamina += UpdatedValue;
+			break;
+		}
+		}
+		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, UpdatedValue);
+	}*/
+
+
 }
 
 void UCPlayerAttributeComp::BeginPlay()
@@ -43,7 +85,12 @@ void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, 
 			//send broadcast and stop tick.
 }
 
-int UCPlayerAttributeComp::GetCurrentMana() const
+FStruct_StatDisplays UCPlayerAttributeComp::GetAttributesToDisplay() const
+{
+	return { CurrentHealth, MaxHealth, CurrentMana, MaxMana, CurrentStamina, MaxStamina };
+}
+
+float UCPlayerAttributeComp::GetCurrentMana() const
 {
 	return CurrentMana;
 }
@@ -54,6 +101,16 @@ float UCPlayerAttributeComp::GetCurrentStamina() const
 }
 
 
+float UCPlayerAttributeComp::GetMaxStamina() const
+{
+	return MaxStamina;
+}
+
+float UCPlayerAttributeComp::GetMaxMana() const
+{
+	return MaxMana;
+}
+
 bool UCPlayerAttributeComp::TrySpendMana(int SpendAmount)
 {
 	if (CurrentMana <= SpendAmount)
@@ -62,7 +119,7 @@ bool UCPlayerAttributeComp::TrySpendMana(int SpendAmount)
 	}
 	else
 	{
-		CurrentMana-= SpendAmount;
+		CurrentMana -= SpendAmount;
 		if (CurrentMana <= 0)
 		{
 			CurrentMana = 0;
@@ -92,41 +149,6 @@ void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 //Bring Player progression info from GameMode.
 void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
 {
-	ACGameModeBase* PlayerGM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (PlayerGM)
-	{
-		UDataTable* DT_Progress = PlayerGM->GetProgressionTableOf(StatInfo.PlayerStatEnum);
 
-		TArray<FStruct_PlayerAttribute*> Rows;
-		FString str("Context");
-		DT_Progress->GetAllRows<FStruct_PlayerAttribute>(*str, Rows);
-
-		float UpdatedValue = 0.f;
-		for (auto Attribute : Rows)
-		{
-			if (Attribute->Level == StatInfo.Level)
-				UpdatedValue = Attribute->Amount;
-		}
-
-		switch (StatInfo.PlayerStatEnum)
-		{
-		case EPlayerStat::HEALTH:
-		{
-			MaxHealth += UpdatedValue;
-			break;
-		}
-		case EPlayerStat::MANA:
-		{
-			MaxMana += UpdatedValue;
-			break;
-		}
-		case EPlayerStat::STAMINA:
-		{
-			MaxStamina += UpdatedValue;
-			break;
-		}
-		}
-		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, UpdatedValue);
-	}
 }
 

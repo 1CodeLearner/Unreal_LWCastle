@@ -16,12 +16,12 @@ void UCAttributeComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
-int UCAttributeComponent::GetCurrentHealth() const
+float UCAttributeComponent::GetCurrentHealth() const
 {
 	return CurrentHealth;
 }
 
-int UCAttributeComponent::GetMaxHealth() const
+float UCAttributeComponent::GetMaxHealth() const
 {
 	return MaxHealth;
 }

@@ -30,6 +30,11 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 	return ItemBaseClasses;
 }
 
+UDataTable* ACGameModeBase::GetCurrentLevelsTable()
+{
+	return nullptr;
+}
+
 UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
 {
 	switch(StatType)
@@ -63,4 +68,11 @@ void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 			ItemBaseMap.Add(tempItem->TagName, tempItem->GetClass());
 		}
 	}
+}
+
+void ACGameModeBase::InitGameState()
+{
+	Super::InitGameState();
+
+
 }
