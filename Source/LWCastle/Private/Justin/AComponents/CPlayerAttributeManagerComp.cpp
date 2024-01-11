@@ -5,6 +5,7 @@
 #include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CInventoryComponent.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Justin/PlayerStatTypes.h"
 #include "Justin/CGameModeBase.h"
 
 UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
@@ -21,6 +22,8 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	PlayerLevelMap.Add("Mana", { "Mana", 1 });
 	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
 
+
+	//Bring Player progression info from GameMode.
 	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(this);
 	ACGameModeBase* CGameMode = Cast<ACGameModeBase>(GameMode);
 	if (CGameMode) 

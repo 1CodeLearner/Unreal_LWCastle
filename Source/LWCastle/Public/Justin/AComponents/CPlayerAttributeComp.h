@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Justin/AComponents/CAttributeComponent.h"
+#include "Justin/PlayerStatTypes.h"
 #include "CPlayerAttributeComp.generated.h"
 
 /**

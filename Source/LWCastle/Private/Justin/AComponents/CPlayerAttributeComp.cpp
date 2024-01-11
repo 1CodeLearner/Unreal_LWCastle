@@ -86,6 +86,7 @@ void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 	SetComponentTickEnabled(bIsEnabled);
 }
 
+//Bring Player progression info from GameMode.
 void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
 {
 	switch (StatInfo.PlayerStatEnum)
