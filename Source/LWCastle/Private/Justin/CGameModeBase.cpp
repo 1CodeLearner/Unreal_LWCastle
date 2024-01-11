@@ -30,10 +30,25 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 	return ItemBaseClasses;
 }
 
-//UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
-//{
-//
-//}
+UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
+{
+	switch(StatType)
+	{
+	case EPlayerStat::HEALTH: {
+		return DT_HealthProgression;
+		break;
+	}
+	case EPlayerStat::MANA: {
+		return DT_ManaProgression;
+		break;
+	}
+	case EPlayerStat::STAMINA: {
+		return DT_StaminaProgression;
+		break;
+	}
+	}
+	return nullptr;
+}
 
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {

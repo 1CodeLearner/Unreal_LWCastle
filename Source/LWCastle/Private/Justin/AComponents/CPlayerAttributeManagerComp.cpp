@@ -4,8 +4,7 @@
 #include "Justin/AComponents/CPlayerAttributeManagerComp.h"
 #include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CInventoryComponent.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
-#include "Justin/PlayerStatTypes.h"
+#include "Kismet/GameplayStatics.h"
 #include "Justin/CGameModeBase.h"
 
 UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
@@ -26,56 +25,57 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	//Bring Player progression info from GameMode.
 	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(this);
 	ACGameModeBase* CGameMode = Cast<ACGameModeBase>(GameMode);
-	if (CGameMode) 
+	if (CGameMode)
 	{
-
-	}
-	{
-		TArray<FStruct_PlayerAttribute> HealthProgressionArr;
-		TArray<FStruct_PlayerAttribute*> HealthProgRows;
-		DT_HealthProgression->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
-		for (int i = 0; i < HealthProgRows.Num(); ++i)
 		{
-			FString RowName = FString::Printf(TEXT("Health_%d"), i);
-			FStruct_PlayerAttribute HealthProgressionRow = { HealthProgRows[i]->Level, HealthProgRows[i]->Amount,HealthProgRows[i]->LevelupCost };
+			TArray<FStruct_PlayerAttribute> HealthProgressionArr;
+			TArray<FStruct_PlayerAttribute*> HealthProgRows;
+			CGameMode->GetProgressionTableOf(EPlayerStat::HEALTH)->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
+			for (int i = 0; i < HealthProgRows.Num(); ++i)
+			{
+				FString RowName = FString::Printf(TEXT("Health_%d"), i);
+				FStruct_PlayerAttribute HealthProgressionRow = { HealthProgRows[i]->Level, HealthProgRows[i]->Amount,HealthProgRows[i]->LevelupCost };
 
-			HealthProgressionArr.Add(HealthProgressionRow);
+				HealthProgressionArr.Add(HealthProgressionRow);
+			}
+			FStatProgressConversion Holder = { HealthProgressionArr };
+			PlayerProgressionMap.Add("Health", Holder);
 		}
-		FStatProgressConversion Holder = { HealthProgressionArr };
-		PlayerProgressionMap.Add("Health", Holder);
-	}
-	{
-		TArray<FStruct_PlayerAttribute> ManaProgressionArr;
-		TArray<FStruct_PlayerAttribute*> ManaProgRows;
-		DT_ManaProgression->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
-		for (int i = 0; i < ManaProgRows.Num(); ++i)
 		{
-			FString RowName = FString::Printf(TEXT("Health_%d"), i);
-			FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]->LevelupCost };
+			TArray<FStruct_PlayerAttribute> ManaProgressionArr;
+			TArray<FStruct_PlayerAttribute*> ManaProgRows;
+			CGameMode->GetProgressionTableOf(EPlayerStat::MANA)->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
+			for (int i = 0; i < ManaProgRows.Num(); ++i)
+			{
+				FString RowName = FString::Printf(TEXT("Health_%d"), i);
+				FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]->LevelupCost };
 
-			ManaProgressionArr.Add(ManaProgressionRow);
-		}
+				ManaProgressionArr.Add(ManaProgressionRow);
+			}
 
-		FStatProgressConversion Holder = { ManaProgressionArr };
-		PlayerProgressionMap.Add("Mana", Holder);
-	}
-
-	{
-
-		TArray<FStruct_PlayerAttribute> StaminaProgressionArr;
-		TArray<FStruct_PlayerAttribute*> StaminaProgRows;
-		DT_StaminaProgression->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
-		for (int i = 0; i < StaminaProgRows.Num(); ++i)
-		{
-			FString RowName = FString::Printf(TEXT("Health_%d"), i);
-			FStruct_PlayerAttribute StaminaProgressionRow = { StaminaProgRows[i]->Level, StaminaProgRows[i]->Amount,StaminaProgRows[i]->LevelupCost };
-
-			StaminaProgressionArr.Add(StaminaProgressionRow);
+			FStatProgressConversion Holder = { ManaProgressionArr };
+			PlayerProgressionMap.Add("Mana", Holder);
 		}
 
-		FStatProgressConversion Holder = { StaminaProgressionArr };
-		PlayerProgressionMap.Add("Stamina", Holder);
+		{
+
+			TArray<FStruct_PlayerAttribute> StaminaProgressionArr;
+			TArray<FStruct_PlayerAttribute*> StaminaProgRows;
+			CGameMode->GetProgressionTableOf(EPlayerStat::STAMINA)->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
+			for (int i = 0; i < StaminaProgRows.Num(); ++i)
+			{
+				FString RowName = FString::Printf(TEXT("Health_%d"), i);
+				FStruct_PlayerAttribute StaminaProgressionRow = { StaminaProgRows[i]->Level, StaminaProgRows[i]->Amount,StaminaProgRows[i]->LevelupCost };
+
+				StaminaProgressionArr.Add(StaminaProgressionRow);
+			}
+
+			FStatProgressConversion Holder = { StaminaProgressionArr };
+			PlayerProgressionMap.Add("Stamina", Holder);
+		}
+		
 	}
+
 
 	InventoryComp = Cast<APlayerController>(GetOwner())->GetPawn()->GetComponentByClass<UCInventoryComponent>();
 	if (ensureAlwaysMsgf(InventoryComp, TEXT("Inventory Missing! Add Inventory Component to controlled Character!"))) {
@@ -89,22 +89,22 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 {
 	//Not enough currency
-	if (!ensure(InventoryComp->HasEnoughCurrency(GetLevelupCostFor(GetStatName(PlayerStatType))))) 
+	if (!ensure(InventoryComp->HasEnoughCurrency(GetLevelupCostFor(GetStatName(PlayerStatType)))))
 	{
 		return;
 	}
 	//PlayerStatType is NONE
 	if (!ensure(PlayerStatType != EPlayerStat::NONE)) {
-		return;	
+		return;
 	}
 
 	//Is Max Level
-	if (!ensure(!CheckIsMaxFor(GetStatName(PlayerStatType)))) 
+	if (!ensure(!CheckIsMaxFor(GetStatName(PlayerStatType))))
 	{
 		return;
 	}
 
-	InventoryComp->SpendCurrency(GetLevelupCostFor(GetStatName(PlayerStatType))	);
+	InventoryComp->SpendCurrency(GetLevelupCostFor(GetStatName(PlayerStatType)));
 	IncrementStatLevel(GetStatName(PlayerStatType));
 	FStruct_PlayerAttribute	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
 	OnPlayerStatUpdated.Broadcast(

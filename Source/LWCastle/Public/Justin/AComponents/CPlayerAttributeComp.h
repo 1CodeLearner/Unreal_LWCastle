@@ -13,7 +13,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaDepletedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManaDepletedDelegate);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FProgressonChangedDelegate, EPlayerStat, StatTypeEnum, float, MaxAmount);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCPlayerAttributeComp : public UCAttributeComponent
@@ -26,17 +26,18 @@ public:
 	FStaminaDepletedDelegate OnStaminaDepleted;
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FManaDepletedDelegate OnManaDepleted;
-
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FProgressonChangedDelegate OnProgressionChanged;
 protected:
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	int GetManaPoints() const;
+	int GetCurrentMana() const;
 
 	UFUNCTION(BlueprintCallable)
-	float GetStamina() const;
+	float GetCurrentStamina() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool TrySpendMana(int SpendAmount);
@@ -51,10 +52,12 @@ protected:
 
 	UFUNCTION()
 	void OnStatUpdated(FStatInfo StatInfo);
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerAttribute")
-	int ManaPoints;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PlayerAttribute")
-	float Stamina;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
+	float MaxMana;
+	float CurrentMana;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
+	float MaxStamina;
+	float CurrentStamina;
 private:
 	UPROPERTY(VisibleDefaultsOnly)
 	float StaminaSpendRate;

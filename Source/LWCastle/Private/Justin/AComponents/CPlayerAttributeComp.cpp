@@ -4,12 +4,15 @@
 #include "Justin/AComponents/CPlayerAttributeComp.h"
 #include "Justin/AComponents/CPlayerAttributeManagerComp.h"
 #include "kismet/GameplayStatics.h"
+#include "Justin/CGameModeBase.h"
 
 UCPlayerAttributeComp::UCPlayerAttributeComp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	ManaPoints = 100;
-	Stamina = 80;
+	MaxMana = 100;
+	CurrentMana = MaxMana; 
+	MaxStamina = 80;
+	CurrentMana = MaxStamina;
 	StaminaSpendRate = .5;
 }
 
@@ -40,29 +43,29 @@ void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, 
 			//send broadcast and stop tick.
 }
 
-int UCPlayerAttributeComp::GetManaPoints() const
+int UCPlayerAttributeComp::GetCurrentMana() const
 {
-	return ManaPoints;
+	return CurrentMana;
 }
 
-float UCPlayerAttributeComp::GetStamina() const
+float UCPlayerAttributeComp::GetCurrentStamina() const
 {
-	return Stamina;
+	return CurrentStamina;
 }
 
 
 bool UCPlayerAttributeComp::TrySpendMana(int SpendAmount)
 {
-	if (ManaPoints <= SpendAmount)
+	if (CurrentMana <= SpendAmount)
 	{
 		return false;
 	}
 	else
 	{
-		ManaPoints -= SpendAmount;
-		if (ManaPoints <= 0)
+		CurrentMana-= SpendAmount;
+		if (CurrentMana <= 0)
 		{
-			ManaPoints = 0;
+			CurrentMana = 0;
 			OnManaDepleted.Broadcast();
 		}
 		return true;
@@ -71,11 +74,11 @@ bool UCPlayerAttributeComp::TrySpendMana(int SpendAmount)
 
 void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 {
-	if (Stamina > 0.f)
+	if (CurrentStamina > 0.f)
 	{
-		Stamina -= SpendAmount;
+		CurrentStamina -= SpendAmount;
 	}
-	else if (Stamina <= 0.f)
+	else if (CurrentStamina <= 0.f)
 	{
 		OnStaminaDepleted.Broadcast();
 	}
@@ -89,24 +92,41 @@ void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 //Bring Player progression info from GameMode.
 void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
 {
-	switch (StatInfo.PlayerStatEnum)
+	ACGameModeBase* PlayerGM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (PlayerGM)
 	{
-	case EPlayerStat::HEALTH:
-	{
-		MaxHealth += 0;
-		break;
-	}
-	case EPlayerStat::MANA:
-	{
-		ManaPoints += 0;
-		break;
-	}
-	case EPlayerStat::STAMINA:
-	{
-		Stamina += 0;
-		break;
-	}
-	}
+		UDataTable* DT_Progress = PlayerGM->GetProgressionTableOf(StatInfo.PlayerStatEnum);
 
+		TArray<FStruct_PlayerAttribute*> Rows;
+		FString str("Context");
+		DT_Progress->GetAllRows<FStruct_PlayerAttribute>(*str, Rows);
+
+		float UpdatedValue = 0.f;
+		for (auto Attribute : Rows)
+		{
+			if (Attribute->Level == StatInfo.Level)
+				UpdatedValue = Attribute->Amount;
+		}
+
+		switch (StatInfo.PlayerStatEnum)
+		{
+		case EPlayerStat::HEALTH:
+		{
+			MaxHealth += UpdatedValue;
+			break;
+		}
+		case EPlayerStat::MANA:
+		{
+			MaxMana += UpdatedValue;
+			break;
+		}
+		case EPlayerStat::STAMINA:
+		{
+			MaxStamina += UpdatedValue;
+			break;
+		}
+		}
+		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, UpdatedValue);
+	}
 }
 

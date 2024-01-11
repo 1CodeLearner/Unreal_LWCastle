@@ -29,3 +29,24 @@ struct FStatInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool bIsMax = false;
 };
+
+//Store current player level 
+USTRUCT()
+struct FStruct_PlayerLevel : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FStruct_PlayerLevel() = default;
+
+	FStruct_PlayerLevel(FName name, int level)
+	{
+		StatName = name;
+		Level = level;
+	}
+
+	UPROPERTY(EditAnywhere)
+	FName StatName;
+
+	UPROPERTY(EditAnywhere)
+	int Level = 1;
+};

@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Justin/PlayerStatTypes.h"
 #include "CGameModeBase.generated.h"
 
 class UCItemBase;
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API ACGameModeBase : public AGameModeBase
@@ -21,8 +22,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<UCItemBase>> GetItems();
 
-	/*UFUNCTION()
-	UDataTable* GetProgressionTableOf(EPlayerStat StatType);*/
+	UFUNCTION()
+	UDataTable* GetProgressionTableOf(EPlayerStat StatType);
+
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_HealthProgression;
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_ManaProgression;
+	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
+	TObjectPtr<UDataTable> DT_StaminaProgression;
 
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -34,4 +42,3 @@ protected:
 
 
 };
-	

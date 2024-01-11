@@ -7,29 +7,6 @@
 #include "Justin/PlayerStatTypes.h"
 #include "CPlayerAttributeManagerComp.generated.h"
 
-
-
-//Store current player level 
-USTRUCT()
-struct FStruct_PlayerLevel : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	FStruct_PlayerLevel() = default;
-
-	FStruct_PlayerLevel(FName name, int level)
-	{
-		StatName = name;
-		Level = level;
-	}
-
-	UPROPERTY(EditAnywhere)
-	FName StatName;
-
-	UPROPERTY(EditAnywhere)
-	int Level = 1;
-};
-
 //Store player progression data
 USTRUCT()
 struct FStruct_PlayerAttribute : public FTableRowBase
@@ -111,13 +88,6 @@ private:
 	//StatName, Stat Progression
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerAttribute")
 	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
-
-		UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
-	TObjectPtr<UDataTable> DT_HealthProgression;
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
-	TObjectPtr<UDataTable> DT_ManaProgression;
-	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
-	TObjectPtr<UDataTable> DT_StaminaProgression;
 
 private:
 	FName GetStatName(EPlayerStat PlayerStatEnum);
