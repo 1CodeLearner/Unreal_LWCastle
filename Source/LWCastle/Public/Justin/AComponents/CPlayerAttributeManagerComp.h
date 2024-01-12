@@ -68,8 +68,6 @@ private:
 	TMap<FName, FStatProgressConversion > PlayerProgressionMap;
 
 private:
-	FName GetStatName(EPlayerStat PlayerStatEnum);
-	FName GetStatName(EPlayerStat PlayerStatEnum) const;
 	void IncrementStatLevel(FName StatName);
 	bool IsMaxReached(FName StatName);
 
@@ -81,4 +79,6 @@ private:
 	int GetLevelupCostFor(FName StatName);
 	bool CheckIsMaxFor(FName StatName);
 	bool CheckIsMaxFor(FName StatName) const;
+	FName GetStatName(EPlayerStat PlayerStatEnum);
+	FName GetStatName(EPlayerStat PlayerStatEnum) const;
 };

@@ -32,7 +32,7 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 
 UDataTable* ACGameModeBase::GetCurrentLevelsTable()
 {
-	return nullptr;
+	return DT_CurrentLevels;
 }
 
 UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
@@ -55,6 +55,54 @@ UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
 	return nullptr;
 }
 
+TArray<FStruct_Progression> ACGameModeBase::GetProgressionOf(EPlayerStat StatType) const
+{
+	TArray<FStruct_Progression*> ProgRows;
+	switch (StatType) 
+	{
+		case EPlayerStat::HEALTH:
+		{
+			DT_HealthProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
+		case EPlayerStat::MANA:
+		{
+			DT_ManaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
+		case EPlayerStat::STAMINA:
+		{
+			DT_StaminaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
+	}
+
+
+	TArray<FStruct_Progression> ProgressionArr;
+	for (int i = 0; i < ProgRows.Num(); ++i)
+	{
+		FStruct_Progression ProgressionRow = { ProgRows[i]->Level, ProgRows[i]->Amount,ProgRows[i]->LevelupCost };
+
+		ProgressionArr.Add(ProgressionRow);
+	}
+
+	return ProgressionArr;
+}
+
+TArray<FStruct_Level> ACGameModeBase::GetCurrentLevels() const
+{
+	FString Context = "StringContext";
+	TArray< FStruct_Level*> StatsPtr;
+	TArray< FStruct_Level> Stats;
+	DT_CurrentLevels->GetAllRows<FStruct_Level>(Context, StatsPtr);
+	for (FStruct_Level* stat : StatsPtr)
+	{
+		FStruct_Level Level = *stat;
+		Stats.Add(Level);
+	}
+	return Stats;
+}
+
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
@@ -75,4 +123,51 @@ void ACGameModeBase::InitGameState()
 	Super::InitGameState();
 
 
+}
+
+
+FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum)
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
+	}
+}
+
+FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum) const
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
+	}
 }

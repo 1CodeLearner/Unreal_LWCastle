@@ -84,17 +84,3 @@ struct FStruct_Level : public FTableRowBase
 	UPROPERTY(EditAnywhere)
 	int Level = 1;
 };
-
-
-//USTRUCT()
-//struct FStruct_StatLevels : public FTableRowBase
-//{
-//	GENERATED_BODY()
-//	
-//	UPROPERTY(EditAnywhere)
-//	float Health = 100.f; 
-//	UPROPERTY(EditAnywhere)
-//	float Mana = 90.f; 
-//	UPROPERTY(EditAnywhere)
-//	float Stamina = 80.f;
-//};

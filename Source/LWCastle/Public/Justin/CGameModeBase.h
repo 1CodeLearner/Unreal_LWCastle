@@ -21,19 +21,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<UCItemBase>> GetItems();
 
-	UFUNCTION()
-	UDataTable* GetCurrentLevelsTable();
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	UDataTable* DT_CurrentLevels;
-
-	UFUNCTION()
-	UDataTable* GetProgressionTableOf(EPlayerStat StatType);
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_HealthProgression;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_ManaProgression;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_StaminaProgression;
+
+	UFUNCTION()
+	TArray<FStruct_Progression> GetProgressionOf(EPlayerStat StatType) const;
+	UFUNCTION()
+	TArray<FStruct_Level> GetCurrentLevels() const;
 
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -44,5 +44,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	TMap<FName, TSubclassOf<UCItemBase>> ItemBaseMap;
 
-
+private:
+	FName GetStatName(EPlayerStat PlayerStatEnum);
+	FName GetStatName(EPlayerStat PlayerStatEnum) const;
 };
