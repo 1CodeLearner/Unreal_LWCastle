@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Uwol/uwol_test.h"
 #include "Uwol/DefaultMagic.h"
 #include <Blueprint/UserWidget.h>
@@ -9,6 +8,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Uwol/PlayerAnim.h"
 
 // Sets default values
 Auwol_test::Auwol_test()
@@ -17,7 +17,7 @@ Auwol_test::Auwol_test()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Mesh Load and set location, rotation
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/playermodel/Nobeta_mesh.Nobeta_mesh'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/uwol_blueprints/Animation_Retarget/Elaina/Real_Character/Crouch_Walk_Forward.Crouch_Walk_Forward'"));
 	if (TempMesh.Succeeded()) {
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
@@ -41,7 +41,7 @@ Auwol_test::Auwol_test()
 	// Default Magic 스켈레탈메시 컴포넌트 등록
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
 	// 부모 컴포넌트를 Mesh 컴포넌트로 설정
-	gunMeshComp->SetupAttachment(GetMesh());
+	gunMeshComp->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
 	// 스켈레탈메시 데이터 로드
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/untitled_category/untitled_asset/Nobeta_Staff_mesh.Nobeta_Staff_mesh'"));
 	// 데이터로드 성공
@@ -49,10 +49,13 @@ Auwol_test::Auwol_test()
 	{
 		// 스켈레탈 메시 데이터 할당
 		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
+		//FName SocketName = TEXT("WeaponSocket");
+		//gunMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 		// 위치 조정
 		gunMeshComp->SetRelativeLocation(FVector(-38, -2, 30));
-		// 방향 조정
 		gunMeshComp->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+		gunMeshComp->SetRelativeScale3D(FVector(0.15f));
+
 	}
 }
 
@@ -67,6 +70,8 @@ void Auwol_test::BeginPlay()
 	_crosshairUI->AddToViewport();
 
 	_FocusUI = CreateWidget(GetWorld(), sniperFac);
+
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 	
 }
 
@@ -155,6 +160,8 @@ void Auwol_test::Move(float DeltaTime)
 
 void Auwol_test::InputFire()
 {
+	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	anim->PlayAttackAnim();
 	// 현재 방향
 	FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
 	//UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>();
@@ -191,14 +198,16 @@ void Auwol_test::SniperAim()
 
 void Auwol_test::CastR()
 {
-	movespeed = 0.5f;
+	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
+	//movespeed = 0.5f;
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
 }
 
 void Auwol_test::speedchange()
 {
-	movespeed = 1.0f;
+	//movespeed = 1.0f;
+	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
 }
 
 void Auwol_test::Dodge()
@@ -209,12 +218,13 @@ void Auwol_test::Dodge()
 void Auwol_test::RunP()
 {
 	//movespeed = 1.5f;
-	GetCharacterMovement()->MaxWalkSpeed *= 2.0;
+	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
 	
 }
 
 void Auwol_test::RunR()
 {
 	//movespeed = 1.0f;
-	GetCharacterMovement()->MaxWalkSpeed /= 2.0;
+	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
 }
+

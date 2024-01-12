@@ -46,7 +46,7 @@ public:
 
 	// moving velocity
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed = 1000;
+	float walkSpeed = 200;
 	// direction
 	FVector direction;
 
