@@ -29,8 +29,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FProgressonChangedDelegate OnProgressionChanged;
 
-	UFUNCTION(BlueprintCallable)
-	void UpdateStats();
 protected:
 
 	virtual void BeginPlay() override;

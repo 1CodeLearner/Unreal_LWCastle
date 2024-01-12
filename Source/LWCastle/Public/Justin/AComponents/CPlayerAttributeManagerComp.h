@@ -34,18 +34,20 @@ class LWCASTLE_API UCPlayerAttributeManagerComp : public UActorComponent
 public:
 	UCPlayerAttributeManagerComp();
 
+	void BeginInit();
+
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, BlueprintReadWrite)
 	FPlayerStatUpdatedDelegate OnPlayerStatUpdated;
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite)
 	FMaxReachedDelegate OnMaxReached;
 
-	virtual void BeginPlay() override;
-
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerStat(EPlayerStat PlayerStatType);	
 
 	UFUNCTION(BlueprintCallable)
-	FStatInfo GetStatInfo(EPlayerStat StatType) const;
+	FStatInfo GetStatInfoOf(EPlayerStat StatType) const;
+	UFUNCTION()
+	FStruct_StatDisplays GetAllStats() const;
 
 	UFUNCTION(BlueprintCallable)
 	int GetHealthLevel() const;
@@ -54,6 +56,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetStaminaLevel() const;
 
+protected:
+	virtual void BeginPlay() override;
 private:
 
 	UPROPERTY()

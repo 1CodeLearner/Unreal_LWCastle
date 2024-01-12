@@ -9,7 +9,7 @@
 // Sets default values
 ATest::ATest()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
 }

@@ -9,53 +9,6 @@
 UCPlayerAttributeComp::UCPlayerAttributeComp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	MaxMana = 100;
-	CurrentMana = MaxMana;
-	MaxStamina = 80;
-	CurrentMana = MaxStamina;
-	StaminaSpendRate = .5;
-}
-
-void UCPlayerAttributeComp::UpdateStats()
-{
-	/*ACGameModeBase* PlayerGM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (PlayerGM)
-	{
-		UDataTable* DT_Progress = PlayerGM->GetProgressionTableOf(PlayerGM->);
-
-		TArray<FStruct_Progression*> Rows;
-		FString str("Context");
-		DT_Progress->GetAllRows<FStruct_Progression>(*str, Rows);
-
-		float UpdatedValue = 0.f;
-		for (auto Attribute : Rows)
-		{
-			if (Attribute->Level == StatInfo.Level)
-				UpdatedValue = Attribute->Amount;
-		}
-
-		switch (StatInfo.PlayerStatEnum)
-		{
-		case EPlayerStat::HEALTH:
-		{
-			MaxHealth += UpdatedValue;
-			break;
-		}
-		case EPlayerStat::MANA:
-		{
-			MaxMana += UpdatedValue;
-			break;
-		}
-		case EPlayerStat::STAMINA:
-		{
-			MaxStamina += UpdatedValue;
-			break;
-		}
-		}
-		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, UpdatedValue);
-	}*/
-
-
 }
 
 void UCPlayerAttributeComp::BeginPlay()
@@ -64,15 +17,23 @@ void UCPlayerAttributeComp::BeginPlay()
 	auto PC = UGameplayStatics::GetPlayerController(this, 0);
 	if (PC)
 	{
-		auto ActorComponent = PC->GetComponentByClass<UCPlayerAttributeManagerComp>();
-		if (ActorComponent)
+		auto Manager = PC->GetComponentByClass<UCPlayerAttributeManagerComp>();
+		if (Manager)
 		{
-			ActorComponent->OnPlayerStatUpdated.AddDynamic(this, &UCPlayerAttributeComp::OnStatUpdated);
+			Manager->OnPlayerStatUpdated.AddDynamic(this, &UCPlayerAttributeComp::OnStatUpdated);
+			auto StatsInfo = Manager->GetAllStats();
+			MaxHealth = StatsInfo.MaxHealth;
+			MaxMana = StatsInfo.MaxMana;
+			MaxStamina = StatsInfo.MaxStamina;
 		}
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player Controller not found!"));
 	}
+
+	CurrentHealth = MaxHealth;
+	CurrentMana = MaxMana;
+	CurrentStamina = MaxStamina;
 }
 
 void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -149,6 +110,30 @@ void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 //Bring Player progression info from GameMode.
 void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
 {
+	ACGameModeBase* GM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (GM)
+	{
+		FStruct_Progression Progression = GM->GetCurrentProgressionOf(StatInfo.PlayerStatEnum, StatInfo.Level);
+		switch (StatInfo.PlayerStatEnum)
+		{
+		case EPlayerStat::HEALTH:
+		{
+			MaxHealth = Progression.Amount;
+			break;
+		}
+		case EPlayerStat::MANA:
+		{
+			MaxMana = Progression.Amount;
+			break;
+		}
+		case EPlayerStat::STAMINA:
+		{
+			MaxStamina = Progression.Amount;
+			break;
+		}
+		}
 
+		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, Progression.Amount);
+	}
 }
 

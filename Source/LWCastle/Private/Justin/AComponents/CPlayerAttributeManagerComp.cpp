@@ -13,27 +13,25 @@ UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
 
 }
 
-void UCPlayerAttributeManagerComp::BeginPlay()
+void UCPlayerAttributeManagerComp::BeginInit()
 {
-	Super::BeginPlay();
-
 	//Bring Player progression info from GameMode.
 	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(this);
 	ACGameModeBase* CGameMode = Cast<ACGameModeBase>(GameMode);
 	if (CGameMode)
 	{
 		{
-			TArray<FStruct_Progression> Progession = CGameMode->GetProgressionOf(EPlayerStat::HEALTH);
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::HEALTH);
 			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Health", Holder);
 		}
 		{
-			TArray<FStruct_Progression> Progession = CGameMode->GetProgressionOf(EPlayerStat::MANA);
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::MANA);
 			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Mana", Holder);
 		}
 		{
-			TArray<FStruct_Progression> Progession = CGameMode->GetProgressionOf(EPlayerStat::STAMINA);
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::STAMINA);
 			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Stamina", Holder);
 		}
@@ -47,6 +45,13 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 		}
 	}
 
+
+}
+
+void UCPlayerAttributeManagerComp::BeginPlay()
+{
+	Super::BeginPlay();
+
 	InventoryComp = Cast<APlayerController>(GetOwner())->GetPawn()->GetComponentByClass<UCInventoryComponent>();
 	if (ensureAlwaysMsgf(InventoryComp, TEXT("Inventory Missing! Add Inventory Component to controlled Character!"))) {
 		UE_LOG(LogTemp, Warning, TEXT("SUCCESS"));
@@ -54,6 +59,7 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("FAIL"));
 	}
+
 }
 
 void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
@@ -87,7 +93,7 @@ void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 	);
 }
 
-FStatInfo UCPlayerAttributeManagerComp::GetStatInfo(EPlayerStat StatType) const
+FStatInfo UCPlayerAttributeManagerComp::GetStatInfoOf(EPlayerStat StatType) const
 {
 	if (ensure(StatType != EPlayerStat::NONE))
 	{
@@ -95,6 +101,14 @@ FStatInfo UCPlayerAttributeManagerComp::GetStatInfo(EPlayerStat StatType) const
 		return { StatType, CurrStat.Level, CurrStat.LevelupCost, CheckIsMaxFor(GetStatName(StatType)) };
 	}
 	return FStatInfo();
+}
+
+FStruct_StatDisplays UCPlayerAttributeManagerComp::GetAllStats() const
+{
+	auto Health = GetCurrentProgressionOf(GetStatName(EPlayerStat::HEALTH));
+	auto Mana = GetCurrentProgressionOf(GetStatName(EPlayerStat::MANA));
+	auto Stamina = GetCurrentProgressionOf(GetStatName(EPlayerStat::STAMINA));
+	return {Health.Amount, Health.Amount , Mana.Amount, Mana.Amount , Stamina.Amount, Stamina.Amount};
 }
 
 int UCPlayerAttributeManagerComp::GetHealthLevel() const

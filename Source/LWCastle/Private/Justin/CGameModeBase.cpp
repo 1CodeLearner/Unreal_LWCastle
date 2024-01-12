@@ -30,32 +30,7 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 	return ItemBaseClasses;
 }
 
-UDataTable* ACGameModeBase::GetCurrentLevelsTable()
-{
-	return DT_CurrentLevels;
-}
-
-UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
-{
-	switch(StatType)
-	{
-	case EPlayerStat::HEALTH: {
-		return DT_HealthProgression;
-		break;
-	}
-	case EPlayerStat::MANA: {
-		return DT_ManaProgression;
-		break;
-	}
-	case EPlayerStat::STAMINA: {
-		return DT_StaminaProgression;
-		break;
-	}
-	}
-	return nullptr;
-}
-
-TArray<FStruct_Progression> ACGameModeBase::GetProgressionOf(EPlayerStat StatType) const
+TArray<FStruct_Progression> ACGameModeBase::GetProgressions(EPlayerStat StatType) const
 {
 	TArray<FStruct_Progression*> ProgRows;
 	switch (StatType) 
@@ -89,6 +64,13 @@ TArray<FStruct_Progression> ACGameModeBase::GetProgressionOf(EPlayerStat StatTyp
 	return ProgressionArr;
 }
 
+FStruct_Progression ACGameModeBase::GetCurrentProgressionOf(EPlayerStat StatType, int Level)
+{
+	TArray<FStruct_Progression> temp = GetProgressions(StatType);
+	ensureAlways(Level <= temp.Num() && Level > 0);
+	return temp[Level - 1];
+}
+
 TArray<FStruct_Level> ACGameModeBase::GetCurrentLevels() const
 {
 	FString Context = "StringContext";
@@ -117,14 +99,6 @@ void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 		}
 	}
 }
-
-void ACGameModeBase::InitGameState()
-{
-	Super::InitGameState();
-
-
-}
-
 
 FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum)
 {

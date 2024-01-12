@@ -35,11 +35,17 @@ struct FStruct_StatDisplays
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Health; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxHealth; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Mana; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxMana; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Stamina; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MaxStamina;
 };
 

@@ -21,28 +21,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<UCItemBase>> GetItems();
 
+	UFUNCTION()
+	TArray<FStruct_Progression> GetProgressions(EPlayerStat StatType) const;
+	UFUNCTION()
+	FStruct_Progression GetCurrentProgressionOf(EPlayerStat StatType, int Level);
+	UFUNCTION()
+	TArray<FStruct_Level> GetCurrentLevels() const;
+
+protected:
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Item")
+	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	TMap<FName, TSubclassOf<UCItemBase>> ItemBaseMap;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	UDataTable* DT_CurrentLevels;
+
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_HealthProgression;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_ManaProgression;
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_StaminaProgression;
-
-	UFUNCTION()
-	TArray<FStruct_Progression> GetProgressionOf(EPlayerStat StatType) const;
-	UFUNCTION()
-	TArray<FStruct_Level> GetCurrentLevels() const;
-
-protected:
-	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-	virtual void InitGameState() override;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Item")
-	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;
-	UPROPERTY(VisibleAnywhere, Category = "Item")
-	TMap<FName, TSubclassOf<UCItemBase>> ItemBaseMap;
 
 private:
 	FName GetStatName(EPlayerStat PlayerStatEnum);

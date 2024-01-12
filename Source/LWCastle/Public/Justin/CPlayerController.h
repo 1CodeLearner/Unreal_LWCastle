@@ -17,6 +17,8 @@ class LWCASTLE_API ACPlayerController : public APlayerController
 	
 public:
 	ACPlayerController();
+
+	virtual void PostInitializeComponents() override;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Manager")
 	TObjectPtr<UCPlayerAttributeManagerComp> StatManagerComp;
