@@ -10,8 +10,11 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running StartAction %s"), *this->GetName());
 
-	auto Gameplay = GetOwnerComponent();
-	Gameplay->ActiveGameplayTags.AppendTags(GrantedTags);
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
+	{
+		Gameplay->ActiveGameplayTags.AppendTags(GrantedTags);
+	}
 	bIsRunning = true;
 }
 
@@ -19,8 +22,11 @@ void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running StopAction %s"), *this->GetName());
 
-	auto Gameplay = GetOwnerComponent();
-	Gameplay->ActiveGameplayTags.RemoveTags(GrantedTags);
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
+	{
+		Gameplay->ActiveGameplayTags.RemoveTags(GrantedTags);
+	}
 	bIsRunning = false;
 }
 
@@ -34,7 +40,7 @@ bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
 	if (IsRunning())
 		return false;
 
-	auto GameplayComp = GetOwnerComponent();
+	auto GameplayComp = GetGameplayComponent();
 	if (GameplayComp && GameplayComp->ActiveGameplayTags.HasAny(BlockedTags))
 	{
 		return false;
@@ -55,6 +61,14 @@ bool UCAction::CanStop_Implementation(AActor* InstigatorActor, FGameplayTagConta
 	return false;
 }
 
+void UCAction::Initialize(UCGameplayComponent* GameplayComp)
+{
+	if (GameplayComp)
+	{
+		this->GameplayCompRef = GameplayComp;
+	}
+}
+
 bool UCAction::IsRunning() const
 {
 	return bIsRunning;
@@ -62,10 +76,10 @@ bool UCAction::IsRunning() const
 
 UWorld* UCAction::GetWorld() const
 {
-	UCGameplayComponent* GameplayComp = Cast<UCGameplayComponent>(GetOuter());
-	if (GameplayComp)
+	AActor* Actor = Cast<AActor>(GetOuter());
+	if (Actor)
 	{
-		return GameplayComp->GetWorld();
+		return Actor->GetWorld();
 	}
 	return nullptr;
 }
@@ -75,8 +89,8 @@ FName UCAction::GetActionName() const
 	return ActionName;
 }
 
-UCGameplayComponent* UCAction::GetOwnerComponent() const
+UCGameplayComponent* UCAction::GetGameplayComponent() const
 {
-	return Cast<UCGameplayComponent>(GetOuter());
+	return GameplayCompRef;
 }
 

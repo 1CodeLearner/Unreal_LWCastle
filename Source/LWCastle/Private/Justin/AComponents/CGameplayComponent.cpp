@@ -3,14 +3,16 @@
 
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Justin/Actions/CAction.h"
+#include "Justin/Actions/CAction_MagicAttack.h"
 
 void UCGameplayComponent::AddAction(TSubclassOf<UCAction> NewActionClass)
 {
 	if (NewActionClass)
 	{
-		UCAction* NewAction = NewObject<UCAction>(this, NewActionClass);
+		UCAction* NewAction = NewObject<UCAction>(GetOwner(), NewActionClass);
 		if (NewAction)
 		{
+			NewAction->Initialize(this);
 			Actions.Add(NewAction);
 		}
 	}
@@ -56,11 +58,7 @@ void UCGameplayComponent::BeginPlay()
 	Super::BeginPlay();
 	for (auto ActionClass : ActionClasses)
 	{
-		UCAction* NewAction = NewObject<UCAction>(this, ActionClass);
-		if (NewAction)
-		{
-			Actions.Add(NewAction);
-		}
+		AddAction(ActionClass);
 	}
 }
 

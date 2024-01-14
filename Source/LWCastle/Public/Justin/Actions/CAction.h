@@ -17,13 +17,15 @@ class LWCASTLE_API UCAction : public UObject
 
 public:
 
+	UFUNCTION()
+	void Initialize( UCGameplayComponent* GameplayComp);
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	bool CanStart(AActor* InstigatorActor) const;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StartAction(AActor* InstigatorActor);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StopAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
@@ -35,7 +37,7 @@ public:
 	FName GetActionName() const;
 
 	UFUNCTION(BlueprintCallable)
-	UCGameplayComponent* GetOwnerComponent() const;
+	UCGameplayComponent* GetGameplayComponent() const;
 
 protected:
 	virtual UWorld* GetWorld() const override;
@@ -59,5 +61,8 @@ protected:
 
 
 private:
+	UPROPERTY()
 	bool bIsRunning;
+	UPROPERTY()
+	UCGameplayComponent* GameplayCompRef;
 };

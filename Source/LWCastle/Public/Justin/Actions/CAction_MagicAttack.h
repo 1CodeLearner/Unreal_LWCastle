@@ -7,11 +7,28 @@
 #include "CAction_MagicAttack.generated.h"
 
 /**
- * 
+ *
  */
-UCLASS()
+UCLASS(Abstract)
 class LWCASTLE_API UCAction_MagicAttack : public UCAction
 {
 	GENERATED_BODY()
-	
+public:
+
+	void StartAction_Implementation(AActor* InstigatorActor) override;
+	void StopAction_Implementation(AActor* InstigatorActor) override;
+
+	UFUNCTION()
+	void ExecuteMagic(AActor* InstigatorActor);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	bool bIsLooping;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	float FireRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	float FireDelay;
+private:
+	FTimerHandle ExecuteMagicHandle;
+	FTimerDelegate ExecuteMagicDelegate;
 };
