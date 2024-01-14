@@ -7,6 +7,7 @@
 #include "Test.generated.h"
 
 
+class UCGameplayComponent;
 class UCPlayerAttributeComp;
 
 UCLASS()
@@ -24,6 +25,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCGameplayComponent> GameplayComp;
 
 public:
 	// Called every frame

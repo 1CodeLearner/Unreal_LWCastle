@@ -1,0 +1,63 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "CAction.generated.h"
+
+class UCGameplayComponent;
+/**
+ *
+ */
+UCLASS(Blueprintable)
+class LWCASTLE_API UCAction : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	bool CanStart(AActor* InstigatorActor) const;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	void StartAction(AActor* InstigatorActor);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	void StopAction(AActor* InstigatorActor);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	bool CanStop(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsRunning() const;
+	UFUNCTION(BlueprintCallable)
+	FName GetActionName() const;
+
+	UFUNCTION(BlueprintCallable)
+	UCGameplayComponent* GetOwnerComponent() const;
+
+protected:
+	virtual UWorld* GetWorld() const override;
+
+public:
+	UCAction();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	FGameplayTagContainer GrantedTags;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	FGameplayTagContainer BlockedTags;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	FGameplayTagContainer InterruptedTags;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	FName ActionName;
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bCanInterrupt;
+
+
+
+private:
+	bool bIsRunning;
+};
