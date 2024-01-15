@@ -26,7 +26,8 @@ void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
 
 bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
 {
-	return GetActiveMagic()->CanStart(InstigatorActor);
+	bool CanStartAction = GetActiveMagic()->CanStart(InstigatorActor);
+	return CanStartAction;
 }
 
 bool UCAction_AttackManager::IsRunning() const

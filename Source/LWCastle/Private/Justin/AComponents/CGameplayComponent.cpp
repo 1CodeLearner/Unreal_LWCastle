@@ -66,7 +66,7 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 		FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
 
 	//Draw All Actions
 	/*for (auto* Action : Actions)

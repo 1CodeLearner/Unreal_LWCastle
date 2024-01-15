@@ -9,39 +9,58 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
 
-	ensure(!GetWorld()->GetTimerManager().IsTimerActive(CooldownMagicHandle) && bIsMagicCooldown == false);
-
-	ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
-	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
-
-	if (!bIsLoopingMagic)
+	if (bIsLoopingMagic)
 	{
-		GetWorld()->GetTimerManager().PauseTimer(ExecuteMagicHandle);
+		ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
+		GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
 	}
+	else
+	{
+		if (bIsMagicCooldown)
+		{
+			return;
+		}
+
+
+		ensure(!GetWorld()->GetTimerManager().IsTimerActive(CooldownMagicHandle));
+
+		ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
+		GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
+
+		GetWorld()->GetTimerManager().PauseTimer(ExecuteMagicHandle);
+
+	}
+
 }
 
 void UCAction_MagicAttack::StopAction_Implementation(AActor* InstigatorActor)
 {
-	if (!bIsLoopingMagic)
-	{
-		if (bIsMagicCooldown)
-		{
-			bIsMagicCooldown = false;
-			Super::StopAction_Implementation(InstigatorActor);
-		}
-		else {
-			GetWorld()->GetTimerManager().UnPauseTimer(ExecuteMagicHandle);
-			bIsMagicCooldown = true;
-			CooldownMagicDelegate.BindUFunction(this, "StopAction", InstigatorActor);
-			GetWorld()->GetTimerManager().SetTimer(CooldownMagicHandle, CooldownMagicDelegate, 0.f, false, FireRate);
-		}
-	}
-	else
+	if (bIsLoopingMagic)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
 		Super::StopAction_Implementation(InstigatorActor);
+
+	}
+	else
+	{
+		if (bIsMagicCooldown)
+		{
+			return;
+		}
+
+		if (ExecuteMagicHandle.IsValid()) {
+			GetWorld()->GetTimerManager().UnPauseTimer(ExecuteMagicHandle);
+			CooldownMagicDelegate.BindUFunction(this, "StopCooldown", InstigatorActor);
+			GetWorld()->GetTimerManager().SetTimer(CooldownMagicHandle, CooldownMagicDelegate, 0.5f, false, FireRate);
+			bIsMagicCooldown = true;
+		}
+		else
+		{
+			Super::StopAction_Implementation(InstigatorActor);
+		}
 	}
 }
+
 
 void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
 {
@@ -53,10 +72,21 @@ void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
 	FHitResult Hit;
 	FColor DebugColorLocal;
 	bool Success = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
-	Success ? DebugColorLocal = FColor::Red  : DebugColorLocal = FColor::Blue;
+	Success ? DebugColorLocal = FColor::Red : DebugColorLocal = FColor::Blue;
 	if (Success)
 	{
-		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, false, 3.0f);
+		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, false, 3.0f);
 	}
 	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
+
+	if (!bIsLoopingMagic)
+		GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
+}
+
+void UCAction_MagicAttack::StopCooldown(AActor* InstigatorActor)
+{
+	bIsMagicCooldown = false;
+	GetWorld()->GetTimerManager().ClearTimer(CooldownMagicHandle);
+	GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
+	StopAction(InstigatorActor);
 }

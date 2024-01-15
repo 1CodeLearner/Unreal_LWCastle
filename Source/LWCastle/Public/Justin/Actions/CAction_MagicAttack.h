@@ -18,9 +18,6 @@ public:
 	void StartAction_Implementation(AActor* InstigatorActor) override;
 	void StopAction_Implementation(AActor* InstigatorActor) override;
 
-	UFUNCTION()
-	void ExecuteMagic(AActor* InstigatorActor);
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	FColor DebugMagicColor;
@@ -33,6 +30,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float FireDelay;
 private:
+
+	
+	UFUNCTION()
+	void ExecuteMagic(AActor* InstigatorActor);
+
+	UFUNCTION()
+	void StopCooldown(AActor* InstigatorActor);
+
 	FTimerHandle ExecuteMagicHandle;
 	FTimerDelegate ExecuteMagicDelegate;
 
