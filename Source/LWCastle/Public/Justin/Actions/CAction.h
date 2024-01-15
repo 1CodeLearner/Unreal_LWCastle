@@ -26,13 +26,17 @@ public:
 	void StartAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
+	void InterruptAction(AActor* InstigatorActor);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StopAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanStop(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const;
+	bool CanInterrupt(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsRunning() const;
+
 	UFUNCTION(BlueprintCallable)
 	FName GetActionName() const;
 

@@ -7,7 +7,7 @@
 UCCombatComponent::UCCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	
+
 }
 
 void UCCombatComponent::BeginPlay()
@@ -22,12 +22,25 @@ void UCCombatComponent::BeginPlay()
 			OwningDefaultMagic.Add(NewMagic);
 		}
 	}
-	if(OwningDefaultMagic.Num() > 0)
+
+
+	for (auto ChargedMagicClass : OwningChargedMagicClasses)
+	{
+		auto NewChargeMagic = NewObject<UCAction_MagicAttack>(GetOwner(), ChargedMagicClass);
+		if (NewChargeMagic)
+		{
+			OwningChargedMagic.Add(NewChargeMagic);
+		}
+	}
+
+	if (OwningDefaultMagic.Num() > 0)
 		ActiveDefaultMagic = OwningDefaultMagic.HeapTop();
+	if (OwningChargedMagic.Num() > 0)
+		ActiveChargedMagic = OwningChargedMagic.HeapTop();
 }
 
 
 FMagicAttackGroup UCCombatComponent::GetActiveMagic() const
 {
-	return { ActiveDefaultMagic, ActiveDefaultMagic };
+	return { ActiveDefaultMagic, ActiveChargedMagic };
 }

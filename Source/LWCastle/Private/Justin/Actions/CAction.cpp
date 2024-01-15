@@ -18,6 +18,11 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 	bIsRunning = true;
 }
 
+void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
+{
+	StopAction(InstigatorActor);
+}
+
 void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running StopAction %s"), *this->GetName());
@@ -28,6 +33,19 @@ void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 		Gameplay->ActiveGameplayTags.RemoveTags(GrantedTags);
 	}
 	bIsRunning = false;
+}
+
+bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
+{
+	if (bCanInterrupt)
+	{
+		if (InterruptedTags.HasAny(OtherGrantedTag))
+		{
+			return true;
+		}
+		return false;
+	}
+	return false;
 }
 
 UCAction::UCAction()
@@ -46,19 +64,6 @@ bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
 		return false;
 	}
 	return true;
-}
-
-bool UCAction::CanStop_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
-{
-	if (bCanInterrupt)
-	{
-		if (InterruptedTags.HasAny(OtherGrantedTag))
-		{
-			return true;
-		}
-		return false;
-	}
-	return false;
 }
 
 void UCAction::Initialize(UCGameplayComponent* GameplayComp)

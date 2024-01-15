@@ -25,6 +25,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	FColor DebugMagicColor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	float DebugLineThickness;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	bool bIsLoopingMagic;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float FireRate;
@@ -33,4 +35,7 @@ protected:
 private:
 	FTimerHandle ExecuteMagicHandle;
 	FTimerDelegate ExecuteMagicDelegate;
+	FTimerHandle CooldownMagicHandle;
+	FTimerDelegate CooldownMagicDelegate;
+	bool bIsMagicCooldown = false;
 };

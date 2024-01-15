@@ -15,7 +15,9 @@ struct FMagicAttackGroup
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCAction_MagicAttack> ActiveDefaultMagic;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCAction_MagicAttack> ActiveChargeMagic;
 };
 
@@ -43,18 +45,18 @@ protected:
 	TObjectPtr<UCAction_MagicAttack> ActiveChargedMagic;
 	//
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TArray<UCAction_MagicAttack*> OwningDefaultMagic;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TArray<UCAction_MagicAttack*> OwningChargedMagic;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 	TArray<TSubclassOf<UCAction>> OwningDefaultMagicClasses;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 	TArray<TSubclassOf<UCAction>> OwningChargedMagicClasses;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TArray<UCAction_MagicAttack*> OwningDefaultMagic;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TArray<UCAction_MagicAttack*> OwningChargedMagic;
-
 protected:
 	virtual void BeginPlay() override;
-
+private:
 
 };

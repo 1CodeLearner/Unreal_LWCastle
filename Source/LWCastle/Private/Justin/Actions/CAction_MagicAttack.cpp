@@ -9,6 +9,9 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
 
+	ensure(!GetWorld()->GetTimerManager().IsTimerActive(CooldownMagicHandle) && bIsMagicCooldown == false);
+	GetWorld()->GetTimerManager().ClearTimer(CooldownMagicHandle);
+
 	ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
 	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
 
@@ -16,20 +19,29 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 	{
 		GetWorld()->GetTimerManager().PauseTimer(ExecuteMagicHandle);
 	}
-
 }
 
 void UCAction_MagicAttack::StopAction_Implementation(AActor* InstigatorActor)
 {
 	if (!bIsLoopingMagic)
 	{
-		GetWorld()->GetTimerManager().UnPauseTimer(ExecuteMagicHandle);
+		if (bIsMagicCooldown)
+		{
+			bIsMagicCooldown = false;
+			Super::StopAction_Implementation(InstigatorActor);
+		}
+		else {
+			GetWorld()->GetTimerManager().UnPauseTimer(ExecuteMagicHandle);
+			bIsMagicCooldown = true;
+			CooldownMagicDelegate.BindUFunction(this, "StopAction", InstigatorActor);
+			GetWorld()->GetTimerManager().SetTimer(CooldownMagicHandle, CooldownMagicDelegate, 0.f, false, FireRate);
+		}
 	}
 	else
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
+		Super::StopAction_Implementation(InstigatorActor);
 	}
-	Super::StopAction_Implementation(InstigatorActor);
 }
 
 void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
@@ -45,7 +57,7 @@ void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
 	Success ? DebugColorLocal = FColor::Red  : DebugColorLocal = FColor::Blue;
 	if (Success)
 	{
-		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, true, 3.0f);
+		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, false, 3.0f);
 	}
-	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, true, 3.f);
+	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 3.f, DebugLineThickness);
 }
