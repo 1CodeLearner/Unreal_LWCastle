@@ -74,6 +74,7 @@ void UCAction_AttackManager::OnWeaponSwitched(AActor* InstigatorActor, FMagicAtt
 
 		//ensureAlwaysMsgf(GetActiveMagic() == ActiveMagic.ActiveDefaultMagic, TEXT("Cannot Switch weapon During Charged Magic State!!!"));
 
+
 		if (IsSameMagic(ActiveMagicGroup))
 			return;
 

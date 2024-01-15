@@ -31,6 +31,8 @@ protected:
 	float FireDelay;
 private:
 
+	UFUNCTION()
+	void SetupExecuteMagic(AActor* InstigatorActor);
 	
 	UFUNCTION()
 	void ExecuteMagic(AActor* InstigatorActor);

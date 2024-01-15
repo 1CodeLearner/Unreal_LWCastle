@@ -29,9 +29,10 @@ float UCAttributeComponent::GetMaxHealth() const
 void UCAttributeComponent::ApplyDamage(const int Damage)
 {
 	CurrentHealth -= Damage;
-	if(!IsAlive())
+	OnTakenDamage.Broadcast(CurrentHealth, Damage);
+	if(IsAlive())
 	{
-		OnTakenDamage.Broadcast(CurrentHealth, Damage);
+		UE_LOG(LogTemp, Warning, TEXT("Taken this mouch Damgae %d"), Damage);
 	}
 }
 
