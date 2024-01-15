@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Actions/CAction.h"
+#include "Justin/AComponents/CCombatComponent.h"
 #include "CAction_AttackManager.generated.h"
 
 class UCAction_MagicAttack;
@@ -21,7 +22,10 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "MagicManager")
-	TObjectPtr<UCAction_MagicAttack> ActiveMagicAttack;
+	TObjectPtr<UCAction_MagicAttack> ActiveDefaultAttack;
+	
+	UPROPERTY(VisibleAnywhere, Category = "MagicManager")
+	TObjectPtr<UCAction_MagicAttack> ActiveChargeAttack;
 
 	UFUNCTION()
 	void OnWeaponSwitched(AActor* InstigatorActor, UCAction_MagicAttack* SwitchedMagicAttack);

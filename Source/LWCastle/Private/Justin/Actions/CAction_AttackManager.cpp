@@ -9,7 +9,7 @@
 void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
-	if(!ActiveMagicAttack)
+	if(!ActiveDefaultAttack)
 	{
 		AActor* OwningActor = Cast<AActor>(GetOuter());
 		if(OwningActor)
@@ -17,34 +17,34 @@ void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 			auto CombatComp = OwningActor->GetComponentByClass<UCCombatComponent>();
 			if(CombatComp)
 			{
-				ActiveMagicAttack = CombatComp->GetActiveMagic();
-				ensure(ActiveMagicAttack->GetGameplayComponent() == nullptr);
+				ActiveDefaultAttack = CombatComp->GetActiveMagic();
+				ensure(ActiveDefaultAttack->GetGameplayComponent() == nullptr);
 				CombatComp->OnActiveMagicSwitched.AddDynamic(this, &UCAction_AttackManager::OnWeaponSwitched);
 			}
 		}
 	}
-	ActiveMagicAttack->StartAction(InstigatorActor);
+	ActiveDefaultAttack->StartAction(InstigatorActor);
 }
 
 void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StopAction_Implementation(InstigatorActor);
-	ActiveMagicAttack->StopAction(InstigatorActor);
+	ActiveDefaultAttack->StopAction(InstigatorActor);
 }
 
 void UCAction_AttackManager::OnWeaponSwitched(AActor* InstigatorActor, UCAction_MagicAttack* SwitchedMagicAttack)
 {
 	ensure(SwitchedMagicAttack->GetOuter() == GetOuter() && SwitchedMagicAttack->GetGameplayComponent() == nullptr);
 
-	if (ActiveMagicAttack == SwitchedMagicAttack)
+	if (ActiveDefaultAttack == SwitchedMagicAttack)
 		return;
 
-	if (ActiveMagicAttack->IsRunning())
+	if (ActiveDefaultAttack->IsRunning())
 	{
-		ActiveMagicAttack->StopAction(InstigatorActor);
-		ActiveMagicAttack = SwitchedMagicAttack;
-		ActiveMagicAttack->StartAction(InstigatorActor);
+		ActiveDefaultAttack->StopAction(InstigatorActor);
+		ActiveDefaultAttack = SwitchedMagicAttack;
+		ActiveDefaultAttack->StartAction(InstigatorActor);
 	}
 
-	ActiveMagicAttack = SwitchedMagicAttack;
+	ActiveDefaultAttack = SwitchedMagicAttack;
 }

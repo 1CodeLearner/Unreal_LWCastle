@@ -14,20 +14,20 @@ void UCCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (auto MagicClass : OwningMagicClasses)
+	for (auto DefaultMagicClass : OwningDefaultMagicClasses)
 	{
-		auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), MagicClass);
+		auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), DefaultMagicClass);
 		if (NewMagic)
 		{
-			OwningMagic.Add(NewMagic);
+			OwningDefaultMagic.Add(NewMagic);
 		}
 	}
-	if(OwningMagic.Num() > 0)
-		ActiveMagic = OwningMagic.HeapTop();
+	if(OwningDefaultMagic.Num() > 0)
+		ActiveDefaultMagic = OwningDefaultMagic.HeapTop();
 }
 
 
-UCAction_MagicAttack* UCCombatComponent::GetActiveMagic() const
+FMagicAttackGroup UCCombatComponent::GetActiveMagic() const
 {
-	return ActiveMagic;
+	return { ActiveDefaultMagic, ActiveDefaultMagic };
 }

@@ -10,9 +10,9 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 	Super::StartAction_Implementation(InstigatorActor);
 
 	ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
-	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLooping, FireDelay);
+	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
 
-	if (!bIsLooping)
+	if (!bIsLoopingMagic)
 	{
 		GetWorld()->GetTimerManager().PauseTimer(ExecuteMagicHandle);
 	}
@@ -21,7 +21,7 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 
 void UCAction_MagicAttack::StopAction_Implementation(AActor* InstigatorActor)
 {
-	if (!bIsLooping)
+	if (!bIsLoopingMagic)
 	{
 		GetWorld()->GetTimerManager().UnPauseTimer(ExecuteMagicHandle);
 	}
@@ -40,12 +40,12 @@ void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(InstigatorActor);
 	FHitResult Hit;
-	FColor DebugColor;
+	FColor DebugColorLocal;
 	bool Success = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
-	Success ? DebugColor = FColor::Red  : DebugColor = FColor::Blue;
+	Success ? DebugColorLocal = FColor::Red  : DebugColorLocal = FColor::Blue;
 	if (Success)
 	{
-		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColor, true, 3.0f);
+		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, true, 3.0f);
 	}
-	DrawDebugLine(GetWorld(), Start, End, DebugColor, true, 3.f);
+	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, true, 3.f);
 }

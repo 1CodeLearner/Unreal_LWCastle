@@ -10,7 +10,16 @@
 class UCAction;
 class UCAction_MagicAttack;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActiveMagicSwitchedDelegate, AActor*, InstigatorActor, UCAction_MagicAttack*, SwitchedMagicAttack);
+USTRUCT(BlueprintType)
+struct FMagicAttackGroup
+{
+	GENERATED_BODY()
+
+	TObjectPtr<UCAction_MagicAttack> ActiveDefaultMagic;
+	TObjectPtr<UCAction_MagicAttack> ActiveChargeMagic;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActiveMagicSwitchedDelegate, AActor*, InstigatorActor, FMagicAttackGroup, ActiveMagicGroup);
 
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCCombatComponent : public UActorComponent
@@ -19,21 +28,30 @@ class LWCASTLE_API UCCombatComponent : public UActorComponent
 
 public:
 	UCCombatComponent();
-	UPROPERTY(BlueprintCallable)
+	UPROPERTY(BlueprintCallable, Category = "Combat")
 	FActiveMagicSwitchedDelegate OnActiveMagicSwitched;
 
 	UFUNCTION(BlueprintCallable)
-	UCAction_MagicAttack* GetActiveMagic() const;
+	FMagicAttackGroup GetActiveMagic() const;
 
 protected:
+
+	//Magic attack that is Active
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-	TObjectPtr<UCAction_MagicAttack> ActiveMagic;
+	TObjectPtr<UCAction_MagicAttack> ActiveDefaultMagic;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<UCAction_MagicAttack> ActiveChargedMagic;
+	//
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
-	TArray<TSubclassOf<UCAction>> OwningMagicClasses;
+	TArray<TSubclassOf<UCAction>> OwningDefaultMagicClasses;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
+	TArray<TSubclassOf<UCAction>> OwningChargedMagicClasses;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TArray<UCAction_MagicAttack*> OwningMagic;
+	TArray<UCAction_MagicAttack*> OwningDefaultMagic;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TArray<UCAction_MagicAttack*> OwningChargedMagic;
 
 protected:
 	virtual void BeginPlay() override;

@@ -23,7 +23,9 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
-	bool bIsLooping;
+	FColor DebugMagicColor;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	bool bIsLoopingMagic;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float FireRate;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
