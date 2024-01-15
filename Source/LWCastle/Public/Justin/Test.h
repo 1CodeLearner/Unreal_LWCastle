@@ -9,6 +9,7 @@
 
 class UCGameplayComponent;
 class UCPlayerAttributeComp;
+class UCCombatComponent;
 
 UCLASS()
 class LWCASTLE_API ATest : public ACharacter
@@ -23,11 +24,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
 	TObjectPtr<UCGameplayComponent> GameplayComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCCombatComponent> CombatComp;
 
 public:
 	// Called every frame

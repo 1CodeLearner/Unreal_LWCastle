@@ -10,37 +10,37 @@ UCCombatComponent::UCCombatComponent()
 
 }
 
-void UCCombatComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	for (auto DefaultMagicClass : OwningDefaultMagicClasses)
-	{
-		auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), DefaultMagicClass);
-		if (NewMagic)
-		{
-			OwningDefaultMagic.Add(NewMagic);
-		}
-	}
-
-
-	for (auto ChargedMagicClass : OwningChargedMagicClasses)
-	{
-		auto NewChargeMagic = NewObject<UCAction_MagicAttack>(GetOwner(), ChargedMagicClass);
-		if (NewChargeMagic)
-		{
-			OwningChargedMagic.Add(NewChargeMagic);
-		}
-	}
-
-	if (OwningDefaultMagic.Num() > 0)
-		ActiveDefaultMagic = OwningDefaultMagic.HeapTop();
-	if (OwningChargedMagic.Num() > 0)
-		ActiveChargedMagic = OwningChargedMagic.HeapTop();
-}
-
-
 FMagicAttackGroup UCCombatComponent::GetActiveMagic() const
 {
 	return { ActiveDefaultMagic, ActiveChargedMagic };
+}
+
+void UCCombatComponent::Initialize()
+{
+	if (ensureMsgf(OwningDefaultMagic.Num() == 0 && OwningChargedMagic.Num() == 0, TEXT("Can only Initialize once")))
+	{
+		for (auto DefaultMagicClass : OwningDefaultMagicClasses)
+		{
+			auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), DefaultMagicClass);
+			if (NewMagic)
+			{
+				OwningDefaultMagic.Add(NewMagic);
+			}
+		}
+
+
+		for (auto ChargedMagicClass : OwningChargedMagicClasses)
+		{
+			auto NewChargeMagic = NewObject<UCAction_MagicAttack>(GetOwner(), ChargedMagicClass);
+			if (NewChargeMagic)
+			{
+				OwningChargedMagic.Add(NewChargeMagic);
+			}
+		}
+
+		if (OwningDefaultMagic.Num() > 0)
+			ActiveDefaultMagic = OwningDefaultMagic.HeapTop();
+		if (OwningChargedMagic.Num() > 0)
+			ActiveChargedMagic = OwningChargedMagic.HeapTop();
+	}
 }

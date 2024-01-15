@@ -18,7 +18,7 @@ class LWCASTLE_API UCAction : public UObject
 public:
 
 	UFUNCTION()
-	void Initialize( UCGameplayComponent* GameplayComp);
+	virtual void Initialize( UCGameplayComponent* GameplayComp);
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	bool CanStart(AActor* InstigatorActor) const;
 
@@ -35,7 +35,7 @@ public:
 	bool CanInterrupt(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool IsRunning() const;
+	virtual bool IsRunning() const;
 
 	UFUNCTION(BlueprintCallable)
 	FName GetActionName() const;

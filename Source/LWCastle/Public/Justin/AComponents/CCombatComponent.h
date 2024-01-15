@@ -23,6 +23,9 @@ struct FMagicAttackGroup
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActiveMagicSwitchedDelegate, AActor*, InstigatorActor, FMagicAttackGroup, ActiveMagicGroup);
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChargeStateActivatedDelegate, bool, bIsCharged);
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCCombatComponent : public UActorComponent
 {
@@ -30,11 +33,18 @@ class LWCASTLE_API UCCombatComponent : public UActorComponent
 
 public:
 	UCCombatComponent();
+	
 	UPROPERTY(BlueprintCallable, Category = "Combat")
 	FActiveMagicSwitchedDelegate OnActiveMagicSwitched;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat")
+	FChargeStateActivatedDelegate OnChargeStateActivated;
 
 	UFUNCTION(BlueprintCallable)
 	FMagicAttackGroup GetActiveMagic() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void Initialize();
 
 protected:
 
@@ -54,9 +64,4 @@ protected:
 	TArray<TSubclassOf<UCAction>> OwningDefaultMagicClasses;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
 	TArray<TSubclassOf<UCAction>> OwningChargedMagicClasses;
-
-protected:
-	virtual void BeginPlay() override;
-private:
-
 };

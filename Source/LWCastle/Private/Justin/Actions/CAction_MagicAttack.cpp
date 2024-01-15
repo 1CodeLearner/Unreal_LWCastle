@@ -10,7 +10,6 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 	Super::StartAction_Implementation(InstigatorActor);
 
 	ensure(!GetWorld()->GetTimerManager().IsTimerActive(CooldownMagicHandle) && bIsMagicCooldown == false);
-	GetWorld()->GetTimerManager().ClearTimer(CooldownMagicHandle);
 
 	ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
 	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, FireRate, bIsLoopingMagic, FireDelay);
@@ -59,5 +58,5 @@ void UCAction_MagicAttack::ExecuteMagic(AActor* InstigatorActor)
 	{
 		 DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, DebugColorLocal, false, 3.0f);
 	}
-	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 3.f, DebugLineThickness);
+	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
 }

@@ -19,20 +19,24 @@ public:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	UFUNCTION()
 	virtual void StopAction_Implementation(AActor* InstigatorActor) override;
-	bool CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const override;
+	virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
+
+	virtual void Initialize(UCGameplayComponent* GameplayComp) override;
+	virtual bool IsRunning() const override;
 
 protected:
-	//UPROPERTY(VisibleAnywhere, Category = "MagicManager")
-	//TObjectPtr<UCAction_MagicAttack> ActiveDefaultAttack;
 	
 	UPROPERTY(VisibleAnywhere, Category = "MagicManager")
 	FMagicAttackGroup ActiveMagic;
 	/*FOR TESTING - REMOVE THIS THING AFTER TESTING SWITCHING BETWEEN CHARGING AND DEFAULT ATTACKS*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "MagicManager")
-	bool bIsDefaultMagic;
+	bool bIsCharged;
 
 	UFUNCTION()
 	void OnWeaponSwitched(AActor* InstigatorActor, FMagicAttackGroup ActiveMagicGroup);
+
+	UFUNCTION()
+	void OnChargeStateActivated(bool _bIsCharged);
 
 private:
 	UCAction_MagicAttack* GetActiveMagic() const;

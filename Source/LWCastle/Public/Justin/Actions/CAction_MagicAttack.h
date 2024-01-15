@@ -35,7 +35,9 @@ protected:
 private:
 	FTimerHandle ExecuteMagicHandle;
 	FTimerDelegate ExecuteMagicDelegate;
+
 	FTimerHandle CooldownMagicHandle;
 	FTimerDelegate CooldownMagicDelegate;
+
 	bool bIsMagicCooldown = false;
 };

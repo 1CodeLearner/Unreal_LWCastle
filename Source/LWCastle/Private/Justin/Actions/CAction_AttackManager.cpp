@@ -9,10 +9,38 @@
 void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
-	UCAction_MagicAttack* DefaultMagic = ActiveMagic.ActiveDefaultMagic;
-	UCAction_MagicAttack* ChargeMagic = ActiveMagic.ActiveDefaultMagic;
+	GetActiveMagic()->StartAction(InstigatorActor);
+	//if (GetActiveMagic() != nullptr && GetActiveMagic()->CanStart(InstigatorActor))
+	//{
+	//}
+}
 
-	if (!DefaultMagic && !ChargeMagic)
+void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
+{
+	Super::StopAction_Implementation(InstigatorActor);
+	GetActiveMagic()->StopAction(InstigatorActor);
+	//if (GetActiveMagic()->IsRunning()) {
+	//}
+}
+
+
+bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
+{
+	return GetActiveMagic()->CanStart(InstigatorActor);
+}
+
+bool UCAction_AttackManager::IsRunning() const
+{
+	return GetActiveMagic()->IsRunning();
+}
+
+
+void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
+{
+	Super::Initialize(GameplayComp);
+
+	//Initialize MagicAttacks for player
+	if (!ActiveMagic.ActiveDefaultMagic && !ActiveMagic.ActiveDefaultMagic)
 	{
 		AActor* OwningActor = Cast<AActor>(GetOuter());
 		if (OwningActor)
@@ -29,27 +57,10 @@ void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 						&& ActiveMagic.ActiveChargeMagic->GetGameplayComponent() == nullptr);
 
 					CombatComp->OnActiveMagicSwitched.AddDynamic(this, &UCAction_AttackManager::OnWeaponSwitched);
+					CombatComp->OnChargeStateActivated.AddDynamic(this, &UCAction_AttackManager::OnChargeStateActivated);
 				}
 			}
 		}
-	}
-
-	if (GetActiveMagic() != nullptr && GetActiveMagic()->CanStart(InstigatorActor))
-		GetActiveMagic()->StartAction(InstigatorActor);
-}
-
-void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
-{
-	Super::StopAction_Implementation(InstigatorActor);
-	GetActiveMagic()->StopAction(InstigatorActor);
-}
-
-bool UCAction_AttackManager::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
-{
-	return true;
-	if (bCanInterrupt) 
-	{
-		
 	}
 }
 
@@ -76,9 +87,14 @@ void UCAction_AttackManager::OnWeaponSwitched(AActor* InstigatorActor, FMagicAtt
 	}
 }
 
+void UCAction_AttackManager::OnChargeStateActivated(bool _bIsCharged)
+{
+	bIsCharged = _bIsCharged;
+}
+
 UCAction_MagicAttack* UCAction_AttackManager::GetActiveMagic() const
 {
-	if (bIsDefaultMagic)
+	if (ensure(ActiveMagic.ActiveDefaultMagic && ActiveMagic.ActiveChargeMagic) && !bIsCharged)
 	{
 		return ActiveMagic.ActiveDefaultMagic;
 	}
@@ -86,8 +102,8 @@ UCAction_MagicAttack* UCAction_AttackManager::GetActiveMagic() const
 	{
 		return ActiveMagic.ActiveChargeMagic;
 	}
-
 }
+
 void UCAction_AttackManager::SetActiveMagic(FMagicAttackGroup NewActiveMagic)
 {
 	ActiveMagic.ActiveDefaultMagic = NewActiveMagic.ActiveDefaultMagic;

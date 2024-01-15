@@ -5,6 +5,7 @@
 
 #include "Justin/AComponents/CPlayerAttributeComp.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Justin/AComponents/CCombatComponent.h"
 // Sets default values
 ATest::ATest()
 {
@@ -12,6 +13,13 @@ ATest::ATest()
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
 	GameplayComp = CreateDefaultSubobject<UCGameplayComponent>("GameplayComp");
+	CombatComp = CreateDefaultSubobject<UCCombatComponent>("CombatComp");
+}
+
+void ATest::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	CombatComp->Initialize();
 }
 
 // Called when the game starts or when spawned
