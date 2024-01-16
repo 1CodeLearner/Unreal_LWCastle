@@ -2,8 +2,8 @@
 
 
 #include "Justin/Enemy/CEnemyAnim.h"
-#include "Justin/Enemy/CEnemyCharacter.h"
-
+#include "Justin/Enemy/CBossPawn.h"
+#include "BehaviorTree/BlackboardComponent.h"
 void UCEnemyAnim::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -13,15 +13,16 @@ void UCEnemyAnim::NativeInitializeAnimation()
 void UCEnemyAnim::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-	BossCharacter = Cast<ACEnemyCharacter>(GetOwningActor());
+	BossPawn = Cast<ACBossPawn>(GetOwningActor());
+	BlackBoard = BossPawn->GetBlackBoard();
 }
 
 void UCEnemyAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (BossCharacter) 
+	if (BossPawn)
 	{
-		bIsBossStage = BossCharacter->bIsBossStage;
+		bIsBossStage = BlackBoard->GetValueAsBool("IsBossStage");
 	}
 }

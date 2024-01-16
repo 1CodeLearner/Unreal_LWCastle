@@ -6,8 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "CEnemyAnim.generated.h"
 
-class ACEnemyCharacter;
-
+class ACBossPawn;
+class UBlackboardComponent;
 /**
  *
  */
@@ -26,7 +26,10 @@ protected:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossAnimation")
-	TObjectPtr<ACEnemyCharacter> BossCharacter;
+	TObjectPtr<ACBossPawn> BossPawn;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossAnimation")
+	TObjectPtr<UBlackboardComponent> BlackBoard;
 
 
 

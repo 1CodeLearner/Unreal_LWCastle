@@ -17,6 +17,7 @@ class LWCASTLE_API ACEnemyCharacter : public ACharacter
 public:
 	void StartBoss();
 
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Boss")
 	bool bIsBossStage;
 
