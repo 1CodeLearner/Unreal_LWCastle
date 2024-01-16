@@ -30,6 +30,7 @@ public:
 
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Item")
 	TArray<TSubclassOf<UCItemBase>> ItemBaseClasses;

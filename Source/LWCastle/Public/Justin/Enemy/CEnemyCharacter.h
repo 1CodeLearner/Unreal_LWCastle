@@ -8,6 +8,7 @@
 
 class UCGameplayComponent;
 class UCEnemyAttributeComp;
+
 UCLASS()
 class LWCASTLE_API ACEnemyCharacter : public ACharacter
 {

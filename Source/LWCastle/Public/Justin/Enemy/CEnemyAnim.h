@@ -27,6 +27,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossAnimation")
 	TObjectPtr<ACEnemyCharacter> BossCharacter;
+
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BossAnimation")
 	bool bIsBossStage;
 };
