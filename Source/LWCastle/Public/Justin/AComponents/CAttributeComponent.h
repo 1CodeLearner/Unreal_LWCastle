@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetMaxHealth() const;
 	UFUNCTION(BlueprintCallable)
+	float GetBaseDamage() const;
+	UFUNCTION(BlueprintCallable)
 	void ApplyDamage(const int Damage);
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
@@ -42,5 +44,8 @@ protected:
 	float CurrentHealth;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attribute")
 	float MaxHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attribute")
+	float BaseDamage;
 
 };

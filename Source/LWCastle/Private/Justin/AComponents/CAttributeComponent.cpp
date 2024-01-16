@@ -45,3 +45,7 @@ int UCAttributeComponent::GetCurrency() const
 	return Currency;
 }
 
+float UCAttributeComponent::GetBaseDamage() const
+{
+	return BaseDamage;
+}

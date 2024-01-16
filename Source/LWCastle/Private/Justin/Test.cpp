@@ -26,7 +26,7 @@ void ATest::PostInitializeComponents()
 void ATest::BeginPlay()
 {
 	Super::BeginPlay();
-
+	FVector test = GetVelocity();
 }
 
 // Called every frame
