@@ -20,14 +20,17 @@ void UCGameplayComponent::AddAction(TSubclassOf<UCAction> NewActionClass)
 
 void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
-	for (auto Action : Actions)
+	if (ensure(!ActionName.IsNone() && InstigatorActor))
 	{
-		if (Action && Action->GetActionName() == ActionName)
+		for (auto Action : Actions)
 		{
-			if (Action->CanStart(InstigatorActor))
+			if (Action && Action->GetActionName() == ActionName)
 			{
-				Action->StartAction(InstigatorActor);
-				break;
+				if (Action->CanStart(InstigatorActor))
+				{
+					Action->StartAction(InstigatorActor);
+					break;
+				}
 			}
 		}
 	}
@@ -35,14 +38,17 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 
 void UCGameplayComponent::StopActionByName(AActor* InstigatorActor, FName ActionName)
 {
-	for (auto Action : Actions)
+	if (ensure(!ActionName.IsNone() && InstigatorActor))
 	{
-		if (Action && Action->GetActionName() == ActionName)
+		for (auto Action : Actions)
 		{
-			if(Action->IsRunning())
+			if (Action && Action->GetActionName() == ActionName)
 			{
-				Action->StopAction(InstigatorActor);
-				break;
+				if (Action->IsRunning())
+				{
+					Action->StopAction(InstigatorActor);
+					break;
+				}
 			}
 		}
 	}
@@ -65,7 +71,7 @@ void UCGameplayComponent::BeginPlay()
 void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-		FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
 
 	//Draw All Actions
@@ -73,7 +79,7 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
 		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
-	
+
 		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}*/
 }

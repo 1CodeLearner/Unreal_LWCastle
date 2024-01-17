@@ -6,6 +6,20 @@
 #include "AssetTypeCategories.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 
+
+bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
+{
+	if (IsRunning())
+		return false;
+
+	auto GameplayComp = GetGameplayComponent();
+	if (GameplayComp && GameplayComp->ActiveGameplayTags.HasAny(BlockedTags))
+	{
+		return false;
+	}
+	return true;
+}
+
 void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running StartAction %s"), *this->GetName());
@@ -15,6 +29,15 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 	{
 		Gameplay->ActiveGameplayTags.AppendTags(GrantedTags);
 	}
+
+
+	if (bHasDuration)
+	{
+		DurationDelegate.BindUFunction(this, "StopDuration", InstigatorActor);
+		GetWorld()->GetTimerManager().SetTimer(DurationHandle, DurationDelegate, .1, false, ActionDuration);
+	}
+
+
 	bIsRunning = true;
 }
 
@@ -35,6 +58,7 @@ void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 	bIsRunning = false;
 }
 
+
 bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
 {
 	if (bCanInterrupt)
@@ -48,22 +72,14 @@ bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTag
 	return false;
 }
 
+void UCAction::StopDuration(AActor* InstigatorActor)
+{
+	StopAction(InstigatorActor);
+}
+
 UCAction::UCAction()
 {
 	bIsRunning = false;
-}
-
-bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
-{
-	if (IsRunning())
-		return false;
-
-	auto GameplayComp = GetGameplayComponent();
-	if (GameplayComp && GameplayComp->ActiveGameplayTags.HasAny(BlockedTags))
-	{
-		return false;
-	}
-	return true;
 }
 
 void UCAction::Initialize(UCGameplayComponent* GameplayComp)
@@ -97,5 +113,10 @@ FName UCAction::GetActionName() const
 UCGameplayComponent* UCAction::GetGameplayComponent() const
 {
 	return GameplayCompRef;
+}
+
+float UCAction::GetActionDuration() const
+{
+	return ActionDuration;
 }
 

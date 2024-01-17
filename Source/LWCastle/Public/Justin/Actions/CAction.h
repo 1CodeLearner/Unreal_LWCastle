@@ -43,6 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UCGameplayComponent* GetGameplayComponent() const;
 
+	UFUNCTION(BlueprintCallable)
+	float GetActionDuration() const;
+
 protected:
 	virtual UWorld* GetWorld() const override;
 
@@ -59,14 +62,23 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bCanInterrupt;
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bHasDuration;
 
 private:
 	UPROPERTY()
 	bool bIsRunning;
 	UPROPERTY()
 	UCGameplayComponent* GameplayCompRef;
+
+	UFUNCTION()
+	void StopDuration(AActor* InstigatorActor);
+	
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0", AllowPrivateAccess = "true"), Category = "Action")
+	float ActionDuration;
+	FTimerHandle DurationHandle;
+	FTimerDelegate DurationDelegate;
 };
