@@ -30,14 +30,6 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 		Gameplay->ActiveGameplayTags.AppendTags(GrantedTags);
 	}
 
-
-	if (bHasDuration)
-	{
-		DurationDelegate.BindUFunction(this, "StopDuration", InstigatorActor);
-		GetWorld()->GetTimerManager().SetTimer(DurationHandle, DurationDelegate, .1, false, ActionDuration);
-	}
-
-
 	bIsRunning = true;
 }
 
@@ -70,11 +62,6 @@ bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTag
 		return false;
 	}
 	return false;
-}
-
-void UCAction::StopDuration(AActor* InstigatorActor)
-{
-	StopAction(InstigatorActor);
 }
 
 UCAction::UCAction()
@@ -114,9 +101,3 @@ UCGameplayComponent* UCAction::GetGameplayComponent() const
 {
 	return GameplayCompRef;
 }
-
-float UCAction::GetActionDuration() const
-{
-	return ActionDuration;
-}
-
