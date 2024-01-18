@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Justin/Magic/CMagicMulti.h"
+#include "Justin/Magic/CMagicFireInLoop.h"
 
-void UCMagicMulti::Press_Implementation(AActor* InstigatorActor)
+void UCMagicFireInLoop::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
 
@@ -11,15 +11,14 @@ void UCMagicMulti::Press_Implementation(AActor* InstigatorActor)
 	GetWorld()->GetTimerManager().SetTimer(MagicHandle, MagicDelegate, GetDelayTime(), true);
 }
 
-void UCMagicMulti::Release_Implementation(AActor* InstigatorActor)
+void UCMagicFireInLoop::Release_Implementation(AActor* InstigatorActor)
 {
 	Super::Release_Implementation(InstigatorActor);
 	if (MagicHandle.IsValid())
 		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);
 }
 
-void UCMagicMulti::Reset_Implementation(AActor* InstigatorActor)
+void UCMagicFireInLoop::MagicExecute(AActor* InstigatorActor)
 {
-	Super::Reset_Implementation(InstigatorActor);
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	Super::MagicExecute(InstigatorActor);
 }

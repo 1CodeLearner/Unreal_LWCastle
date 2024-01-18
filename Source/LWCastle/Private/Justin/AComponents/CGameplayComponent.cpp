@@ -29,6 +29,8 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 				if (Action->CanStart(InstigatorActor))
 				{
 					Action->StartAction(InstigatorActor);
+
+					UE_LOG(LogTemp, Warning, TEXT("Inside StartAction"));
 					break;
 				}
 			}
@@ -47,6 +49,7 @@ void UCGameplayComponent::StopActionByName(AActor* InstigatorActor, FName Action
 				if (Action->IsRunning())
 				{
 					Action->StopAction(InstigatorActor);
+					UE_LOG(LogTemp, Warning, TEXT("Inside StopAction"));
 					break;
 				}
 			}

@@ -3,6 +3,7 @@
 
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/Actions/CAction_MagicAttack.h"
+#include "Justin/Magic/CMagic.h"
 
 UCCombatComponent::UCCombatComponent()
 {
@@ -10,41 +11,49 @@ UCCombatComponent::UCCombatComponent()
 
 }
 
-FMagicAttackGroup UCCombatComponent::GetActiveMagic() const
+FElement UCCombatComponent::GetActiveElement() const
 {
-	return { ActiveDefaultMagic, ActiveChargedMagic };
+	return ActiveElement;
 }
 
 void UCCombatComponent::Initialize()
 {
-	if (ensureMsgf(OwningDefaultMagic.Num() == 0 && OwningChargedMagic.Num() == 0, TEXT("Can only Initialize once")))
-	{
-		if (OwningDefaultMagicClasses.Num() == 0 && OwningChargedMagicClasses.Num() == 0) {
-			return;
-		}
-
-		for (auto DefaultMagicClass : OwningDefaultMagicClasses)
+	ensure(OwningElements.Num() == 0);
+	FName Temp;
+	if (ensure(DT_ElementData)) {
+		TArray<FName> Names = DT_ElementData->GetRowNames();
+		for (auto Name : Names)
 		{
-			auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), DefaultMagicClass);
-			if (NewMagic)
-			{
-				OwningDefaultMagic.Add(NewMagic);
-			}
+			FElementData* Data = DT_ElementData->FindRow<FElementData>(Name, TEXT(""));
+
+			FElement ElementToAdd;
+			UCMagic* Default = NewObject<UCMagic>(GetOwner(), Data->DefaultElement);
+			UCMagic* Charged = NewObject<UCMagic>(GetOwner(), Data->ChargedElement);
+
+			ElementToAdd.DefaultElement = Default;
+			ElementToAdd.ChargedElement = Charged;
+			OwningElements.Add(Name, ElementToAdd);
+			Temp = Name;
 		}
+	}
+	if (OwningElements.Num() > 0)
+		ActiveElement = OwningElements[Temp];
+}
 
+void UCCombatComponent::SwitchElementByName(FName ElementName)
+{
+	if (!ensure(ElementName.IsNone())) {
+		FElementData* DTData = DT_ElementData->FindRow<FElementData>(ElementName,TEXT(""));
 
-		for (auto ChargedMagicClass : OwningChargedMagicClasses)
-		{
-			auto NewChargeMagic = NewObject<UCAction_MagicAttack>(GetOwner(), ChargedMagicClass);
-			if (NewChargeMagic)
-			{
-				OwningChargedMagic.Add(NewChargeMagic);
-			}
-		}
+		FElementData ElementDataTemp = *DTData;
+		ActiveElement = GetElementFromName(ElementName);
 
-		if (OwningDefaultMagic.Num() > 0)
-			ActiveDefaultMagic = OwningDefaultMagic.HeapTop();
-		if (OwningChargedMagic.Num() > 0)
-			ActiveChargedMagic = OwningChargedMagic.HeapTop();
+		OnActiveElementSwitched.Broadcast(GetOwner(), ElementDataTemp, ActiveElement);
 	}
 }
+
+FElement UCCombatComponent::GetElementFromName(FName Name) const
+{
+	return OwningElements[Name];
+}
+

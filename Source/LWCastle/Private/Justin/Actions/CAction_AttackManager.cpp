@@ -5,43 +5,43 @@
 
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/Actions/CAction_MagicAttack.h"
+#include "Justin/Magic/CMagic.h"
 
 void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
-	GetActiveMagic()->StartAction(InstigatorActor);
-	//if (GetActiveMagic() != nullptr && GetActiveMagic()->CanStart(InstigatorActor))
-	//{
-	//}
+	GetActiveElement()->Press(InstigatorActor);
 }
 
 void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StopAction_Implementation(InstigatorActor);
-	GetActiveMagic()->StopAction(InstigatorActor);
-	//if (GetActiveMagic()->IsRunning()) {
-	//}
+	GetActiveElement()->Release(InstigatorActor);
 }
 
 
 bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
 {
-	bool CanStartAction = GetActiveMagic()->CanStart(InstigatorActor);
-	return CanStartAction;
+	return !GetActiveElement()->IsPressing();
 }
 
 bool UCAction_AttackManager::IsRunning() const
 {
-	return GetActiveMagic()->IsRunning();
+	return GetActiveElement()->IsPressing();
 }
 
+
+UCAction_AttackManager::UCAction_AttackManager()
+{
+	bIsCharged = false;
+}
 
 void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
 {
 	Super::Initialize(GameplayComp);
 
-	//Initialize MagicAttacks for player
-	if (!ActiveMagic.ActiveDefaultMagic && !ActiveMagic.ActiveDefaultMagic)
+	//Initialize Magic attack for player
+	if (!ActiveElement.DefaultElement)
 	{
 		AActor* OwningActor = Cast<AActor>(GetOuter());
 		if (OwningActor)
@@ -49,15 +49,11 @@ void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
 			auto CombatComp = OwningActor->GetComponentByClass<UCCombatComponent>();
 			if (CombatComp)
 			{
-				ActiveMagic.ActiveDefaultMagic = CombatComp->GetActiveMagic().ActiveDefaultMagic;
-				ActiveMagic.ActiveChargeMagic = CombatComp->GetActiveMagic().ActiveChargeMagic;
+				ActiveElement = CombatComp->GetActiveElement();
 
-				if (ensure(ActiveMagic.ActiveDefaultMagic && ActiveMagic.ActiveChargeMagic))
+				if (ensure(ActiveElement.DefaultElement&& ActiveElement.ChargedElement))
 				{
-					ensure(ActiveMagic.ActiveDefaultMagic->GetGameplayComponent() == nullptr
-						&& ActiveMagic.ActiveChargeMagic->GetGameplayComponent() == nullptr);
-
-					CombatComp->OnActiveMagicSwitched.AddDynamic(this, &UCAction_AttackManager::OnWeaponSwitched);
+					CombatComp->OnActiveElementSwitched.AddDynamic(this, &UCAction_AttackManager::OnElementSwitched);
 					CombatComp->OnChargeStateActivated.AddDynamic(this, &UCAction_AttackManager::OnChargeStateActivated);
 				}
 			}
@@ -65,54 +61,53 @@ void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
 	}
 }
 
-void UCAction_AttackManager::OnWeaponSwitched(AActor* InstigatorActor, FMagicAttackGroup ActiveMagicGroup)
+void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElementData ElementData, FElement SwitchedElement)
 {
-	if (ensure(ActiveMagicGroup.ActiveChargeMagic && ActiveMagicGroup.ActiveDefaultMagic))
+	if (ensure(SwitchedElement.DefaultElement && SwitchedElement.ChargedElement))
 	{
-		ensure(ActiveMagicGroup.ActiveChargeMagic->GetOuter() == GetOuter() && ActiveMagicGroup.ActiveChargeMagic->GetGameplayComponent() == nullptr);
-		ensure(ActiveMagicGroup.ActiveDefaultMagic->GetOuter() == GetOuter() && ActiveMagicGroup.ActiveDefaultMagic->GetGameplayComponent() == nullptr);
+		ensure(SwitchedElement.ChargedElement->GetOuter() == GetOuter());
+		ensure(SwitchedElement.DefaultElement->GetOuter() == GetOuter());
 
-		//ensureAlwaysMsgf(GetActiveMagic() == ActiveMagic.ActiveDefaultMagic, TEXT("Cannot Switch weapon During Charged Magic State!!!"));
+		//ensureAlwaysMsgf(GetActiveMagic() == ActiveMagic.ActiveDefaultMagic, TEX("Cannot Switch weapon During Charged Magic State!!!"));
 
-
-		if (IsSameMagic(ActiveMagicGroup))
+		if (IsSameMagic(SwitchedElement))
 			return;
 
-		if (GetActiveMagic()->IsRunning())
+		if (GetActiveElement()->IsPressing())
 		{
-			GetActiveMagic()->StopAction(InstigatorActor);
-			SetActiveMagic(ActiveMagicGroup);
-			GetActiveMagic()->StartAction(InstigatorActor);
+			GetActiveElement()->Reset(InstigatorActor);
+			SetActiveElement(SwitchedElement);
+			GetActiveElement()->Press(InstigatorActor);
 		}
-
-		SetActiveMagic(ActiveMagicGroup);
+		SetActiveElement(SwitchedElement);
 	}
 }
 
-void UCAction_AttackManager::OnChargeStateActivated(bool _bIsCharged)
+void UCAction_AttackManager::OnChargeStateActivated(AActor* InstigatorActor, bool _bIsCharged)
 {
-	bIsCharged = _bIsCharged;
+	if (bIsCharged != _bIsCharged) {
+		if (GetActiveElement()->IsPressing()) 
+		{
+			GetActiveElement()->Reset(InstigatorActor);
+		}
+		bIsCharged = _bIsCharged;
+	}
 }
 
-UCAction_MagicAttack* UCAction_AttackManager::GetActiveMagic() const
+UCMagic* UCAction_AttackManager::GetActiveElement() const
 {
-	if (ensure(ActiveMagic.ActiveDefaultMagic && ActiveMagic.ActiveChargeMagic) && !bIsCharged)
-	{
-		return ActiveMagic.ActiveDefaultMagic;
-	}
+	if(bIsCharged)
+		return ActiveElement.ChargedElement;
 	else
-	{
-		return ActiveMagic.ActiveChargeMagic;
-	}
+		return ActiveElement.DefaultElement;
 }
 
-void UCAction_AttackManager::SetActiveMagic(FMagicAttackGroup NewActiveMagic)
+void UCAction_AttackManager::SetActiveElement(FElement SwitchedElement)
 {
-	ActiveMagic.ActiveDefaultMagic = NewActiveMagic.ActiveDefaultMagic;
-	ActiveMagic.ActiveChargeMagic = NewActiveMagic.ActiveChargeMagic;
+	ActiveElement = SwitchedElement;
 }
 
-bool UCAction_AttackManager::IsSameMagic(FMagicAttackGroup ActiveMagicGroup) const
+bool UCAction_AttackManager::IsSameMagic(FElement SwitchedElement) const
 {
-	return ActiveMagicGroup.ActiveDefaultMagic == ActiveMagic.ActiveDefaultMagic;
+	return SwitchedElement.DefaultElement == ActiveElement.DefaultElement;
 }

@@ -6,18 +6,24 @@
 
 void UCMagic::Press_Implementation(AActor* InstigatorActor)
 {
-	bIsPressed = true;
+	bIsPressing = true;
+	UE_LOG(LogTemp, Warning, TEXT("Running Press %s"), *GetNameSafe(this));
 }
 
 void UCMagic::Release_Implementation(AActor* InstigatorActor)
 {
-	bIsPressed = false;
+	bIsPressing = false;
+	UE_LOG(LogTemp, Warning, TEXT("Running Release %s"), *GetNameSafe(this));
 }
 
 void UCMagic::Reset_Implementation(AActor* InstigatorActor)
 {
-	bIsPressed = false;
+	bIsPressing = false;
+	if (MagicHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
 }
+
 void UCMagic::MagicExecute(AActor* InstigatorActor)
 {
 	FVector Origin = InstigatorActor->GetActorLocation();
@@ -40,7 +46,7 @@ void UCMagic::MagicExecute(AActor* InstigatorActor)
 UCMagic::UCMagic()
 {
 	DelayTime = 0;
-	bIsPressed = false;
+	bIsPressing = false;
 }
 
 float UCMagic::GetDelayTime() const
@@ -48,9 +54,9 @@ float UCMagic::GetDelayTime() const
 	return DelayTime;
 }
 
-bool UCMagic::IsPressed() const
+bool UCMagic::IsPressing() const
 {
-	return bIsPressed;
+	return bIsPressing;
 }
 
 UWorld* UCMagic::GetWorld() const

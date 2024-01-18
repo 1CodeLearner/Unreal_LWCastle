@@ -26,7 +26,6 @@ void ATest::PostInitializeComponents()
 void ATest::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame

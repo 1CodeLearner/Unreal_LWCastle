@@ -8,23 +8,36 @@
 
 
 class UCAction;
-class UCAction_MagicAttack;
+class UCMagic;
 
 USTRUCT(BlueprintType)
-struct FMagicAttackGroup
+struct FElement
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCMagic> DefaultElement;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UCMagic> ChargedElement;
+};
+
+USTRUCT(BlueprintType)
+struct FElementData : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UCAction_MagicAttack> ActiveDefaultMagic;
+	TSubclassOf<UCMagic> DefaultElement;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UCAction_MagicAttack> ActiveChargeMagic;
+	TSubclassOf<UCMagic> ChargedElement;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActiveMagicSwitchedDelegate, AActor*, InstigatorActor, FMagicAttackGroup, ActiveMagicGroup);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FActiveElementSwitchedDelegate, AActor*, InstigatorActor, FElementData, ElementData, FElement, ActiveElement);
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChargeStateActivatedDelegate, bool, bIsCharged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FChargeStateActivatedDelegate, AActor*, InstigatorActor, bool, bIsCharged);
 
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCCombatComponent : public UActorComponent
@@ -33,35 +46,32 @@ class LWCASTLE_API UCCombatComponent : public UActorComponent
 
 public:
 	UCCombatComponent();
-	
+
 	UPROPERTY(BlueprintCallable, Category = "Combat")
-	FActiveMagicSwitchedDelegate OnActiveMagicSwitched;
-	
+	FActiveElementSwitchedDelegate OnActiveElementSwitched;
+
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat")
 	FChargeStateActivatedDelegate OnChargeStateActivated;
 
 	UFUNCTION(BlueprintCallable)
-	FMagicAttackGroup GetActiveMagic() const;
+	FElement GetActiveElement() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void Initialize();
 
+	UFUNCTION(BlueprintCallable)
+	void SwitchElementByName(FName ElementName);
+
 protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Combat")
+	FElement ActiveElement;
 
-	//Magic attack that is Active
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-	TObjectPtr<UCAction_MagicAttack> ActiveDefaultMagic;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-	TObjectPtr<UCAction_MagicAttack> ActiveChargedMagic;
-	//
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TMap<FName, FElement> OwningElements;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Combat")
-	TArray<UCAction_MagicAttack*> OwningDefaultMagic;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Combat")
-	TArray<UCAction_MagicAttack*> OwningChargedMagic;
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	UDataTable* DT_ElementData;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
-	TArray<TSubclassOf<UCAction>> OwningDefaultMagicClasses;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Combat")
-	TArray<TSubclassOf<UCAction>> OwningChargedMagicClasses;
+	UFUNCTION()
+	FElement GetElementFromName(FName Name) const;
 };

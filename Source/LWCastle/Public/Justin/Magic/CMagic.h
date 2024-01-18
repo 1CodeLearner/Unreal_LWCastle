@@ -9,7 +9,7 @@
 /**
  *
  */
-UCLASS(Abstract)
+UCLASS(BlueprintType, Blueprintable)
 class LWCASTLE_API UCMagic : public UObject
 {
 	GENERATED_BODY()
@@ -22,7 +22,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Magic")
 	void Reset(AActor* InstigatorActor);
 	UFUNCTION(BlueprintCallable)
-	bool IsPressed() const;
+	bool IsPressing() const;
 	UFUNCTION(BlueprintCallable)
 	float GetDelayTime() const;
 
@@ -40,7 +40,7 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly,meta = (AllowPrivateAccess="true", ClampMin="0."), Category = "Magic")
 	float DelayTime;
-	bool bIsPressed;
+	bool bIsPressing;
 public:
 	UCMagic();
 

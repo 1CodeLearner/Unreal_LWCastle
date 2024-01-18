@@ -16,6 +16,8 @@ class LWCASTLE_API UCAction_AttackManager : public UCAction
 {
 	GENERATED_BODY()
 public:
+
+	UCAction_AttackManager();
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	UFUNCTION()
 	virtual void StopAction_Implementation(AActor* InstigatorActor) override;
@@ -27,19 +29,19 @@ public:
 protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "MagicManager")
-	FMagicAttackGroup ActiveMagic;
+	FElement ActiveElement;
 	/*FOR TESTING - REMOVE THIS THING AFTER TESTING SWITCHING BETWEEN CHARGING AND DEFAULT ATTACKS*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "MagicManager")
 	bool bIsCharged;
 
 	UFUNCTION()
-	void OnWeaponSwitched(AActor* InstigatorActor, FMagicAttackGroup ActiveMagicGroup);
+	void OnElementSwitched(AActor* InstigatorActor, FElementData ElementData, FElement SwitchedElement);
 
 	UFUNCTION()
-	void OnChargeStateActivated(bool _bIsCharged);
+	void OnChargeStateActivated(AActor* InstigatorActor, bool _bIsCharged);
 
 private:
-	UCAction_MagicAttack* GetActiveMagic() const;
-	void SetActiveMagic(FMagicAttackGroup NewActiveMagic);
-	bool IsSameMagic(FMagicAttackGroup ActiveMagicGroup) const;
+	UCMagic* GetActiveElement() const;
+	void SetActiveElement(FElement NewActiveMagic);
+	bool IsSameMagic(FElement SwitchedElement) const;
 };

@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Justin/Magic/CMagicSingle.h"
+#include "Justin/Magic/CMagicFireAtRelease.h"
 
-void UCMagicSingle::Press_Implementation(AActor* InstigatorActor)
+void UCMagicFireAtRelease::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
 
@@ -15,23 +15,22 @@ void UCMagicSingle::Press_Implementation(AActor* InstigatorActor)
 	GetWorld()->GetTimerManager().PauseTimer(MagicHandle);
 }
 
-void UCMagicSingle::Release_Implementation(AActor* InstigatorActor)
+void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 {
 	Super::Release_Implementation(InstigatorActor);
 
 	if (bIsCoolDown) return;
 
-	if(MagicHandle.IsValid())
-		GetWorld()->GetTimerManager().UnPauseTimer(MagicHandle);
+	GetWorld()->GetTimerManager().UnPauseTimer(MagicHandle);
 }
 
-void UCMagicSingle::Reset_Implementation(AActor* InstigatorActor)
+void UCMagicFireAtRelease::Reset_Implementation(AActor* InstigatorActor)
 {
 	Super::Reset_Implementation(InstigatorActor);
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	bIsCoolDown = false;
 }
 
-void UCMagicSingle::MagicExecute(AActor* InstigatorActor)
+void UCMagicFireAtRelease::MagicExecute(AActor* InstigatorActor)
 {
 	Super::MagicExecute(InstigatorActor);
 	if (ensure(InstigatorActor))
@@ -43,12 +42,12 @@ void UCMagicSingle::MagicExecute(AActor* InstigatorActor)
 	}
 }
 
-void UCMagicSingle::StopCooldown(AActor* InstigatorActor)
+void UCMagicFireAtRelease::StopCooldown(AActor* InstigatorActor)
 {
 	bIsCoolDown = false;
 }
 
-UCMagicSingle::UCMagicSingle()
+UCMagicFireAtRelease::UCMagicFireAtRelease()
 {
 	bIsCoolDown = false;
 }

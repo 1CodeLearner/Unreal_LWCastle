@@ -4,28 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Magic/CMagic.h"
-#include "CMagicSingle.generated.h"
+#include "CMagicFireInLoop.generated.h"
 
 /**
  *
  */
 UCLASS(Blueprintable)
-class LWCASTLE_API UCMagicSingle : public UCMagic
+class LWCASTLE_API UCMagicFireInLoop : public UCMagic
 {
 	GENERATED_BODY()
 public:
+
 	virtual void Press_Implementation(AActor* InstigatorActor) override;
 	virtual void Release_Implementation(AActor* InstigatorActor) override;
-	virtual void Reset_Implementation(AActor* InstigatorActor) override;
-
 	virtual void MagicExecute(AActor* InstigatorActor) override;
-
-private:
-	FTimerHandle CooldownHandle;
-	FTimerDelegate CooldownDelegate;
-	bool bIsCoolDown;
-	UFUNCTION()
-	void StopCooldown(AActor* InstigatorActor);
-public:
-	UCMagicSingle();
 };
