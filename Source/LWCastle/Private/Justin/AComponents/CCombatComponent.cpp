@@ -19,6 +19,10 @@ void UCCombatComponent::Initialize()
 {
 	if (ensureMsgf(OwningDefaultMagic.Num() == 0 && OwningChargedMagic.Num() == 0, TEXT("Can only Initialize once")))
 	{
+		if (OwningDefaultMagicClasses.Num() == 0 && OwningChargedMagicClasses.Num() == 0) {
+			return;
+		}
+
 		for (auto DefaultMagicClass : OwningDefaultMagicClasses)
 		{
 			auto NewMagic = NewObject<UCAction_MagicAttack>(GetOwner(), DefaultMagicClass);

@@ -56,7 +56,8 @@ void UCGameplayComponent::StopActionByName(AActor* InstigatorActor, FName Action
 
 UCGameplayComponent::UCGameplayComponent()
 {
-
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
 void UCGameplayComponent::BeginPlay()
