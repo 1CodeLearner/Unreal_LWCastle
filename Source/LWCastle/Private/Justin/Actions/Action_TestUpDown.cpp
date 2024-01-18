@@ -10,7 +10,7 @@ void UAction_TestUpDown::StartAction_Implementation(AActor* InstigatorActor)
 	UE_LOG(LogTemp, Warning, TEXT("Inside Start"));
 
 	ExecuteMagicDelegate.BindUFunction(this, "ExecuteMagic", InstigatorActor);
-	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, .2, true);
+	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, .05, true);
 }
 
 void UAction_TestUpDown::StopAction_Implementation(AActor* InstigatorActor)
