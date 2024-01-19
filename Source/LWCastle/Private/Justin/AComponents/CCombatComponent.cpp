@@ -27,12 +27,16 @@ void UCCombatComponent::Initialize()
 			FElementData* Data = DT_ElementData->FindRow<FElementData>(Name, TEXT(""));
 
 			FElement ElementToAdd;
+
 			UCMagic* Default = NewObject<UCMagic>(GetOwner(), Data->DefaultElement);
+			Default->Initialize(GetOwner());
 			UCMagic* Charged = NewObject<UCMagic>(GetOwner(), Data->ChargedElement);
+			Charged->Initialize(GetOwner());
 
 			ElementToAdd.DefaultElement = Default;
 			ElementToAdd.ChargedElement = Charged;
 			OwningElements.Add(Name, ElementToAdd);
+
 			Temp = Name;
 		}
 	}
@@ -42,7 +46,7 @@ void UCCombatComponent::Initialize()
 
 void UCCombatComponent::SwitchElementByName(FName ElementName)
 {
-	if (!ensure(ElementName.IsNone())) {
+	if (ensure(!ElementName.IsNone())) {
 		FElementData* DTData = DT_ElementData->FindRow<FElementData>(ElementName,TEXT(""));
 
 		FElementData ElementDataTemp = *DTData;

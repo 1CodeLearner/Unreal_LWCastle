@@ -14,7 +14,7 @@ class LWCASTLE_API UCMagicFireInLoop : public UCMagic
 {
 	GENERATED_BODY()
 public:
-
+	
 	virtual void Press_Implementation(AActor* InstigatorActor) override;
 	virtual void Release_Implementation(AActor* InstigatorActor) override;
 	virtual void MagicExecute(AActor* InstigatorActor) override;

@@ -7,12 +7,12 @@ void UCMagicFireAtRelease::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
 
-	if(MagicHandle.IsValid())
-		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);
+	/*if(MagicHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);*/
 
-	MagicDelegate.BindUFunction(this, "MagicExecute", InstigatorActor);
-	GetWorld()->GetTimerManager().SetTimer(MagicHandle, MagicDelegate, .005f, false);
-	GetWorld()->GetTimerManager().PauseTimer(MagicHandle);
+		//MagicDelegate.BindUFunction(this, "MagicExecute", InstigatorActor);
+		//GetWorld()->GetTimerManager().SetTimer(MagicHandle, MagicDelegate, .005f, false);
+		//GetWorld()->GetTimerManager().PauseTimer(MagicHandle);
 }
 
 void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
@@ -21,7 +21,8 @@ void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 
 	if (bIsCoolDown) return;
 
-	GetWorld()->GetTimerManager().UnPauseTimer(MagicHandle);
+	StartMontage();
+	//GetWorld()->GetTimerManager().UnPauseTimer(MagicHandle);
 }
 
 void UCMagicFireAtRelease::Reset_Implementation(AActor* InstigatorActor)
@@ -33,16 +34,17 @@ void UCMagicFireAtRelease::Reset_Implementation(AActor* InstigatorActor)
 void UCMagicFireAtRelease::MagicExecute(AActor* InstigatorActor)
 {
 	Super::MagicExecute(InstigatorActor);
-	if (ensure(InstigatorActor))
-	{
-		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);
-		CooldownDelegate.BindUFunction(this, "StopCooldown", InstigatorActor);
-		GetWorld()->GetTimerManager().SetTimer(CooldownHandle, CooldownDelegate, 0.005f, false, GetDelayTime());
-		bIsCoolDown = true;
-	}
+	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in MagicFireAtRelease"));
 }
 
-void UCMagicFireAtRelease::StopCooldown(AActor* InstigatorActor)
+void UCMagicFireAtRelease::StartMontage()
+{
+	Super::StartMontage();
+	bIsCoolDown = true;
+	GetWorld()->GetTimerManager().SetTimer(CooldownHandle, this, &UCMagicFireAtRelease::StopCooldown, 0.f, false, GetCooldownTime());
+}
+
+void UCMagicFireAtRelease::StopCooldown()
 {
 	bIsCoolDown = false;
 }

@@ -6,16 +6,18 @@
 void UCMagicFireInLoop::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
-
-	MagicDelegate.BindUFunction(this, "MagicExecute", InstigatorActor);
-	GetWorld()->GetTimerManager().SetTimer(MagicHandle, MagicDelegate, GetDelayTime(), true);
+	
+	StartMontage();
+	/*MagicDelegate.BindUFunction(this, "MagicExecute", InstigatorActor);
+	GetWorld()->GetTimerManager().SetTimer(MagicHandle, MagicDelegate, GetDelayTime(), true);*/
 }
 
 void UCMagicFireInLoop::Release_Implementation(AActor* InstigatorActor)
 {
 	Super::Release_Implementation(InstigatorActor);
-	if (MagicHandle.IsValid())
-		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);
+	StopMontage();
+	/*if (MagicHandle.IsValid())
+		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);*/
 }
 
 void UCMagicFireInLoop::MagicExecute(AActor* InstigatorActor)
