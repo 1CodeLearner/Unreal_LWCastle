@@ -25,6 +25,10 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 		// АјСп
 		auto movement = player->GetCharacterMovement();
 		isInAir = movement->IsFalling();
+
+		checkdodge = player->IsDodging;
+		checkattack = player->isattackingmagic;
+
 	}
 
 
@@ -35,4 +39,5 @@ void UPlayerAnim::PlayAttackAnim()
 {
 	Montage_Play(attackAnimMontage);
 }
+
 

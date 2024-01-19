@@ -32,11 +32,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
 	class UCameraComponent* tpsCamComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	UAnimMontage* m_pDodgeMomtage;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	//UAnimMontage* m_pDodgeMomtage;
 
-	void Dodge();
-	bool m_bIsDodging = false;
+	//void Dodge();
+	//bool m_bIsDodging = false;
 
 
 	// Horizontal rotation
@@ -92,4 +92,47 @@ public:
 	void speedchange();
 	void RunP();
 	void RunR();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	UAnimMontage* pDodgeMontage;
+
+	void Dodge();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	bool IsDodging = false;
+
+	void ResetDodgeState();
+
+	UPROPERTY(EditDefaultsOnly, Category=PlayerAnim)
+	class UAnimMontage* DodgeAnimMontage;
+
+	UFUNCTION(BlueprintCallable, Category = "Animation")
+	void StartDodgeAnimation();
+
+	UPROPERTY(EditAnywhere, Category = BulletEffect)
+	class UParticleSystem* MagicEffectFactory;
+
+	void Attack_Melee();
+	void Attack_Melee_End();
+
+
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* Attack_MeleeAnim1;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* Attack_MeleeAnim2;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* Attack_MeleeAnim3;
+
+	
+	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UAnimMontage* Attack_MeleeAnim4;
+
+
+	bool isDuringAttack;
+	// 좌클릭 공격 사용 중
+	bool isattackingmagic = false;
+	int ComboAttack_Num;
+
 };

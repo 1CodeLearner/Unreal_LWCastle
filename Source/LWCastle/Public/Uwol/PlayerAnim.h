@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Uwol/uwol_test.h"
 #include "PlayerAnim.generated.h"
 
 /**
@@ -34,6 +35,13 @@ public:
 
 	// 애니메이션 재생
 	void PlayAttackAnim();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=PlayerAnim)
+	bool checkdodge = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=PlayerAnim)
+	bool checkattack = false;
+
+
 
 
 };

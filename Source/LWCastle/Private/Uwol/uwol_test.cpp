@@ -49,12 +49,12 @@ Auwol_test::Auwol_test()
 	{
 		// 스켈레탈 메시 데이터 할당
 		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
-		//FName SocketName = TEXT("WeaponSocket");
-		//gunMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SocketName);
+		FName SocketName = TEXT("WeaponSocket");
+		gunMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SocketName);
 		// 위치 조정
-		gunMeshComp->SetRelativeLocation(FVector(-38, -2, 30));
-		gunMeshComp->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
-		gunMeshComp->SetRelativeScale3D(FVector(0.15f));
+		//gunMeshComp->SetRelativeLocation(FVector(-38, -2, 30));
+		//gunMeshComp->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+		//gunMeshComp->SetRelativeScale3D(FVector(1.0f));
 
 	}
 }
@@ -118,6 +118,9 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &Auwol_test::RunP);
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
 
+	// Attack Binding
+	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Released, this, &Auwol_test::Attack_Melee);
+
 }
 
 void Auwol_test::Turn(float value)
@@ -154,7 +157,10 @@ void Auwol_test::Move(float DeltaTime)
 	direction = direction.Y * right + direction.X * forward;
 	direction.Normalize();
 
-	AddMovementInput(direction, movespeed);
+	if (isDuringAttack == false)
+	{
+		AddMovementInput(direction, movespeed);
+	}
 	direction = FVector::ZeroVector;
 }
 
@@ -162,21 +168,30 @@ void Auwol_test::InputFire()
 {
 	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	anim->PlayAttackAnim();
-	// 현재 방향
-	FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
-	//UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>();
-	//FVector CameraForwardVector;
-	//if (CameraComponent)
-	//{
-	//	CameraForwardVector = CameraComponent->GetForwardVector();
-		// CameraForwardVector를 사용하여 원하는 작업 수행
-	//}
-	//UGameplayStatics::GetPlayerController(this, 0);
-	//FHitResult HitResult;
-	//GetWorld()->LineTraceSingleByChannel(HitResult, fireposition.GetLocation(), CameraForwardVector, ECC_GameTraceChannel1);
+	//isattackingmagic = true;
 
+	// 발사
+	//FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
 
-	GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
+	// Linetrace
+	FVector startPos = tpsCamComp->GetComponentLocation();
+	FVector endPos = tpsCamComp->GetComponentLocation() + tpsCamComp->GetForwardVector() * 5000;
+	FHitResult hitInfo;
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+	if (bHit)
+	{
+		FTransform magicTrans;
+		magicTrans.SetLocation(hitInfo.ImpactPoint);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
+	}
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
+	//isattackingmagic = false;
+
+	// 발사
+	// GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
 
 }
 
@@ -212,7 +227,22 @@ void Auwol_test::speedchange()
 
 void Auwol_test::Dodge()
 {
-	LaunchCharacter(GetActorForwardVector() * 2500, true, true);
+	if (!IsDodging)
+	{
+		UAnimInstance* pAnimInst = GetMesh()->GetAnimInstance();
+		if (pAnimInst != nullptr)
+		{
+			IsDodging = true;
+
+			//StartDodgeAnimation();
+
+			const FVector PlayerForward = GetActorForwardVector();
+			//LaunchCharacter(PlayerForward * 2500, true, true);
+
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::ResetDodgeState, 1.0f, false);
+		}
+	}
 }
 
 void Auwol_test::RunP()
@@ -228,3 +258,53 @@ void Auwol_test::RunR()
 	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
 }
 
+void Auwol_test::ResetDodgeState()
+{
+	IsDodging = false;
+}
+
+void Auwol_test::StartDodgeAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance != nullptr)
+	{
+		AnimInstance->Montage_Play(pDodgeMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, false);
+	}
+}
+
+void Auwol_test::Attack_Melee()
+{
+	switch (ComboAttack_Num)
+	{
+	case 0:
+		PlayAnimMontage(Attack_MeleeAnim1, 1.0f);
+		isDuringAttack = true;
+		ComboAttack_Num++;
+		break;
+	case 1:
+		PlayAnimMontage(Attack_MeleeAnim2, 1.0f);
+		isDuringAttack = true;
+		ComboAttack_Num++;
+		break;
+	case 2:
+		PlayAnimMontage(Attack_MeleeAnim3, 1.0f);
+		isDuringAttack = true;
+		ComboAttack_Num++;
+		break;
+	case 3:
+		PlayAnimMontage(Attack_MeleeAnim4, 1.0f);
+		isDuringAttack = true;
+		ComboAttack_Num++;
+		break;
+	default:
+		ComboAttack_Num = 0;
+
+	}
+	FTimerHandle TH_Attack_End;
+	GetWorldTimerManager().SetTimer(TH_Attack_End, this, &Auwol_test::Attack_Melee_End, 1.7f, false);
+}
+
+void Auwol_test::Attack_Melee_End()
+{
+	isDuringAttack = false;
+}
