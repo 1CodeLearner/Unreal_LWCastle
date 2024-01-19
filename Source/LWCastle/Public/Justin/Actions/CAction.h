@@ -63,6 +63,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bCanInterrupt;
 
+	virtual FGameplayTagContainer GetGrantedTags() const;
+
 private:
 	UPROPERTY()
 	bool bIsRunning;

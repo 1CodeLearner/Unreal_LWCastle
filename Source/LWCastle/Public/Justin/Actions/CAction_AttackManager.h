@@ -40,8 +40,11 @@ protected:
 	UFUNCTION()
 	void OnChargeStateActivated(AActor* InstigatorActor, bool _bIsCharged);
 
+	virtual FGameplayTagContainer GetGrantedTags() const override;
+
 private:
 	UCMagic* GetActiveElement() const;
 	void SetActiveElement(FElement NewActiveMagic);
 	bool IsSameMagic(FElement SwitchedElement) const;
+	//void ResetElementTags(FGameplayTagContainer TagsToRemove);
 };

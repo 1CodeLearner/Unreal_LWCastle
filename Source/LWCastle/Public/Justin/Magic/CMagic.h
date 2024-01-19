@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "CMagic.generated.h"
 
 /**
@@ -33,6 +34,8 @@ public:
 
 	FMagicExecuted OnMagicExecuted;
 
+	FGameplayTagContainer GetGrantedTags() const;
+
 protected:
 	UFUNCTION()
 	virtual void MagicExecute(AActor* InstigatorActor);
@@ -55,6 +58,9 @@ protected:
 	
 	UFUNCTION()
 	UAnimInstance* GetAnimInstance() const;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
+	FGameplayTagContainer GrantedTags;
 
 private:
 

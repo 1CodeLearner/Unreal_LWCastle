@@ -27,7 +27,7 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
-		Gameplay->ActiveGameplayTags.AppendTags(GrantedTags);
+		Gameplay->ActiveGameplayTags.AppendTags(GetGrantedTags());
 	}
 
 	bIsRunning = true;
@@ -45,7 +45,7 @@ void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
-		Gameplay->ActiveGameplayTags.RemoveTags(GrantedTags);
+		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
 }
@@ -95,6 +95,11 @@ UWorld* UCAction::GetWorld() const
 FName UCAction::GetActionName() const
 {
 	return ActionName;
+}
+
+FGameplayTagContainer UCAction::GetGrantedTags() const
+{
+	return GrantedTags;
 }
 
 UCGameplayComponent* UCAction::GetGameplayComponent() const

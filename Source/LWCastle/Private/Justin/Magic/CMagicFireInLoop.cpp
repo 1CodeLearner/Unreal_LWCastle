@@ -15,6 +15,7 @@ void UCMagicFireInLoop::Press_Implementation(AActor* InstigatorActor)
 void UCMagicFireInLoop::Release_Implementation(AActor* InstigatorActor)
 {
 	Super::Release_Implementation(InstigatorActor);
+
 	StopMontage();
 	/*if (MagicHandle.IsValid())
 		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);*/

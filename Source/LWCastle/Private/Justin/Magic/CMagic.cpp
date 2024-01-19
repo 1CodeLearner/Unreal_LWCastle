@@ -134,6 +134,11 @@ float UCMagic::GetAnimMontageLength()
 	return -1.f;
 }
 
+FGameplayTagContainer UCMagic::GetGrantedTags() const
+{
+	return GrantedTags;
+}
+
 UWorld* UCMagic::GetWorld() const
 {
 	AActor* Actor = Cast<AActor>(GetOuter());

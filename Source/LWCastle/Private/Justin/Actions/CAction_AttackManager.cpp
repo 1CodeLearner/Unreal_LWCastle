@@ -6,6 +6,7 @@
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/Actions/CAction_MagicAttack.h"
 #include "Justin/Magic/CMagic.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 
 void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 {
@@ -30,6 +31,11 @@ bool UCAction_AttackManager::IsRunning() const
 	return GetActiveElement()->IsPressing();
 }
 
+
+FGameplayTagContainer UCAction_AttackManager::GetGrantedTags() const
+{
+	return GetActiveElement()->GetGrantedTags();
+}
 
 UCAction_AttackManager::UCAction_AttackManager()
 {
@@ -61,6 +67,15 @@ void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
 	}
 }
 
+//void UCAction_AttackManager::ResetElementTags(FGameplayTagContainer TagsToRemove)
+//{
+//	auto Gameplay = GetGameplayComponent();
+//	if (Gameplay)
+//	{
+//		Gameplay->ActiveGameplayTags.RemoveTags(GrantedTags);
+//	}
+//}
+
 void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElementData ElementData, FElement SwitchedElement)
 {
 	if (ensure(SwitchedElement.DefaultElement && SwitchedElement.ChargedElement))
@@ -76,8 +91,18 @@ void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElement
 		if (GetActiveElement()->IsPressing())
 		{
 			GetActiveElement()->Reset(InstigatorActor);
+			//ResetElementTags(GetActiveElement()->GetGrantedTags());
+
+			Super::StopAction(InstigatorActor);
+			
 			SetActiveElement(SwitchedElement);
+
+			StartAction(InstigatorActor);
+			
 			GetActiveElement()->Press(InstigatorActor);
+			
+			//GetActiveElement()->Press(InstigatorActor);
+			//StopAction(InstigatorActor);
 		}
 		SetActiveElement(SwitchedElement);
 	}
