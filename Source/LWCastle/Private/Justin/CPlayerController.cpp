@@ -7,3 +7,9 @@ ACPlayerController::ACPlayerController()
 {
 	StatManagerComp = CreateDefaultSubobject<UCPlayerAttributeManagerComp>(TEXT("StatManagerComp"));
 }
+
+void ACPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	StatManagerComp->BeginInit();
+}

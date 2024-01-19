@@ -30,24 +30,59 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 	return ItemBaseClasses;
 }
 
-UDataTable* ACGameModeBase::GetProgressionTableOf(EPlayerStat StatType)
+TArray<FStruct_Progression> ACGameModeBase::GetProgressions(EPlayerStat StatType) const
 {
-	switch(StatType)
+	TArray<FStruct_Progression*> ProgRows;
+	switch (StatType) 
 	{
-	case EPlayerStat::HEALTH: {
-		return DT_HealthProgression;
-		break;
+		case EPlayerStat::HEALTH:
+		{
+			DT_HealthProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
+		case EPlayerStat::MANA:
+		{
+			DT_ManaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
+		case EPlayerStat::STAMINA:
+		{
+			DT_StaminaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+			break;
+		}
 	}
-	case EPlayerStat::MANA: {
-		return DT_ManaProgression;
-		break;
+
+
+	TArray<FStruct_Progression> ProgressionArr;
+	for (int i = 0; i < ProgRows.Num(); ++i)
+	{
+		FStruct_Progression ProgressionRow = { ProgRows[i]->Level, ProgRows[i]->Amount,ProgRows[i]->LevelupCost };
+
+		ProgressionArr.Add(ProgressionRow);
 	}
-	case EPlayerStat::STAMINA: {
-		return DT_StaminaProgression;
-		break;
+
+	return ProgressionArr;
+}
+
+FStruct_Progression ACGameModeBase::GetCurrentProgressionOf(EPlayerStat StatType, int Level)
+{
+	TArray<FStruct_Progression> temp = GetProgressions(StatType);
+	ensureAlways(Level <= temp.Num() && Level > 0);
+	return temp[Level - 1];
+}
+
+TArray<FStruct_Level> ACGameModeBase::GetCurrentLevels() const
+{
+	FString Context = "StringContext";
+	TArray< FStruct_Level*> StatsPtr;
+	TArray< FStruct_Level> Stats;
+	DT_CurrentLevels->GetAllRows<FStruct_Level>(Context, StatsPtr);
+	for (FStruct_Level* stat : StatsPtr)
+	{
+		FStruct_Level Level = *stat;
+		Stats.Add(Level);
 	}
-	}
-	return nullptr;
+	return Stats;
 }
 
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -62,5 +97,51 @@ void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FS
 			UCItemBase* tempItem = ItemBaseClass.GetDefaultObject();
 			ItemBaseMap.Add(tempItem->TagName, tempItem->GetClass());
 		}
+	}
+}
+
+FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum)
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
+	}
+}
+
+FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum) const
+{
+	switch (PlayerStatEnum)
+	{
+	case EPlayerStat::HEALTH:
+	{
+		return FName("Health");
+	}
+	case EPlayerStat::MANA:
+	{
+		return FName("Mana");
+	}
+	case EPlayerStat::STAMINA:
+	{
+		return FName("Stamina");
+	}
+	default:
+	{
+		return FName();
+	}
 	}
 }

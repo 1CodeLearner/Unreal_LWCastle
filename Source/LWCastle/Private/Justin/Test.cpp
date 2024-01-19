@@ -4,21 +4,28 @@
 #include "Justin/Test.h"
 
 #include "Justin/AComponents/CPlayerAttributeComp.h"
-#include "Kismet/GameplayStatics.h"
-
+#include "Justin/AComponents/CGameplayComponent.h"
+#include "Justin/AComponents/CCombatComponent.h"
 // Sets default values
 ATest::ATest()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
+	GameplayComp = CreateDefaultSubobject<UCGameplayComponent>("GameplayComp");
+	CombatComp = CreateDefaultSubobject<UCCombatComponent>("CombatComp");
+}
+
+void ATest::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	CombatComp->Initialize();
 }
 
 // Called when the game starts or when spawned
 void ATest::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame

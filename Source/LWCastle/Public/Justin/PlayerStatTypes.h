@@ -30,15 +30,55 @@ struct FStatInfo
 	bool bIsMax = false;
 };
 
-//Store current player level 
-USTRUCT()
-struct FStruct_PlayerLevel : public FTableRowBase
+USTRUCT(BlueprintType)
+struct FStruct_StatDisplays 
 {
 	GENERATED_BODY()
 
-	FStruct_PlayerLevel() = default;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Health; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MaxHealth; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Mana; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MaxMana; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Stamina; 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MaxStamina;
+};
 
-	FStruct_PlayerLevel(FName name, int level)
+USTRUCT()
+struct FStruct_Progression : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FStruct_Progression() = default;
+	FStruct_Progression(int level, float amount, int levelUpCost)
+	{
+		Level = level;
+		Amount = amount;
+		LevelupCost = levelUpCost;
+	}
+
+	UPROPERTY(EditAnywhere)
+	int Level = 0;
+	UPROPERTY(EditAnywhere)
+	float Amount = 0.f;
+	UPROPERTY(EditAnywhere)
+	int LevelupCost = 0;
+};
+
+//Store current player level 
+USTRUCT()
+struct FStruct_Level : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FStruct_Level() = default;
+
+	FStruct_Level(FName name, int level)
 	{
 		StatName = name;
 		Level = level;

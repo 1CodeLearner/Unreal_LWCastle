@@ -16,12 +16,12 @@ void UCAttributeComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
-int UCAttributeComponent::GetCurrentHealth() const
+float UCAttributeComponent::GetCurrentHealth() const
 {
 	return CurrentHealth;
 }
 
-int UCAttributeComponent::GetMaxHealth() const
+float UCAttributeComponent::GetMaxHealth() const
 {
 	return MaxHealth;
 }
@@ -29,9 +29,10 @@ int UCAttributeComponent::GetMaxHealth() const
 void UCAttributeComponent::ApplyDamage(const int Damage)
 {
 	CurrentHealth -= Damage;
-	if(!IsAlive())
+	OnTakenDamage.Broadcast(CurrentHealth, Damage);
+	if(IsAlive())
 	{
-		OnTakenDamage.Broadcast(CurrentHealth, Damage);
+		UE_LOG(LogTemp, Warning, TEXT("Taken this mouch Damgae %d"), Damage);
 	}
 }
 

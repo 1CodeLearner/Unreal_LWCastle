@@ -28,16 +28,24 @@ public:
 	FManaDepletedDelegate OnManaDepleted;
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FProgressonChangedDelegate OnProgressionChanged;
+
 protected:
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	int GetCurrentMana() const;
+	FStruct_StatDisplays GetAttributesToDisplay() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentMana() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMaxMana() const;
 
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentStamina() const;
+	UFUNCTION(BlueprintCallable)
+	float GetMaxStamina() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool TrySpendMana(int SpendAmount);

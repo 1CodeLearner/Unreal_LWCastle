@@ -13,69 +13,44 @@ UCPlayerAttributeManagerComp::UCPlayerAttributeManagerComp()
 
 }
 
-void UCPlayerAttributeManagerComp::BeginPlay()
+void UCPlayerAttributeManagerComp::BeginInit()
 {
-	Super::BeginPlay();
-
-	PlayerLevelMap.Add("Health", { "Health", 3 });
-	PlayerLevelMap.Add("Mana", { "Mana", 1 });
-	PlayerLevelMap.Add("Stamina", { "Stamina", 2 });
-
-
 	//Bring Player progression info from GameMode.
 	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(this);
 	ACGameModeBase* CGameMode = Cast<ACGameModeBase>(GameMode);
 	if (CGameMode)
 	{
 		{
-			TArray<FStruct_PlayerAttribute> HealthProgressionArr;
-			TArray<FStruct_PlayerAttribute*> HealthProgRows;
-			CGameMode->GetProgressionTableOf(EPlayerStat::HEALTH)->GetAllRows<FStruct_PlayerAttribute>("String", HealthProgRows);
-			for (int i = 0; i < HealthProgRows.Num(); ++i)
-			{
-				FString RowName = FString::Printf(TEXT("Health_%d"), i);
-				FStruct_PlayerAttribute HealthProgressionRow = { HealthProgRows[i]->Level, HealthProgRows[i]->Amount,HealthProgRows[i]->LevelupCost };
-
-				HealthProgressionArr.Add(HealthProgressionRow);
-			}
-			FStatProgressConversion Holder = { HealthProgressionArr };
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::HEALTH);
+			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Health", Holder);
 		}
 		{
-			TArray<FStruct_PlayerAttribute> ManaProgressionArr;
-			TArray<FStruct_PlayerAttribute*> ManaProgRows;
-			CGameMode->GetProgressionTableOf(EPlayerStat::MANA)->GetAllRows<FStruct_PlayerAttribute>("String", ManaProgRows);
-			for (int i = 0; i < ManaProgRows.Num(); ++i)
-			{
-				FString RowName = FString::Printf(TEXT("Health_%d"), i);
-				FStruct_PlayerAttribute ManaProgressionRow = { ManaProgRows[i]->Level, ManaProgRows[i]->Amount, ManaProgRows[i]->LevelupCost };
-
-				ManaProgressionArr.Add(ManaProgressionRow);
-			}
-
-			FStatProgressConversion Holder = { ManaProgressionArr };
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::MANA);
+			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Mana", Holder);
 		}
-
 		{
-
-			TArray<FStruct_PlayerAttribute> StaminaProgressionArr;
-			TArray<FStruct_PlayerAttribute*> StaminaProgRows;
-			CGameMode->GetProgressionTableOf(EPlayerStat::STAMINA)->GetAllRows < FStruct_PlayerAttribute>("String", StaminaProgRows);
-			for (int i = 0; i < StaminaProgRows.Num(); ++i)
-			{
-				FString RowName = FString::Printf(TEXT("Health_%d"), i);
-				FStruct_PlayerAttribute StaminaProgressionRow = { StaminaProgRows[i]->Level, StaminaProgRows[i]->Amount,StaminaProgRows[i]->LevelupCost };
-
-				StaminaProgressionArr.Add(StaminaProgressionRow);
-			}
-
-			FStatProgressConversion Holder = { StaminaProgressionArr };
+			TArray<FStruct_Progression> Progession = CGameMode->GetProgressions(EPlayerStat::STAMINA);
+			FStatProgressConversion Holder = { Progession };
 			PlayerProgressionMap.Add("Stamina", Holder);
 		}
-		
+		{
+
+			TArray<FStruct_Level> LevelStats = CGameMode->GetCurrentLevels();
+			for (FStruct_Level stat : LevelStats)
+			{
+				PlayerLevelMap.Add(stat.StatName, stat);
+			}
+		}
 	}
 
+
+}
+
+void UCPlayerAttributeManagerComp::BeginPlay()
+{
+	Super::BeginPlay();
 
 	InventoryComp = Cast<APlayerController>(GetOwner())->GetPawn()->GetComponentByClass<UCInventoryComponent>();
 	if (ensureAlwaysMsgf(InventoryComp, TEXT("Inventory Missing! Add Inventory Component to controlled Character!"))) {
@@ -84,6 +59,7 @@ void UCPlayerAttributeManagerComp::BeginPlay()
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("FAIL"));
 	}
+
 }
 
 void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
@@ -106,7 +82,7 @@ void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 
 	InventoryComp->SpendCurrency(GetLevelupCostFor(GetStatName(PlayerStatType)));
 	IncrementStatLevel(GetStatName(PlayerStatType));
-	FStruct_PlayerAttribute	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
+	FStruct_Progression	UpdatedStat = GetCurrentProgressionOf(GetStatName(PlayerStatType));
 	OnPlayerStatUpdated.Broadcast(
 		{
 			PlayerStatType,
@@ -117,52 +93,60 @@ void UCPlayerAttributeManagerComp::UpdatePlayerStat(EPlayerStat PlayerStatType)
 	);
 }
 
-FStatInfo UCPlayerAttributeManagerComp::GetStatInfo(EPlayerStat StatType) const
+FStatInfo UCPlayerAttributeManagerComp::GetStatInfoOf(EPlayerStat StatType) const
 {
 	if (ensure(StatType != EPlayerStat::NONE))
 	{
-		FStruct_PlayerAttribute CurrStat = GetCurrentProgressionOf(GetStatName(StatType));
+		FStruct_Progression CurrStat = GetCurrentProgressionOf(GetStatName(StatType));
 		return { StatType, CurrStat.Level, CurrStat.LevelupCost, CheckIsMaxFor(GetStatName(StatType)) };
 	}
 	return FStatInfo();
 }
 
+FStruct_StatDisplays UCPlayerAttributeManagerComp::GetAllStats() const
+{
+	auto Health = GetCurrentProgressionOf(GetStatName(EPlayerStat::HEALTH));
+	auto Mana = GetCurrentProgressionOf(GetStatName(EPlayerStat::MANA));
+	auto Stamina = GetCurrentProgressionOf(GetStatName(EPlayerStat::STAMINA));
+	return {Health.Amount, Health.Amount , Mana.Amount, Mana.Amount , Stamina.Amount, Stamina.Amount};
+}
+
 int UCPlayerAttributeManagerComp::GetHealthLevel() const
 {
-	FStruct_PlayerLevel HealthLevel = PlayerLevelMap["Health"];
+	FStruct_Level HealthLevel = PlayerLevelMap["Health"];
 	return HealthLevel.Level;
 }
 
 int UCPlayerAttributeManagerComp::GetManaLevel() const
 {
-	FStruct_PlayerLevel HealthLevel = PlayerLevelMap["Mana"];
+	FStruct_Level HealthLevel = PlayerLevelMap["Mana"];
 	return HealthLevel.Level;
 }
 
 int UCPlayerAttributeManagerComp::GetStaminaLevel() const
 {
-	FStruct_PlayerLevel HealthLevel = PlayerLevelMap["Stamina"];
+	FStruct_Level HealthLevel = PlayerLevelMap["Stamina"];
 	return HealthLevel.Level;
 }
 
 bool UCPlayerAttributeManagerComp::IsMaxReached(FName StatName)
 {
-	FStruct_PlayerAttribute CurrProgressionLevel = GetCurrentProgressionOf(StatName);
-	FStruct_PlayerAttribute LastProgressionLevel = GetLastProgressionOf(StatName);
+	FStruct_Progression CurrProgressionLevel = GetCurrentProgressionOf(StatName);
+	FStruct_Progression LastProgressionLevel = GetLastProgressionOf(StatName);
 	return CurrProgressionLevel.Level == LastProgressionLevel.Level;
 }
 
-FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName)
+FStruct_Progression UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName)
 {
 	return PlayerProgressionMap[StatName].ProgressionHolder[GetCurrentProgressionIndex(StatName)];
 }
 
-FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName) const
+FStruct_Progression UCPlayerAttributeManagerComp::GetCurrentProgressionOf(FName StatName) const
 {
 	return PlayerProgressionMap[StatName].ProgressionHolder[GetCurrentProgressionIndex(StatName)];
 }
 
-FStruct_PlayerAttribute UCPlayerAttributeManagerComp::GetLastProgressionOf(FName StatName)
+FStruct_Progression UCPlayerAttributeManagerComp::GetLastProgressionOf(FName StatName)
 {
 	return PlayerProgressionMap[StatName].ProgressionHolder.Last();
 }
@@ -183,7 +167,7 @@ int UCPlayerAttributeManagerComp::GetCurrentProgressionIndex(FName StatName) con
 
 int UCPlayerAttributeManagerComp::GetLevelupCostFor(FName StatName)
 {
-	FStruct_PlayerAttribute PlayerProgression = GetCurrentProgressionOf(StatName);
+	FStruct_Progression PlayerProgression = GetCurrentProgressionOf(StatName);
 	return PlayerProgression.LevelupCost;
 }
 
@@ -196,6 +180,16 @@ bool UCPlayerAttributeManagerComp::CheckIsMaxFor(FName StatName) const
 {
 	return GetCurrentProgressionOf(StatName).LevelupCost == 0;
 }
+
+
+
+
+void UCPlayerAttributeManagerComp::IncrementStatLevel(FName StatName)
+{
+	FStruct_Level CurrPlayerLevel = PlayerLevelMap[StatName];
+	PlayerLevelMap[StatName].Level = CurrPlayerLevel.Level + 1;
+}
+
 
 
 FName UCPlayerAttributeManagerComp::GetStatName(EPlayerStat PlayerStatEnum)
@@ -242,10 +236,4 @@ FName UCPlayerAttributeManagerComp::GetStatName(EPlayerStat PlayerStatEnum) cons
 		return FName();
 	}
 	}
-}
-
-void UCPlayerAttributeManagerComp::IncrementStatLevel(FName StatName)
-{
-	FStruct_PlayerLevel CurrPlayerLevel = PlayerLevelMap[StatName];
-	PlayerLevelMap[StatName].Level = CurrPlayerLevel.Level + 1;
 }
