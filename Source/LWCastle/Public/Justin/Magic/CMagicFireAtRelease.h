@@ -18,14 +18,4 @@ public:
 	virtual void Release_Implementation(AActor* InstigatorActor) override;
 	virtual void Reset_Implementation(AActor* InstigatorActor) override;
 	virtual void MagicExecute(AActor* InstigatorActor) override;
-protected:
-	virtual void StartMontage() override;
-private:
-	FTimerHandle CooldownHandle;
-	FTimerDelegate CooldownDelegate;
-	bool bIsCoolDown;
-	UFUNCTION()
-	void StopCooldown();
-public:
-	UCMagicFireAtRelease();
 };

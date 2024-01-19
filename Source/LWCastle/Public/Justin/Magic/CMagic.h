@@ -9,6 +9,9 @@
 /**
  *
  */
+
+ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
+
 UCLASS(BlueprintType, Blueprintable)
 class LWCASTLE_API UCMagic : public UObject
 {
@@ -26,16 +29,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsPressing() const;
 	UFUNCTION(BlueprintCallable)
-	float GetCooldownTime() const;
+	float GetAnimMontageLength();
+
+	FMagicExecuted OnMagicExecuted;
 
 protected:
 	UFUNCTION()
 	virtual void MagicExecute(AActor* InstigatorActor);
-	FTimerHandle MagicHandle;
-	FTimerDelegate MagicDelegate;
 
 	virtual void StartMontage();
 	void StopMontage();
+	bool IsMontagePlaying() const;
+
 	UFUNCTION()
 	virtual void OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
@@ -47,11 +52,12 @@ protected:
 	FColor DebugMagicColor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float DebugLineThickness;
+	
+	UFUNCTION()
+	UAnimInstance* GetAnimInstance() const;
 
 private:
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true", ClampMin = "0."), Category = "Magic")
-	float CooldownTime;
-	
+
 	UPROPERTY()
 	UAnimInstance* AnimInstance;
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0."), Category = "Magic")

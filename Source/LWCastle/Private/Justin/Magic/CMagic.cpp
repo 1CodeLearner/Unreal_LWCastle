@@ -22,8 +22,6 @@ void UCMagic::Reset_Implementation(AActor* InstigatorActor)
 {
 	bIsPressing = false;
 
-	if (MagicHandle.IsValid())
-		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	if (AnimInstance->Montage_IsActive(Montage)) {
 		StopMontage();
 	}
@@ -57,7 +55,10 @@ void UCMagic::StartMontage()
 
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UCMagic::OnNotifyBegin);
 		AnimInstance->Montage_Play(Montage, InPlayRate);
-		if(!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!"))) return;
+
+		if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!"))) 
+			return;
+
 		AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 	}
 }
@@ -65,29 +66,39 @@ void UCMagic::StartMontage()
 void UCMagic::StopMontage()
 {
 	if (AnimInstance) {
-
-		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
+		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(this, "OnNotifyBegin"))
+		{
+			AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
+		}
 		AnimInstance->Montage_Stop(InBlendOutTime, Montage);
 	}
+}
+
+bool UCMagic::IsMontagePlaying() const
+{
+	return AnimInstance->Montage_IsActive(Montage);
 }
 
 void UCMagic::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnNotifyBegin inside CMagic.cpp"));
 	MagicExecute(BranchingPointPayload.SkelMeshComponent->GetOwner());
+	float Cooldown = GetAnimMontageLength();
+	if (Cooldown != -1)
+		OnMagicExecuted.Broadcast(Cooldown);
 }
+
+UAnimInstance* UCMagic::GetAnimInstance() const
+{
+	return AnimInstance;
+}
+
 
 UCMagic::UCMagic()
 {
-	CooldownTime = 0.f;
 	bIsPressing = false;
 	InPlayRate = 1.0f;
 	InBlendOutTime = 0.0f;
-}
-
-float UCMagic::GetCooldownTime() const
-{
-	return CooldownTime;
 }
 
 void UCMagic::Initialize(AActor* InstigatorActor)
@@ -103,11 +114,6 @@ void UCMagic::Initialize(AActor* InstigatorActor)
 			if (ensure(Anim))
 			{
 				AnimInstance = Anim;
-
-				if (Montage) {
-					int32 SecIndex = Montage->GetSectionIndex(MontageSection);
-					CooldownTime = Montage->GetSectionLength(SecIndex);
-				}
 			}
 		}
 	}
@@ -116,6 +122,16 @@ void UCMagic::Initialize(AActor* InstigatorActor)
 bool UCMagic::IsPressing() const
 {
 	return bIsPressing;
+}
+
+float UCMagic::GetAnimMontageLength()
+{
+	if (Montage && AnimInstance->Montage_IsPlaying(Montage))
+	{
+		int32 SecIndex = Montage->GetSectionIndex(MontageSection);
+		return Montage->GetSectionLength(SecIndex);
+	}
+	return -1.f;
 }
 
 UWorld* UCMagic::GetWorld() const
