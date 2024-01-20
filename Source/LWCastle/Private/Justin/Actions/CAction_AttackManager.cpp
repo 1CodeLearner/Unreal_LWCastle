@@ -99,8 +99,6 @@ void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElement
 
 			StartAction(InstigatorActor);
 			
-			GetActiveElement()->Press(InstigatorActor);
-			
 			//GetActiveElement()->Press(InstigatorActor);
 			//StopAction(InstigatorActor);
 		}

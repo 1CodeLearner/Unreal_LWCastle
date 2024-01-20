@@ -18,13 +18,19 @@ void UCMagic::Release_Implementation(AActor* InstigatorActor)
 	UE_LOG(LogTemp, Warning, TEXT("Running Release %s"), *GetNameSafe(this));
 }
 
-void UCMagic::Reset_Implementation(AActor* InstigatorActor)
+void UCMagic::Reset(AActor* InstigatorActor)
 {
 	bIsPressing = false;
 
 	if (AnimInstance->Montage_IsActive(Montage)) {
 		StopMontage();
 	}
+
+	if(AnimInstance->OnPlayMontageNotifyBegin.IsBound())
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");	
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
 }
 

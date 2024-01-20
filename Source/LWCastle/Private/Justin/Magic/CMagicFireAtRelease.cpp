@@ -17,11 +17,6 @@ void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 	StartMontage();
 }
 
-void UCMagicFireAtRelease::Reset_Implementation(AActor* InstigatorActor)
-{
-	Super::Reset_Implementation(InstigatorActor);
-}
-
 void UCMagicFireAtRelease::MagicExecute(AActor* InstigatorActor)
 {
 	Super::MagicExecute(InstigatorActor);

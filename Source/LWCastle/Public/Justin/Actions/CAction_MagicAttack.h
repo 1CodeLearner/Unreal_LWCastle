@@ -8,7 +8,10 @@
 
 /**
  *
- */
+	This class is no longer being used. It's replaced with UCMagic.
+*/
+
+
 UCLASS(Abstract)
 class LWCASTLE_API UCAction_MagicAttack : public UCAction
 {
