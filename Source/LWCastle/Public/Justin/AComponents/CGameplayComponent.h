@@ -1,4 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +10,7 @@
 
 class UCAction;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCGameplayComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -19,17 +20,26 @@ public:
 	void AddAction(TSubclassOf<UCAction> NewActionClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
+	void RemoveAction(UCAction* ActionToRemove);
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void StartActionByName(AActor* InstigatorActor, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void StopActionByName(AActor* InstigatorActor, FName ActionName);
-	
+	void CompleteActionByName(AActor* InstigatorActor, FName ActionName);
+	UFUNCTION()
+	void CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete);
+
 	UPROPERTY(VisibleAnywhere, Category = "Action")
 	FGameplayTagContainer ActiveGameplayTags;
+
+	UPROPERTY(VisibleAnywhere, Category = "Action")
+	FGameplayTagContainer PauseGameplayTags;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	TArray<UCAction*> GetActions() const;
-	
+
 
 protected:
 

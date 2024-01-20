@@ -19,7 +19,7 @@ class LWCASTLE_API UCAction_MagicAttack : public UCAction
 public:
 
 	void StartAction_Implementation(AActor* InstigatorActor) override;
-	void StopAction_Implementation(AActor* InstigatorActor) override;
+	void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")

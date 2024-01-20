@@ -29,12 +29,12 @@ void UCAction_MagicAttack::StartAction_Implementation(AActor* InstigatorActor)
 
 }
 
-void UCAction_MagicAttack::StopAction_Implementation(AActor* InstigatorActor)
+void UCAction_MagicAttack::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	if (bIsLoopingMagic)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
-		Super::StopAction_Implementation(InstigatorActor);
+		Super::CompleteAction_Implementation(InstigatorActor);
 
 	}
 	else
@@ -49,7 +49,7 @@ void UCAction_MagicAttack::StopAction_Implementation(AActor* InstigatorActor)
 		}
 		else
 		{
-			Super::StopAction_Implementation(InstigatorActor);
+			Super::CompleteAction_Implementation(InstigatorActor);
 		}
 	}
 }
@@ -96,5 +96,5 @@ void UCAction_MagicAttack::StopCooldown(AActor* InstigatorActor)
 {
 	bIsMagicCooldown = false;
 	GetWorld()->GetTimerManager().ClearTimer(CooldownMagicHandle);
-	StopAction(InstigatorActor);
+	CompleteAction(InstigatorActor);
 }

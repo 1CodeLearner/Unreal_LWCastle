@@ -18,10 +18,19 @@ void UCGameplayComponent::AddAction(TSubclassOf<UCAction> NewActionClass)
 	}
 }
 
+void UCGameplayComponent::RemoveAction(UCAction* ActionToRemove)
+{
+	if (ensure(ActionToRemove && !ActionToRemove->IsRunning()))
+	{
+		Actions.Remove(ActionToRemove);
+	}
+}
+
 void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
 	if (ensure(!ActionName.IsNone() && InstigatorActor))
 	{
+		UCAction* ActionFound = nullptr;
 		for (auto Action : Actions)
 		{
 			if (Action && Action->GetActionName() == ActionName)
@@ -30,27 +39,95 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 				{
 					Action->StartAction(InstigatorActor);
 
-					UE_LOG(LogTemp, Warning, TEXT("Inside StartAction"));
+					UE_LOG(LogTemp, Warning, TEXT("StartAction: %s"), *Action->GetActionName().ToString());
+					ActionFound = Action;
 					break;
+				}
+			}
+		}
+		if (ActionFound)
+		{
+			for (auto Action : Actions)
+			{
+				if (Action != ActionFound)
+				{
+					if (Action->CanInterrupt(InstigatorActor, ActionFound))
+					{
+						Action->InterruptAction(InstigatorActor);
+						UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *Action->GetActionName().ToString());
+					}
+
+					if (Action->CanPause(InstigatorActor, ActionFound))
+					{
+						Action->PauseAction(InstigatorActor);
+						UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
+					}
 				}
 			}
 		}
 	}
 }
 
-void UCGameplayComponent::StopActionByName(AActor* InstigatorActor, FName ActionName)
+void UCGameplayComponent::CompleteActionByName(AActor* InstigatorActor, FName ActionName)
 {
 	if (ensure(!ActionName.IsNone() && InstigatorActor))
 	{
+		UCAction* ActionFound = nullptr;
 		for (auto Action : Actions)
 		{
 			if (Action && Action->GetActionName() == ActionName)
 			{
-				if (Action->IsRunning())
+				if (Action->IsRunning() && !Action->IsPausing())
 				{
-					Action->StopAction(InstigatorActor);
-					UE_LOG(LogTemp, Warning, TEXT("Inside StopAction"));
+					Action->CompleteAction(InstigatorActor);
+					ActionFound = Action;
+					UE_LOG(LogTemp, Warning, TEXT("Inside CompleteAction"));
 					break;
+				}
+			}
+		}
+		if (ActionFound)
+		{
+			for (auto Action : Actions)
+			{
+				if (Action != ActionFound)
+				{
+					if (Action->CanUnPause(InstigatorActor, Action))
+					{
+						Action->UnPauseAction(InstigatorActor);
+					}
+				}
+			}
+		}
+	}
+}
+
+void UCGameplayComponent::CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete)
+{
+	if (ensure(ActionToComplete && InstigatorActor))
+	{
+		bool HasCompleted = false;
+
+		if (Actions.Contains(ActionToComplete))
+		{
+			if (ActionToComplete->IsRunning())
+			{
+				ActionToComplete->CompleteAction(InstigatorActor);
+				HasCompleted = true;
+				UE_LOG(LogTemp, Warning, TEXT("Inside CompleteAction"));
+			}
+		}
+
+		if (HasCompleted)
+		{
+			for (auto Action : Actions)
+			{
+				if (Action != ActionToComplete)
+				{
+					if (Action->CanUnPause(InstigatorActor, Action))
+					{
+						Action->UnPauseAction(InstigatorActor);
+					}
 				}
 			}
 		}
@@ -76,18 +153,18 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, DebugMsg);
 
 	//Draw All Actions
-	/*for (auto* Action : Actions)
+	for (auto* Action : Actions)
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
 		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
 
-		LogOnScreen(this, ActionMsg, TextColor, 0.0f);
-	}*/
+		//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	}
 }
-
 
 TArray<UCAction*> UCGameplayComponent::GetActions() const
 {

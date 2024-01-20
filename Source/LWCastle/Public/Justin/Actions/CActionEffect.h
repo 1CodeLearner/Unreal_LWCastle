@@ -7,7 +7,7 @@
 #include "CActionEffect.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API UCActionEffect : public UCAction
@@ -16,5 +16,31 @@ class LWCASTLE_API UCActionEffect : public UCAction
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
+
+
+protected:
+
+	//How long effect lasts
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="ActionEffect")
+	float DurationTime;
+	//Intervals to Tick effect within duration
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="ActionEffect")
+	float IntervalTime;
+	
+	FTimerHandle DurationHandle;
+	FTimerDelegate DurationDelegate;
+	FTimerHandle IntervalHandle;
+	FTimerDelegate IntervalDelegate;
+
+	UFUNCTION()
+	void DurationEnd(AActor* InstigatorActor);
+
+	UFUNCTION()
+	void IntervalStart(AActor* InstigatorActor);
 };

@@ -15,7 +15,7 @@ class LWCASTLE_API UAction_TestUpDown : public UCAction
 	GENERATED_BODY()
 public:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
-	virtual void StopAction_Implementation(AActor* InstigatorActor) override;
+	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
 	UFUNCTION(BlueprintCallable)
 	void ResetMagic(AActor* InstigatorActor);

@@ -33,40 +33,24 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 	bIsRunning = true;
 }
 
-void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
+void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	StopAction(InstigatorActor);
-}
-
-void UCAction::StopAction_Implementation(AActor* InstigatorActor)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Running StopAction %s"), *this->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Running CompleteAction %s"), *this->GetName());
 
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
 		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
+		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
-}
-
-
-bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
-{
-	if (bCanInterrupt)
-	{
-		if (InterruptedTags.HasAny(OtherGrantedTag))
-		{
-			return true;
-		}
-		return false;
-	}
-	return false;
+	bIsPausing = false;
 }
 
 UCAction::UCAction()
 {
 	bIsRunning = false;
+	bIsPausing = false;
 }
 
 void UCAction::Initialize(UCGameplayComponent* GameplayComp)
@@ -77,9 +61,89 @@ void UCAction::Initialize(UCGameplayComponent* GameplayComp)
 	}
 }
 
+bool UCAction::CanPause(AActor* InstigatorActor, UCAction* OtherAction)
+{
+	if (bCanPause)
+	{
+		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
+		{
+			return !bIsPausing && bIsRunning;
+		}
+	}
+
+	return false;
+}
+
+void UCAction::PauseAction_Implementation(AActor* InstigatorActor)
+{
+	ensure(IsRunning());
+	bIsPausing = true;
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
+	{
+		Gameplay->PauseGameplayTags.AppendTags(GetGrantedTags());
+	}
+}
+
+bool UCAction::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const
+{
+	if (bCanPause)
+	{
+		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
+		{
+			return bIsPausing && bIsRunning;
+		}
+	}
+
+	return false;
+}
+
+void UCAction::UnPauseAction_Implementation(AActor* InstigatorActor)
+{
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
+	{
+		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
+	}
+	
+	bIsPausing = false;
+}
+
+bool UCAction::CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const
+{
+	if (bCanInterrupt)
+	{
+		if (IsRunning() && InterruptedTags.HasAny(OtherAction->GetGrantedTags()))
+		{
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Running InterruptAction %s"), *this->GetName());
+
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
+	{
+		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
+		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
+	}
+	bIsRunning = false;
+	bIsPausing = false;
+}
+
 bool UCAction::IsRunning() const
 {
 	return bIsRunning;
+}
+
+bool UCAction::IsPausing() const
+{
+	return bIsPausing;
 }
 
 UWorld* UCAction::GetWorld() const

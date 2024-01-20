@@ -13,18 +13,18 @@ void UAction_TestUpDown::StartAction_Implementation(AActor* InstigatorActor)
 	GetWorld()->GetTimerManager().SetTimer(ExecuteMagicHandle, ExecuteMagicDelegate, .05, true);
 }
 
-void UAction_TestUpDown::StopAction_Implementation(AActor* InstigatorActor)
+void UAction_TestUpDown::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	Super::StopAction_Implementation(InstigatorActor);
+	Super::CompleteAction_Implementation(InstigatorActor);
 	UE_LOG(LogTemp, Warning, TEXT("Inside Stop"));
 
 	GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
-	Super::StopAction_Implementation(InstigatorActor);
+	Super::CompleteAction_Implementation(InstigatorActor);
 }
 
 void UAction_TestUpDown::ResetMagic(AActor* InstigatorActor)
 {
-	StopAction(InstigatorActor);
+	CompleteAction(InstigatorActor);
 
 }
 
