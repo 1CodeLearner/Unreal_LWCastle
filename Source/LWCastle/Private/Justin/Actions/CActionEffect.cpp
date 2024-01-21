@@ -42,8 +42,11 @@ void UCActionEffect::InterruptAction_Implementation(AActor* InstigatorActor)
 	}
 
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	GetGameplayComponent()->RemoveAction(this);
-	ConditionalBeginDestroy();
+	if (bDeleteAtEnd && ensure(GetGameplayComponent()))
+	{
+		GetGameplayComponent()->RemoveAction(this);
+		ConditionalBeginDestroy();
+	}
 }
 
 void UCActionEffect::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -61,7 +64,7 @@ bool UCActionEffect::CanPause(AActor* InstigatorActor, UCAction* OtherAction) co
 		if (PausedTags.HasAny(OtherAction->GetGrantedTags())
 			&& !GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
 		{
-			return !bIsPausing;
+			return !bIsPausing && IsRunning();
 		}
 	}
 
@@ -70,7 +73,7 @@ bool UCActionEffect::CanPause(AActor* InstigatorActor, UCAction* OtherAction) co
 
 void UCActionEffect::PauseAction_Implementation(AActor* InstigatorActor)
 {
-	ensure(IsRunning());
+	ensureAlways(IsRunning());
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -89,11 +92,10 @@ bool UCActionEffect::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) 
 {
 	if (bCanPause)
 	{
-
 		if (PausedTags.HasAny(OtherAction->GetGrantedTags()) &&
 			GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
 		{
-			return bIsPausing;
+			return bIsPausing && IsRunning();
 		}
 	}
 
@@ -102,6 +104,8 @@ bool UCActionEffect::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) 
 
 void UCActionEffect::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
+	ensureAlways(IsRunning());
+
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -130,9 +134,10 @@ void UCActionEffect::DurationEnd(AActor* InstigatorActor)
 
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 
-	if (ensure(GetGameplayComponent()))
+	GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
+
+	if (bDeleteAtEnd && ensure(GetGameplayComponent()))
 	{
-		GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
 		GetGameplayComponent()->RemoveAction(this);
 		ConditionalBeginDestroy();
 	}
@@ -147,4 +152,5 @@ UCActionEffect::UCActionEffect()
 {
 	bIsPausing = false;
 	bCanPause = false;
+	bDeleteAtEnd = false;
 }

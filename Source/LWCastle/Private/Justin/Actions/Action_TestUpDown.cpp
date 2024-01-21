@@ -22,6 +22,13 @@ void UAction_TestUpDown::CompleteAction_Implementation(AActor* InstigatorActor)
 	Super::CompleteAction_Implementation(InstigatorActor);
 }
 
+void UAction_TestUpDown::InterruptAction_Implementation(AActor* InstigatorActor)
+{
+	Super::InterruptAction_Implementation(InstigatorActor);
+	
+	GetWorld()->GetTimerManager().ClearTimer(ExecuteMagicHandle);
+}
+
 void UAction_TestUpDown::ResetMagic(AActor* InstigatorActor)
 {
 	CompleteAction(InstigatorActor);

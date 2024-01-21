@@ -17,6 +17,8 @@ public:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
+	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
+
 	UFUNCTION(BlueprintCallable)
 	void ResetMagic(AActor* InstigatorActor);
 

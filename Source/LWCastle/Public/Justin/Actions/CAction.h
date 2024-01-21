@@ -72,13 +72,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bCanInterrupt;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
-	bool bAutoStart;
-
 
 private:
 	UPROPERTY()
 	bool bIsRunning;
+	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"),Category = "Action")
+	bool bAutoStart;
 	UPROPERTY()
 	UCGameplayComponent* GameplayCompRef;
 };

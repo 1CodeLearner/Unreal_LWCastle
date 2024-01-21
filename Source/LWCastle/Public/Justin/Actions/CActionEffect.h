@@ -64,14 +64,16 @@ protected:
 	UFUNCTION()
 	virtual void IntervalStart(AActor* InstigatorActor);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditDefaultsOnly, Category = "ActionEffect")
 	bool bCanPause;
+
+	//Remove Action when Duration reaches the end.
+	UPROPERTY(EditDefaultsOnly, Category = "ActionEffect")
+	bool bDeleteAtEnd;
 
 public:
 	UCActionEffect();
 
 private:
-	
-	UPROPERTY()
 	bool bIsPausing;
 };
