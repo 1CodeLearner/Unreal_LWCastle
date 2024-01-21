@@ -2,8 +2,9 @@
 
 
 #include "Justin/AComponents/CGameplayComponent.h"
+
+#include "Justin/CActionEffectInterface.h"
 #include "Justin/Actions/CAction.h"
-#include "Justin/Actions/CAction_MagicAttack.h"
 
 void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass)
 {
@@ -69,7 +70,7 @@ void UCGameplayComponent::CompleteActionByName(AActor* InstigatorActor, FName Ac
 		{
 			if (Action && Action->GetActionName() == ActionName)
 			{
-				if (Action->IsRunning() && !Action->IsPausing())
+				if (Action->IsRunning())
 				{
 					Action->CompleteAction(InstigatorActor);
 					ActionFound = Action;
@@ -184,21 +185,27 @@ void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction*
 			UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *Action->GetActionName().ToString());
 		}
 
-		if (Action->CanPause(Instigator, ActionCompared))
+		if (Action->Implements<UCActionEffectInterface>())
 		{
-			Action->PauseAction(Instigator);
-			UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
+			auto EffectInterface = Cast<ICActionEffectInterface>(Action);
+			if (EffectInterface->CanPause(Instigator, ActionCompared))
+			{
+				EffectInterface->PauseAction(Instigator);
+				UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
+			}
 		}
 	}
 }
 
 void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared)
 {
-	if (Action != ActionCompared)
+	if (Action->Implements<UCActionEffectInterface>() && Action != ActionCompared)
 	{
-		if (Action->CanUnPause(Instigator, ActionCompared))
+		auto EffectInterface = Cast<ICActionEffectInterface>(Action);
+		if (EffectInterface->CanUnPause(Instigator, ActionCompared))
 		{
-			Action->UnPauseAction(Instigator);
+			EffectInterface->UnPauseAction(Instigator);
+			UE_LOG(LogTemp, Warning, TEXT("UnPauseAction: %s"), *Action->GetActionName().ToString());
 		}
 	}
 }

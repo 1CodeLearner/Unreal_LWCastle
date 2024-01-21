@@ -2,8 +2,6 @@
 
 
 #include "Justin/Actions/CAction.h"
-
-#include "AssetTypeCategories.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 
 
@@ -37,8 +35,6 @@ void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running CompleteAction %s"), *this->GetName());
 
-	ensure(!bIsPausing);
-
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -46,13 +42,11 @@ void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
-	bIsPausing = false;
 }
 
 UCAction::UCAction()
 {
 	bIsRunning = false;
-	bIsPausing = false;
 	bAutoStart = false;
 }
 
@@ -62,55 +56,6 @@ void UCAction::Initialize(UCGameplayComponent* GameplayComp)
 	{
 		this->GameplayCompRef = GameplayComp;
 	}
-}
-
-bool UCAction::CanPause(AActor* InstigatorActor, UCAction* OtherAction)
-{
-	if (bCanPause)
-	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()) && 
-			!GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
-		{
-			return !bIsPausing && bIsRunning;
-		}
-	}
-
-	return false;
-}
-
-void UCAction::PauseAction_Implementation(AActor* InstigatorActor)
-{
-	ensure(IsRunning());
-	auto Gameplay = GetGameplayComponent();
-	if (Gameplay)
-	{
-		Gameplay->PauseGameplayTags.AppendTags(GetGrantedTags());
-	}
-}
-
-bool UCAction::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const
-{
-	if (bCanPause)
-	{
-		if ( PausedTags.HasAny(OtherAction->GetGrantedTags()) && 
-			GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()) )
-		{
-			return bIsPausing && bIsRunning;
-		}
-	}
-
-	return false;
-}
-
-void UCAction::UnPauseAction_Implementation(AActor* InstigatorActor)
-{
-	auto Gameplay = GetGameplayComponent();
-	if (Gameplay)
-	{
-		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
-	}
-	
-	bIsPausing = false;
 }
 
 bool UCAction::CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const
@@ -137,17 +82,11 @@ void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
 		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
-	bIsPausing = false;
 }
 
 bool UCAction::IsRunning() const
 {
 	return bIsRunning;
-}
-
-bool UCAction::IsPausing() const
-{
-	return bIsPausing;
 }
 
 UWorld* UCAction::GetWorld() const

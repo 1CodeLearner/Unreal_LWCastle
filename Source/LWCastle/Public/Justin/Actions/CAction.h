@@ -26,18 +26,10 @@ public:
 	void StartAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	bool CanPause(AActor* InstigatorActor, UCAction* OtherAction);
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
-	void PauseAction(AActor* InstigatorActor);
-	UFUNCTION(BlueprintCallable, Category = "Action")
-	virtual bool CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const;
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
-	void UnPauseAction(AActor* InstigatorActor);
-
-	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const;
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	void InterruptAction(AActor* InstigatorActor);
+
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void CompleteAction(AActor* InstigatorActor);
@@ -56,11 +48,11 @@ protected:
 
 public:
 	UCAction();
+	
+	virtual FGameplayTagContainer GetGrantedTags() const;
 
-		UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	virtual bool IsRunning() const;
-		UFUNCTION(BlueprintCallable)
-	virtual bool IsPausing() const;
 
 protected:
 
@@ -70,9 +62,6 @@ protected:
 	//Stops action if same tag exists in GameplayComponent.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
 	FGameplayTagContainer BlockedTags;
-	//Pauses & unpauses existing action in GamplayComponent if same tag exists in Action that is about to Start or Stop.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
-	FGameplayTagContainer PausedTags;
 	//Stops on-going Action in GameplayComponent if tag exists in Action that is about to Start.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
 	FGameplayTagContainer InterruptedTags;
@@ -84,18 +73,12 @@ protected:
 	bool bCanInterrupt;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
-	bool bCanPause;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bAutoStart;
 
-	virtual FGameplayTagContainer GetGrantedTags() const;
 
 private:
 	UPROPERTY()
 	bool bIsRunning;
-	UPROPERTY()
-	bool bIsPausing;
 	UPROPERTY()
 	UCGameplayComponent* GameplayCompRef;
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Justin/CActionEffectInterface.h"
 #include "Justin/Actions/CAction.h"
 #include "CActionEffect.generated.h"
 
@@ -10,19 +11,34 @@
  *
  */
 UCLASS()
-class LWCASTLE_API UCActionEffect : public UCAction
+class LWCASTLE_API UCActionEffect : public UCAction, public ICActionEffectInterface
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
+
+	UFUNCTION()
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
+	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
+
+	UFUNCTION()
+	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
+
+	UFUNCTION()
+	virtual bool CanPause(AActor* InstigatorActor, UCAction* OtherAction) const override;
+
+	UFUNCTION()
 	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
-	
-	UFUNCTION(BlueprintCallable)
+
+	UFUNCTION()
+	virtual bool CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const override;
+
+	UFUNCTION()
 	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
 
+	UFUNCTION()
+	virtual bool IsPausing() const override;
 
 protected:
 
@@ -38,9 +54,24 @@ protected:
 	FTimerHandle IntervalHandle;
 	FTimerDelegate IntervalDelegate;
 
+	//Pauses & unpauses existing action in GamplayComponent if same tag exists in Action that is about to Start or Stop.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	FGameplayTagContainer PausedTags;
+
 	UFUNCTION()
 	void DurationEnd(AActor* InstigatorActor);
 
 	UFUNCTION()
 	virtual void IntervalStart(AActor* InstigatorActor);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bCanPause;
+
+public:
+	UCActionEffect();
+
+private:
+	
+	UPROPERTY()
+	bool bIsPausing;
 };
