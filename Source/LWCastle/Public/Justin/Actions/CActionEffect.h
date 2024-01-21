@@ -43,10 +43,10 @@ public:
 protected:
 
 	//How long effect lasts
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="ActionEffect")
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="EffectSettings")
 	float DurationTime;
 	//Intervals to Tick effect within duration
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="ActionEffect")
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="EffectSettings")
 	float IntervalTime;
 
 	FTimerHandle DurationHandle;
@@ -54,8 +54,8 @@ protected:
 	FTimerHandle IntervalHandle;
 	FTimerDelegate IntervalDelegate;
 
-	//Pauses & unpauses existing action in GamplayComponent if same tag exists in Action that is about to Start or Stop.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	//Pauses on-going action in GamplayComponent if same tag exists in starting Action's GrantedTags.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer PausedTags;
 
 	UFUNCTION()
@@ -64,11 +64,11 @@ protected:
 	UFUNCTION()
 	virtual void IntervalStart(AActor* InstigatorActor);
 
-	UPROPERTY(EditDefaultsOnly, Category = "ActionEffect")
+	UPROPERTY(EditDefaultsOnly, Category = "EffectSettings")
 	bool bCanPause;
 
 	//Remove Action when Duration reaches the end.
-	UPROPERTY(EditDefaultsOnly, Category = "ActionEffect")
+	UPROPERTY(EditDefaultsOnly, Category = "EffectSettings")
 	bool bDeleteAtEnd;
 
 public:

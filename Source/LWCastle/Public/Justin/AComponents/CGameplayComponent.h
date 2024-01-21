@@ -42,7 +42,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	TArray<UCAction*> GetActions() const;
 
-
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Action")

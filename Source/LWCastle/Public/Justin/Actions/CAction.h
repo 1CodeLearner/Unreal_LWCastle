@@ -56,27 +56,28 @@ public:
 
 protected:
 
-	//Tags that will be granted to GameplayComponent for registering on-going Action
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	//Tags that will be granted to GameplayComponent from this Action
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer GrantedTags;
-	//Stops action if same tag exists in GameplayComponent.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	//Stops Action from starting if tag already exists in GameplayComponent.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
-	//Stops on-going Action in GameplayComponent if tag exists in Action that is about to Start.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
+	/*Stops on-going Action in GameplayComponent if the same Tag exists in starting Action's GrantedTags.
+	Takes first priority over paused Tags*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
 	FGameplayTagContainer InterruptedTags;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditDefaultsOnly, Category = "ActionSettings")
 	FName ActionName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditDefaultsOnly, Category = "ActionSettings")
 	bool bCanInterrupt;
 
 
 private:
 	UPROPERTY()
 	bool bIsRunning;
-	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"),Category = "Action")
+	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"),Category = "ActionSettings")
 	bool bAutoStart;
 	UPROPERTY()
 	UCGameplayComponent* GameplayCompRef;
