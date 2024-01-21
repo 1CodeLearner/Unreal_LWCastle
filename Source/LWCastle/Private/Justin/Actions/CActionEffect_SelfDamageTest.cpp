@@ -12,15 +12,4 @@ void UCActionEffect_SelfDamageTest::IntervalStart(AActor* InstigatorActor)
 
 
 	UCGameplayLibrary::ApplyDamage(InstigatorActor, Cast<AActor>(GetOuter()), DamageAmount);
-	/*if (!AttributeComp)
-	{
-		auto AttributeTemp = Cast<AActor>(GetOuter())->GetComponentByClass<UCAttributeComponent>();
-		if (ensure(AttributeTemp))
-		{
-			AttributeComp = AttributeTemp;
-		}
-	}
-	if (AttributeComp)
-	{
-	}*/
 }

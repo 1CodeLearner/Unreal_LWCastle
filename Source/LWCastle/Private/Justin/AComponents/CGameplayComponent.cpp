@@ -8,7 +8,19 @@
 
 void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass)
 {
-	if (NewActionClass)
+	bool bHasDuplicate = false;
+	for (auto Action : Actions)
+	{
+		auto value1 = NewActionClass->GetDefaultObject();
+		auto value2 = Action->GetClass();
+		if (Action->IsA(NewActionClass))
+		{
+			bHasDuplicate = true;
+			break;
+		}
+	}
+
+	if (NewActionClass && !bHasDuplicate)
 	{
 		UCAction* NewAction = NewObject<UCAction>(GetOwner(), NewActionClass);
 		if (NewAction)
@@ -21,6 +33,7 @@ void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCActio
 				StartActionBy(InstigatorActor, NewAction);
 			}
 		}
+
 	}
 }
 
@@ -160,15 +173,19 @@ void UCGameplayComponent::BeginPlay()
 void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, DebugMsg);
+	FString ActiveDebugMsg = GetNameSafe(GetOwner()) + " Active : " + ActiveGameplayTags.ToStringSimple();
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Green, ActiveDebugMsg);
+
+	FString PauseDebugMsg = GetNameSafe(GetOwner()) + " Paused : " + PauseGameplayTags.ToStringSimple();
+	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, PauseDebugMsg);
+
 
 	//Draw All Actions
 	for (auto* Action : Actions)
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Action Active: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
+		FString ActionMsg = FString::Printf(TEXT("[%s] Actions Owned: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, ActionMsg);
 
 		//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}

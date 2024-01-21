@@ -18,9 +18,6 @@ public:
 
 	virtual void IntervalStart(AActor* InstigatorActor) override;
 
-	UPROPERTY()
-	TObjectPtr<UCAttributeComponent> AttributeComp;
-
 	UPROPERTY(EditDefaultsOnly)
 	float DamageAmount = 0;
 };

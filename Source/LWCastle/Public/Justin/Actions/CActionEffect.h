@@ -25,16 +25,16 @@ public:
 	UFUNCTION()
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual bool CanPause(AActor* InstigatorActor, UCAction* OtherAction) const override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual bool CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
 
 	UFUNCTION()

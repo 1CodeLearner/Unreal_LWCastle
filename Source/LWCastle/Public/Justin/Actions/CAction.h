@@ -20,14 +20,14 @@ public:
 	UFUNCTION()
 	virtual void Initialize(UCGameplayComponent* GameplayComp);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	bool CanStart(AActor* InstigatorActor) const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StartAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	bool CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const;
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void InterruptAction(AActor* InstigatorActor);
 
 

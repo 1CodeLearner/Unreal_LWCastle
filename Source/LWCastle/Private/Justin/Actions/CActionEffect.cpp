@@ -66,11 +66,13 @@ void UCActionEffect::PauseAction_Implementation(AActor* InstigatorActor)
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Inside ActionEffect PauseAction"));
+
 		Gameplay->PauseGameplayTags.AppendTags(GetGrantedTags());
 		GetWorld()->GetTimerManager().PauseTimer(DurationHandle);
 		GetWorld()->GetTimerManager().PauseTimer(IntervalHandle);
 	}
-	
+
 	bIsPausing = true;
 }
 
@@ -91,13 +93,14 @@ bool UCActionEffect::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) 
 
 void UCActionEffect::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Inside ActionEffect UnPauseAction"));
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Inside ActionEffect UnPauseAction"));
+
 		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
-		GetWorld()->GetTimerManager().PauseTimer(DurationHandle);
-		GetWorld()->GetTimerManager().PauseTimer(IntervalHandle);
+		GetWorld()->GetTimerManager().UnPauseTimer(DurationHandle);
+		GetWorld()->GetTimerManager().UnPauseTimer(IntervalHandle);
 	}
 
 	bIsPausing = false;
