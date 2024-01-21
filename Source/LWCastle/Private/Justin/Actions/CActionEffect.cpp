@@ -43,6 +43,7 @@ void UCActionEffect::InterruptAction_Implementation(AActor* InstigatorActor)
 
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	GetGameplayComponent()->RemoveAction(this);
+	ConditionalBeginDestroy();
 }
 
 void UCActionEffect::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -133,6 +134,7 @@ void UCActionEffect::DurationEnd(AActor* InstigatorActor)
 	{
 		GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
 		GetGameplayComponent()->RemoveAction(this);
+		ConditionalBeginDestroy();
 	}
 }
 

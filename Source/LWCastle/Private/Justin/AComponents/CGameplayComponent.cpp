@@ -45,6 +45,7 @@ void UCGameplayComponent::RemoveAction(UCAction* ActionToRemove)
 	if (ensure(ActionToRemove && !ActionToRemove->IsRunning()))
 	{
 		Actions.Remove(ActionToRemove);
+
 	}
 }
 
