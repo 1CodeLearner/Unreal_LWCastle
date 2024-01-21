@@ -72,7 +72,7 @@ bool UCActionEffect::CanPause(AActor* InstigatorActor, UCAction* OtherAction) co
 
 void UCActionEffect::PauseAction_Implementation(AActor* InstigatorActor)
 {
-	ensureAlways(IsRunning());
+	//ensureAlways(IsRunning());
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
