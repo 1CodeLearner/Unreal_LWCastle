@@ -20,10 +20,10 @@ public:
 	UCAction_AttackManager();
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	UFUNCTION()
-	virtual void StopAction_Implementation(AActor* InstigatorActor) override;
+	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 	virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
 
-	virtual void Initialize(UCGameplayComponent* GameplayComp) override;
+	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 	virtual bool IsRunning() const override;
 
 protected:

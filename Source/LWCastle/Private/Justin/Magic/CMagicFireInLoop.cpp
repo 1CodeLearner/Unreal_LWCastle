@@ -21,7 +21,7 @@ void UCMagicFireInLoop::Release_Implementation(AActor* InstigatorActor)
 		GetWorld()->GetTimerManager().ClearTimer(MagicHandle);*/
 }
 
-void UCMagicFireInLoop::MagicExecute(AActor* InstigatorActor)
+void UCMagicFireInLoop::MagicExecute_Implementation(AActor* InstigatorActor)
 {
-	Super::MagicExecute(InstigatorActor);
+	Super::MagicExecute_Implementation(InstigatorActor);
 }

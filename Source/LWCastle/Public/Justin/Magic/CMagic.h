@@ -19,13 +19,13 @@ class LWCASTLE_API UCMagic : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Magic")
+	UFUNCTION(BlueprintNativeEvent, Category = "Magic")
 	void Initialize(AActor* InstigatorActor);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Magic")
 	void Press(AActor* InstigatorActor);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Magic")
 	void Release(AActor* InstigatorActor);
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Magic")
+	UFUNCTION(BlueprintCallable, Category = "Magic")
 	void Reset(AActor* InstigatorActor);
 	UFUNCTION(BlueprintCallable)
 	bool IsPressing() const;
@@ -37,8 +37,8 @@ public:
 	FGameplayTagContainer GetGrantedTags() const;
 
 protected:
-	UFUNCTION()
-	virtual void MagicExecute(AActor* InstigatorActor);
+	UFUNCTION(BlueprintNativeEvent, Category = "Magic")
+	void MagicExecute(AActor* InstigatorActor);
 
 	virtual void StartMontage();
 	void StopMontage();

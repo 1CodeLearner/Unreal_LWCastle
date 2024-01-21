@@ -14,9 +14,9 @@ void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 	GetActiveElement()->Press(InstigatorActor);
 }
 
-void UCAction_AttackManager::StopAction_Implementation(AActor* InstigatorActor)
+void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	Super::StopAction_Implementation(InstigatorActor);
+	Super::CompleteAction_Implementation(InstigatorActor);
 	GetActiveElement()->Release(InstigatorActor);
 }
 
@@ -42,9 +42,9 @@ UCAction_AttackManager::UCAction_AttackManager()
 	bIsCharged = false;
 }
 
-void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
+void UCAction_AttackManager::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
-	Super::Initialize(GameplayComp);
+	Super::Initialize_Implementation(GameplayComp);
 
 	//Initialize Magic attack for player
 	if (!ActiveElement.DefaultElement)
@@ -93,16 +93,14 @@ void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElement
 			GetActiveElement()->Reset(InstigatorActor);
 			//ResetElementTags(GetActiveElement()->GetGrantedTags());
 
-			Super::StopAction(InstigatorActor);
+			Super::CompleteAction(InstigatorActor);
 			
 			SetActiveElement(SwitchedElement);
 
 			StartAction(InstigatorActor);
 			
-			GetActiveElement()->Press(InstigatorActor);
-			
 			//GetActiveElement()->Press(InstigatorActor);
-			//StopAction(InstigatorActor);
+			//CompleteAction(InstigatorActor);
 		}
 		SetActiveElement(SwitchedElement);
 	}

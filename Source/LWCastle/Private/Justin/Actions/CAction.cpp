@@ -2,8 +2,6 @@
 
 
 #include "Justin/Actions/CAction.h"
-
-#include "AssetTypeCategories.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 
 
@@ -33,14 +31,9 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 	bIsRunning = true;
 }
 
-void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
+void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	StopAction(InstigatorActor);
-}
-
-void UCAction::StopAction_Implementation(AActor* InstigatorActor)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Running StopAction %s"), *this->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("Running CompleteAction %s"), *this->GetName());
 
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
@@ -50,12 +43,25 @@ void UCAction::StopAction_Implementation(AActor* InstigatorActor)
 	bIsRunning = false;
 }
 
+UCAction::UCAction()
+{
+	bIsRunning = false;
+	bAutoStart = false;
+}
 
-bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const
+void UCAction::Initialize_Implementation(UCGameplayComponent* GameplayComp)
+{
+	if (GameplayComp)
+	{
+		this->GameplayCompRef = GameplayComp;
+	}
+}
+
+bool UCAction::CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const
 {
 	if (bCanInterrupt)
 	{
-		if (InterruptedTags.HasAny(OtherGrantedTag))
+		if (IsRunning() && InterruptedTags.HasAny(OtherAction->GetGrantedTags()))
 		{
 			return true;
 		}
@@ -64,17 +70,16 @@ bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, FGameplayTag
 	return false;
 }
 
-UCAction::UCAction()
+void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
 {
-	bIsRunning = false;
-}
+	UE_LOG(LogTemp, Warning, TEXT("Running InterruptAction %s"), *this->GetName());
 
-void UCAction::Initialize(UCGameplayComponent* GameplayComp)
-{
-	if (GameplayComp)
+	auto Gameplay = GetGameplayComponent();
+	if (Gameplay)
 	{
-		this->GameplayCompRef = GameplayComp;
+		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
 	}
+	bIsRunning = false;
 }
 
 bool UCAction::IsRunning() const
@@ -96,6 +101,12 @@ FName UCAction::GetActionName() const
 {
 	return ActionName;
 }
+
+bool UCAction::IsAutoStart() const
+{
+	return bAutoStart;
+}
+
 
 FGameplayTagContainer UCAction::GetGrantedTags() const
 {

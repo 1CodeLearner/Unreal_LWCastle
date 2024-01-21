@@ -17,5 +17,5 @@ public:
 	
 	virtual void Press_Implementation(AActor* InstigatorActor) override;
 	virtual void Release_Implementation(AActor* InstigatorActor) override;
-	virtual void MagicExecute(AActor* InstigatorActor) override;
+	virtual void MagicExecute_Implementation(AActor* InstigatorActor) override;
 };

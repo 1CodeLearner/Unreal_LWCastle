@@ -15,5 +15,5 @@ class LWCASTLE_API UCGameplayLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static void ApplyDamage(AActor* Invoker, AActor* AppliedActor);
+	static void ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
 };

@@ -16,7 +16,7 @@ void UAction_Dodge::StartAction_Implementation(AActor* InstigatorActor)
 	}
 }
 
-void UAction_Dodge::StopAction_Implementation(AActor* InstigatorActor)
+void UAction_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	Super::StopAction_Implementation(InstigatorActor);
+	Super::CompleteAction_Implementation(InstigatorActor);
 }

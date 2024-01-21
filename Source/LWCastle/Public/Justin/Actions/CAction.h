@@ -17,28 +17,28 @@ class LWCASTLE_API UCAction : public UObject
 
 public:
 
-	UFUNCTION()
-	virtual void Initialize( UCGameplayComponent* GameplayComp);
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanStart(AActor* InstigatorActor) const;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
+	void Initialize(UCGameplayComponent* GameplayComp);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
+	bool CanStart(AActor* InstigatorActor) const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StartAction(AActor* InstigatorActor);
 
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	bool CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void InterruptAction(AActor* InstigatorActor);
-	
+
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
-	void StopAction(AActor* InstigatorActor);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Action")
-	bool CanInterrupt(AActor* InstigatorActor, FGameplayTagContainer OtherGrantedTag) const;
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool IsRunning() const;
+	void CompleteAction(AActor* InstigatorActor);
 
 	UFUNCTION(BlueprintCallable)
 	FName GetActionName() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsAutoStart() const;
 
 	UFUNCTION(BlueprintCallable)
 	UCGameplayComponent* GetGameplayComponent() const;
@@ -49,25 +49,36 @@ protected:
 public:
 	UCAction();
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
-	FGameplayTagContainer GrantedTags;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
-	FGameplayTagContainer BlockedTags;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tag")
-	FGameplayTagContainer InterruptedTags;
+	virtual FGameplayTagContainer GetGrantedTags() const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool IsRunning() const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+
+	//Tags that will be granted to GameplayComponent from this Action
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
+	FGameplayTagContainer GrantedTags;
+	//Stops Action from starting if tag already exists in GameplayComponent.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
+	FGameplayTagContainer BlockedTags;
+	/*Stops on-going Action in GameplayComponent if the same Tag exists in starting Action's GrantedTags.
+	Takes first priority over paused Tags*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
+	FGameplayTagContainer InterruptedTags;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ActionSettings")
 	FName ActionName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	UPROPERTY(EditDefaultsOnly, Category = "ActionSettings")
 	bool bCanInterrupt;
 
-	virtual FGameplayTagContainer GetGrantedTags() const;
 
 private:
 	UPROPERTY()
 	bool bIsRunning;
+	UPROPERTY(EditDefaultsOnly, meta=(AllowPrivateAccess="true"),Category = "ActionSettings")
+	bool bAutoStart;
 	UPROPERTY()
 	UCGameplayComponent* GameplayCompRef;
 };

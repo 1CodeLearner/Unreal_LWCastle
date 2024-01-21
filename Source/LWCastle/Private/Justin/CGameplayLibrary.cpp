@@ -5,7 +5,7 @@
 
 #include "Justin/AComponents/CAttributeComponent.h"
 
-void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor)
+void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage)
 {
 	if (ensure(Invoker && AppliedActor))
 	{
@@ -16,7 +16,7 @@ void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor)
 			if (AppliedComp->IsAlive())
 			{
 				
-				AppliedComp->ApplyDamage(10);
+				AppliedComp->ApplyDamage(Invoker, Damage);
 			}
 		}
 	}

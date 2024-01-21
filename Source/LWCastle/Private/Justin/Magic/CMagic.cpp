@@ -18,17 +18,23 @@ void UCMagic::Release_Implementation(AActor* InstigatorActor)
 	UE_LOG(LogTemp, Warning, TEXT("Running Release %s"), *GetNameSafe(this));
 }
 
-void UCMagic::Reset_Implementation(AActor* InstigatorActor)
+void UCMagic::Reset(AActor* InstigatorActor)
 {
 	bIsPressing = false;
 
 	if (AnimInstance->Montage_IsActive(Montage)) {
 		StopMontage();
 	}
+
+	if(AnimInstance->OnPlayMontageNotifyBegin.IsBound())
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");	
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
 }
 
-void UCMagic::MagicExecute(AActor* InstigatorActor)
+void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
 
@@ -43,7 +49,7 @@ void UCMagic::MagicExecute(AActor* InstigatorActor)
 	if (Success)
 	{
 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, FColor::Red, false, 3.0f);
-		UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor());
+		UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor(), 8);
 
 	}
 	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
@@ -101,7 +107,7 @@ UCMagic::UCMagic()
 	InBlendOutTime = 0.0f;
 }
 
-void UCMagic::Initialize(AActor* InstigatorActor)
+void UCMagic::Initialize_Implementation(AActor* InstigatorActor)
 {
 	if (ensure(InstigatorActor))
 	{

@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "CAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTakenDamageDelegate, int, CurrentHealth, int, damage);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FTakenDamageDelegate, AActor*, Instigator, UActorComponent*, OwnerComp, float, CurrentHealth, float, MaxHealth, float, damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeadDelegate);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCAttributeComponent : public UActorComponent
@@ -26,19 +26,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetMaxHealth() const;
 	UFUNCTION(BlueprintCallable)
-	void ApplyDamage(const int Damage);
+	void ApplyDamage(AActor* Instigator, const int Damage);
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
+	UPROPERTY(BlueprintAssignable)
 	FTakenDamageDelegate OnTakenDamage;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FDeadDelegate OnDead;
 
 protected:
 	UFUNCTION(BlueprintCallable)
 	int GetCurrency() const;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Attribute")
+	UPROPERTY(VisibleAnywhere, Transient, BlueprintReadOnly, Category = "Attribute")
 	int Currency;
-	UPROPERTY(Transient, BlueprintReadWrite, Category = "Attribute")
+	UPROPERTY(visibleAnywhere, Transient, BlueprintReadWrite, Category = "Attribute")
 	float CurrentHealth;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attribute")
 	float MaxHealth;
