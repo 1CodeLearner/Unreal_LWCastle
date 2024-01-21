@@ -51,6 +51,16 @@ FStruct_StatDisplays UCPlayerAttributeComp::GetAttributesToDisplay() const
 	return { CurrentHealth, MaxHealth, CurrentMana, MaxMana, CurrentStamina, MaxStamina };
 }
 
+void UCPlayerAttributeComp::RecoverToFull()
+{
+	CurrentMana = MaxMana;
+	CurrentStamina = MaxStamina;
+	CurrentHealth = MaxHealth;
+	OnAttributeChange.Broadcast(EPlayerStat::HEALTH, CurrentHealth, MaxHealth);
+	OnAttributeChange.Broadcast(EPlayerStat::MANA, CurrentMana, MaxMana);
+	OnAttributeChange.Broadcast(EPlayerStat::STAMINA, CurrentStamina, MaxStamina);
+}
+
 float UCPlayerAttributeComp::GetCurrentMana() const
 {
 	return CurrentMana;
@@ -72,22 +82,16 @@ float UCPlayerAttributeComp::GetMaxMana() const
 	return MaxMana;
 }
 
-bool UCPlayerAttributeComp::TrySpendMana(int SpendAmount)
+void UCPlayerAttributeComp::SpendMana(float SpendAmount)
 {
-	if (CurrentMana <= SpendAmount)
+	CurrentMana -= SpendAmount;
+	OnAttributeChange.Broadcast(EPlayerStat::MANA, CurrentMana, MaxMana);
+	if (CurrentMana <= 0)
 	{
-		return false;
+		CurrentMana = 0;
+		OnManaDepleted.Broadcast();
 	}
-	else
-	{
-		CurrentMana -= SpendAmount;
-		if (CurrentMana <= 0)
-		{
-			CurrentMana = 0;
-			OnManaDepleted.Broadcast();
-		}
-		return true;
-	}
+
 }
 
 void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
@@ -95,6 +99,9 @@ void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 	if (CurrentStamina > 0.f)
 	{
 		CurrentStamina -= SpendAmount;
+		if (CurrentStamina < 0.f)
+			CurrentStamina = 0.f;
+		OnAttributeChange.Broadcast(EPlayerStat::STAMINA, CurrentStamina, MaxStamina);
 	}
 	else if (CurrentStamina <= 0.f)
 	{
@@ -113,27 +120,34 @@ void UCPlayerAttributeComp::OnStatUpdated(FStatInfo StatInfo)
 	ACGameModeBase* GM = Cast<ACGameModeBase>(UGameplayStatics::GetGameMode(this));
 	if (GM)
 	{
+
 		FStruct_Progression Progression = GM->GetCurrentProgressionOf(StatInfo.PlayerStatEnum, StatInfo.Level);
 		switch (StatInfo.PlayerStatEnum)
 		{
 		case EPlayerStat::HEALTH:
 		{
 			MaxHealth = Progression.Amount;
+			CurrentHealth = MaxHealth;
+			OnAttributeChange.Broadcast(EPlayerStat::HEALTH, CurrentHealth, MaxHealth);
 			break;
 		}
 		case EPlayerStat::MANA:
 		{
 			MaxMana = Progression.Amount;
+			CurrentMana = MaxMana;
+			OnAttributeChange.Broadcast(EPlayerStat::MANA, CurrentMana, MaxMana);
 			break;
 		}
 		case EPlayerStat::STAMINA:
 		{
 			MaxStamina = Progression.Amount;
+			CurrentStamina = MaxStamina;
+			OnAttributeChange.Broadcast(EPlayerStat::STAMINA, CurrentStamina, MaxStamina);
 			break;
 		}
 		}
 
-		OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, Progression.Amount);
+		//OnProgressionChanged.Broadcast(StatInfo.PlayerStatEnum, Progression.Amount);
 	}
 }
 

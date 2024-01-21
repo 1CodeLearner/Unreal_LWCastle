@@ -2,6 +2,8 @@
 
 
 #include "Justin/Actions/Action_TestUpDown.h"
+#include "Justin/AComponents/CGameplayComponent.h"
+#include "AssetTypeCategories.h"
 
 void UAction_TestUpDown::StartAction_Implementation(AActor* InstigatorActor)
 {
@@ -22,6 +24,21 @@ void UAction_TestUpDown::CompleteAction_Implementation(AActor* InstigatorActor)
 	Super::CompleteAction_Implementation(InstigatorActor);
 }
 
+/*
+void UAction_TestUpDown::Initialize_Implementation(UCGameplayComponent* GameplayComp)
+{
+	Super::Initialize_Implementation(GameplayComp);
+
+	if(!PlayerAttComp)
+	{
+		auto CompTemp=  GameplayComp->GetOwner()->GetComponentByClass<UCPlayerAttributeComp>();
+		if(CompTemp)
+		{
+			PlayerAttComp = CompTemp;
+		}
+	}
+}*/
+
 void UAction_TestUpDown::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
@@ -35,7 +52,7 @@ void UAction_TestUpDown::ResetMagic(AActor* InstigatorActor)
 
 }
 
-void UAction_TestUpDown::ExecuteMagic(AActor* InstigatorActor)
+void UAction_TestUpDown::ExecuteMagic_Implementation(AActor* InstigatorActor)
 {
 	FVector Origin = InstigatorActor->GetActorLocation();
 	FVector Start = Origin + 100.f * InstigatorActor->GetActorForwardVector();

@@ -17,8 +17,8 @@ class LWCASTLE_API UCAction : public UObject
 
 public:
 
-	UFUNCTION()
-	virtual void Initialize(UCGameplayComponent* GameplayComp);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
+	void Initialize(UCGameplayComponent* GameplayComp);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	bool CanStart(AActor* InstigatorActor) const;

@@ -215,7 +215,7 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
 		FString ActionMsg = FString::Printf(TEXT("[%s] Actions Owned: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, ActionMsg);
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Magenta, ActionMsg);
 
 		//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
 	}

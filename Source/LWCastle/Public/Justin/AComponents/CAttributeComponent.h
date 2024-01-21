@@ -7,7 +7,7 @@
 #include "CAttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FTakenDamageDelegate, AActor*, Instigator, UActorComponent*, OwnerComp, float, CurrentHealth, float, MaxHealth, float, damage);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDeadDelegate);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCAttributeComponent : public UActorComponent
@@ -32,6 +32,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FTakenDamageDelegate OnTakenDamage;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FDeadDelegate OnDead;
 
 protected:
 	UFUNCTION(BlueprintCallable)

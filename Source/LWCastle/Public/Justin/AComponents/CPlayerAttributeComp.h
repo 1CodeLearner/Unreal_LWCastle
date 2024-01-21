@@ -14,6 +14,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaDepletedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManaDepletedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FProgressonChangedDelegate, EPlayerStat, StatTypeEnum, float, MaxAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttributeChangeDelegate, EPlayerStat, StatTypeEnum, float, Current, float, MaxAmount);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCPlayerAttributeComp : public UCAttributeComponent
@@ -22,13 +23,18 @@ class LWCASTLE_API UCPlayerAttributeComp : public UCAttributeComponent
 
 public:
 	UCPlayerAttributeComp();
-	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Attribute")
+	FAttributeChangeDelegate OnAttributeChange;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Attribute")
 	FStaminaDepletedDelegate OnStaminaDepleted;
-	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Attribute")
 	FManaDepletedDelegate OnManaDepleted;
+
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FProgressonChangedDelegate OnProgressionChanged;
-
+	
 protected:
 
 	virtual void BeginPlay() override;
@@ -36,6 +42,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	FStruct_StatDisplays GetAttributesToDisplay() const;
+
+	UFUNCTION(BlueprintCallable)
+	void RecoverToFull();
 
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentMana() const;
@@ -48,7 +57,7 @@ protected:
 	float GetMaxStamina() const;
 
 	UFUNCTION(BlueprintCallable)
-	bool TrySpendMana(int SpendAmount);
+	void SpendMana(float SpendAmount);
 
 	UFUNCTION(BlueprintCallable)
 	void SpendStamina(float SpendAmount);

@@ -17,9 +17,9 @@ void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 	StartMontage();
 }
 
-void UCMagicFireAtRelease::MagicExecute(AActor* InstigatorActor)
+void UCMagicFireAtRelease::MagicExecute_Implementation(AActor* InstigatorActor)
 {
-	Super::MagicExecute(InstigatorActor);
+	Super::MagicExecute_Implementation(InstigatorActor);
 	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in MagicFireAtRelease"));
 	
 	UAnimInstance* Anim = GetAnimInstance();

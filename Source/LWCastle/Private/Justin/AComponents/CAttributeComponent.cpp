@@ -34,6 +34,10 @@ void UCAttributeComponent::ApplyDamage(AActor* Instigator, const int Damage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Taken this mouch Damgae %d"), Damage);
 	}
+	else
+	{
+		OnDead.Broadcast();
+	}
 }
 
 bool UCAttributeComponent::IsAlive() const

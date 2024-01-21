@@ -6,6 +6,7 @@
 #include "Justin/Actions/CAction.h"
 #include "Action_TestUpDown.generated.h"
 
+class UCPlayerAttributeComp;
 /**
  * 
  */
@@ -16,15 +17,18 @@ class LWCASTLE_API UAction_TestUpDown : public UCAction
 public:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
-
+	//virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 
 	UFUNCTION(BlueprintCallable)
 	void ResetMagic(AActor* InstigatorActor);
 
 protected:
-	
-	UFUNCTION()
+
+	UPROPERTY()
+	UCPlayerAttributeComp* PlayerAttComp;
+
+	UFUNCTION(BlueprintNativeEvent)
 	void ExecuteMagic(AActor* InstigatorActor);
 	FTimerHandle ExecuteMagicHandle;
 	FTimerDelegate ExecuteMagicDelegate;

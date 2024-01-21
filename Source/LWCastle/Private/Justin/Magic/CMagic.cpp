@@ -34,7 +34,7 @@ void UCMagic::Reset(AActor* InstigatorActor)
 	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
 }
 
-void UCMagic::MagicExecute(AActor* InstigatorActor)
+void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
 
@@ -107,7 +107,7 @@ UCMagic::UCMagic()
 	InBlendOutTime = 0.0f;
 }
 
-void UCMagic::Initialize(AActor* InstigatorActor)
+void UCMagic::Initialize_Implementation(AActor* InstigatorActor)
 {
 	if (ensure(InstigatorActor))
 	{

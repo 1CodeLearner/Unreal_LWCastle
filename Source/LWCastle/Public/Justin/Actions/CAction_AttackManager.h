@@ -23,7 +23,7 @@ public:
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 	virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
 
-	virtual void Initialize(UCGameplayComponent* GameplayComp) override;
+	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 	virtual bool IsRunning() const override;
 
 protected:

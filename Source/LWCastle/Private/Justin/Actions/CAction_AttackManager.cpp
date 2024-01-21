@@ -42,9 +42,9 @@ UCAction_AttackManager::UCAction_AttackManager()
 	bIsCharged = false;
 }
 
-void UCAction_AttackManager::Initialize(UCGameplayComponent* GameplayComp)
+void UCAction_AttackManager::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
-	Super::Initialize(GameplayComp);
+	Super::Initialize_Implementation(GameplayComp);
 
 	//Initialize Magic attack for player
 	if (!ActiveElement.DefaultElement)

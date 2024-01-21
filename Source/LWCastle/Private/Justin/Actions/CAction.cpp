@@ -49,7 +49,7 @@ UCAction::UCAction()
 	bAutoStart = false;
 }
 
-void UCAction::Initialize(UCGameplayComponent* GameplayComp)
+void UCAction::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
 	if (GameplayComp)
 	{
