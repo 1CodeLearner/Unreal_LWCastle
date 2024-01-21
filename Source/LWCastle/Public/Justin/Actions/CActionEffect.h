@@ -32,7 +32,7 @@ protected:
 	//Intervals to Tick effect within duration
 	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0."), Category="ActionEffect")
 	float IntervalTime;
-	
+
 	FTimerHandle DurationHandle;
 	FTimerDelegate DurationDelegate;
 	FTimerHandle IntervalHandle;
@@ -42,5 +42,5 @@ protected:
 	void DurationEnd(AActor* InstigatorActor);
 
 	UFUNCTION()
-	void IntervalStart(AActor* InstigatorActor);
+	virtual void IntervalStart(AActor* InstigatorActor);
 };

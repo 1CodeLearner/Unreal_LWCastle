@@ -37,6 +37,8 @@ void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Running CompleteAction %s"), *this->GetName());
 
+	ensure(!bIsPausing);
+
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -51,6 +53,7 @@ UCAction::UCAction()
 {
 	bIsRunning = false;
 	bIsPausing = false;
+	bAutoStart = false;
 }
 
 void UCAction::Initialize(UCGameplayComponent* GameplayComp)
@@ -65,7 +68,8 @@ bool UCAction::CanPause(AActor* InstigatorActor, UCAction* OtherAction)
 {
 	if (bCanPause)
 	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
+		if (PausedTags.HasAny(OtherAction->GetGrantedTags()) && 
+			!GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
 		{
 			return !bIsPausing && bIsRunning;
 		}
@@ -77,7 +81,6 @@ bool UCAction::CanPause(AActor* InstigatorActor, UCAction* OtherAction)
 void UCAction::PauseAction_Implementation(AActor* InstigatorActor)
 {
 	ensure(IsRunning());
-	bIsPausing = true;
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -89,7 +92,8 @@ bool UCAction::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const
 {
 	if (bCanPause)
 	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
+		if ( PausedTags.HasAny(OtherAction->GetGrantedTags()) && 
+			GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()) )
 		{
 			return bIsPausing && bIsRunning;
 		}
@@ -160,6 +164,12 @@ FName UCAction::GetActionName() const
 {
 	return ActionName;
 }
+
+bool UCAction::IsAutoStart() const
+{
+	return bAutoStart;
+}
+
 
 FGameplayTagContainer UCAction::GetGrantedTags() const
 {

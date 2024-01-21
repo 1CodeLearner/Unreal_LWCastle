@@ -17,7 +17,7 @@ class LWCASTLE_API UCGameplayComponent : public UActorComponent
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void AddAction(TSubclassOf<UCAction> NewActionClass);
+	void AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void RemoveAction(UCAction* ActionToRemove);
@@ -27,7 +27,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void CompleteActionByName(AActor* InstigatorActor, FName ActionName);
-	UFUNCTION()
+
+	void StartActionBy(AActor* InstigatorActor, UCAction* ActionToStart);
+
 	void CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete);
 
 	UPROPERTY(VisibleAnywhere, Category = "Action")
@@ -55,4 +57,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+private:
+	void ProcessInterruptAndPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared);
+	void ProcessUnPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared);
 };

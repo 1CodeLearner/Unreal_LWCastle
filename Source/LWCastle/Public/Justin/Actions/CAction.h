@@ -46,6 +46,9 @@ public:
 	FName GetActionName() const;
 
 	UFUNCTION(BlueprintCallable)
+	bool IsAutoStart() const;
+
+	UFUNCTION(BlueprintCallable)
 	UCGameplayComponent* GetGameplayComponent() const;
 
 protected:
@@ -82,6 +85,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	bool bCanPause;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bAutoStart;
 
 	virtual FGameplayTagContainer GetGrantedTags() const;
 

@@ -5,7 +5,7 @@
 #include "Justin/Actions/CAction.h"
 #include "Justin/Actions/CAction_MagicAttack.h"
 
-void UCGameplayComponent::AddAction(TSubclassOf<UCAction> NewActionClass)
+void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass)
 {
 	if (NewActionClass)
 	{
@@ -14,6 +14,11 @@ void UCGameplayComponent::AddAction(TSubclassOf<UCAction> NewActionClass)
 		{
 			NewAction->Initialize(this);
 			Actions.Add(NewAction);
+
+			if (NewAction->IsAutoStart())
+			{
+				StartActionBy(InstigatorActor, NewAction);
+			}
 		}
 	}
 }
@@ -49,20 +54,7 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 		{
 			for (auto Action : Actions)
 			{
-				if (Action != ActionFound)
-				{
-					if (Action->CanInterrupt(InstigatorActor, ActionFound))
-					{
-						Action->InterruptAction(InstigatorActor);
-						UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *Action->GetActionName().ToString());
-					}
-
-					if (Action->CanPause(InstigatorActor, ActionFound))
-					{
-						Action->PauseAction(InstigatorActor);
-						UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
-					}
-				}
+				ProcessInterruptAndPause(InstigatorActor, Action, ActionFound);
 			}
 		}
 	}
@@ -90,13 +82,34 @@ void UCGameplayComponent::CompleteActionByName(AActor* InstigatorActor, FName Ac
 		{
 			for (auto Action : Actions)
 			{
-				if (Action != ActionFound)
-				{
-					if (Action->CanUnPause(InstigatorActor, Action))
-					{
-						Action->UnPauseAction(InstigatorActor);
-					}
-				}
+				ProcessUnPause(InstigatorActor, Action, ActionFound);
+			}
+		}
+	}
+}
+
+void UCGameplayComponent::StartActionBy(AActor* InstigatorActor, UCAction* ActionToStart)
+{
+	if (ensure(ActionToStart && InstigatorActor))
+	{
+		bool HasStarted = false;
+
+		if (Actions.Contains(ActionToStart))
+		{
+			if (ActionToStart->CanStart(InstigatorActor))
+			{
+				ActionToStart->StartAction(InstigatorActor);
+
+				UE_LOG(LogTemp, Warning, TEXT("StartAction: %s"), *ActionToStart->GetActionName().ToString());
+				HasStarted = true;
+			}
+		}
+
+		if (HasStarted)
+		{
+			for (auto Action : Actions)
+			{
+				ProcessInterruptAndPause(InstigatorActor, Action, ActionToStart);
 			}
 		}
 	}
@@ -122,13 +135,7 @@ void UCGameplayComponent::CompleteActionBy(AActor* InstigatorActor, UCAction* Ac
 		{
 			for (auto Action : Actions)
 			{
-				if (Action != ActionToComplete)
-				{
-					if (Action->CanUnPause(InstigatorActor, Action))
-					{
-						Action->UnPauseAction(InstigatorActor);
-					}
-				}
+				ProcessUnPause(InstigatorActor, Action, ActionToComplete);
 			}
 		}
 	}
@@ -145,7 +152,7 @@ void UCGameplayComponent::BeginPlay()
 	Super::BeginPlay();
 	for (auto ActionClass : ActionClasses)
 	{
-		AddAction(ActionClass);
+		AddAction(GetOwner(), ActionClass);
 	}
 }
 
@@ -159,10 +166,40 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	for (auto* Action : Actions)
 	{
 		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+		FString ActionMsg = FString::Printf(TEXT("[%s] Action Active: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
 		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Black, DebugMsg);
 
 		//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	}
+}
+
+
+void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared)
+{
+	if (Action != ActionCompared)
+	{
+		if (Action->CanInterrupt(Instigator, ActionCompared))
+		{
+			Action->InterruptAction(Instigator);
+			UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *Action->GetActionName().ToString());
+		}
+
+		if (Action->CanPause(Instigator, ActionCompared))
+		{
+			Action->PauseAction(Instigator);
+			UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
+		}
+	}
+}
+
+void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared)
+{
+	if (Action != ActionCompared)
+	{
+		if (Action->CanUnPause(Instigator, ActionCompared))
+		{
+			Action->UnPauseAction(Instigator);
+		}
 	}
 }
 

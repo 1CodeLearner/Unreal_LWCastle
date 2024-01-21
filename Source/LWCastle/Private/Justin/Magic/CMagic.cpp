@@ -49,7 +49,7 @@ void UCMagic::MagicExecute(AActor* InstigatorActor)
 	if (Success)
 	{
 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, FColor::Red, false, 3.0f);
-		UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor());
+		UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor(), 8);
 
 	}
 	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
