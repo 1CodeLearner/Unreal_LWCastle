@@ -18,6 +18,8 @@ public:
 
 	virtual void IntervalStart(AActor* InstigatorActor) override;
 
+	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
+
 	UPROPERTY(EditDefaultsOnly)
 	float DamageAmount = 0;
 };

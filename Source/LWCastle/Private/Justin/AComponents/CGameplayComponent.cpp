@@ -8,32 +8,35 @@
 
 void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass)
 {
-	bool bHasDuplicate = false;
-	for (auto Action : Actions)
+	if (ensure(InstigatorActor && NewActionClass))
 	{
-		auto value1 = NewActionClass->GetDefaultObject();
-		auto value2 = Action->GetClass();
-		if (Action->IsA(NewActionClass))
+		bool bHasDuplicate = false;
+		for (auto Action : Actions)
 		{
-			bHasDuplicate = true;
-			break;
-		}
-	}
-
-	if (NewActionClass && !bHasDuplicate)
-	{
-		UCAction* NewAction = NewObject<UCAction>(GetOwner(), NewActionClass);
-		if (NewAction)
-		{
-			NewAction->Initialize(this);
-			Actions.Add(NewAction);
-
-			if (NewAction->IsAutoStart())
+			auto value1 = NewActionClass->GetDefaultObject();
+			auto value2 = Action->GetClass();
+			if (Action->IsA(NewActionClass))
 			{
-				StartActionBy(InstigatorActor, NewAction);
+				bHasDuplicate = true;
+				break;
 			}
 		}
 
+		if (NewActionClass && !bHasDuplicate)
+		{
+			UCAction* NewAction = NewObject<UCAction>(GetOwner(), NewActionClass);
+			if (NewAction)
+			{
+				NewAction->Initialize(this);
+				Actions.Add(NewAction);
+
+				if (NewAction->IsAutoStart())
+				{
+					StartActionBy(InstigatorActor, NewAction);
+				}
+			}
+
+		}
 	}
 }
 
@@ -192,37 +195,40 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 
 
-void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared)
+void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
 {
-	if (Action != ActionCompared)
+	if (ActionProcessed != ActionCompared)
 	{
-		if (Action->CanInterrupt(Instigator, ActionCompared))
+		if (ActionProcessed->CanInterrupt(Instigator, ActionCompared))
 		{
-			Action->InterruptAction(Instigator);
-			UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *Action->GetActionName().ToString());
+			ProcessUnPause(Instigator, ActionProcessed, ActionCompared);
+			ActionProcessed->InterruptAction(Instigator);
+			UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *ActionProcessed->GetActionName().ToString());
 		}
-
-		if (Action->Implements<UCActionEffectInterface>())
+		else
 		{
-			auto EffectInterface = Cast<ICActionEffectInterface>(Action);
-			if (EffectInterface->CanPause(Instigator, ActionCompared))
+			if (ActionProcessed->Implements<UCActionEffectInterface>())
 			{
-				EffectInterface->PauseAction(Instigator);
-				UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *Action->GetActionName().ToString());
+				auto EffectInterface = Cast<ICActionEffectInterface>(ActionProcessed);
+				if (EffectInterface->CanPause(Instigator, ActionCompared))
+				{
+					EffectInterface->Execute_PauseAction(ActionProcessed, Instigator);
+					UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *ActionProcessed->GetActionName().ToString());
+				}
 			}
 		}
 	}
 }
 
-void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared)
+void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
 {
-	if (Action->Implements<UCActionEffectInterface>() && Action != ActionCompared)
+	if (ActionProcessed->Implements<UCActionEffectInterface>() && ActionProcessed != ActionCompared)
 	{
-		auto EffectInterface = Cast<ICActionEffectInterface>(Action);
+		auto EffectInterface = Cast<ICActionEffectInterface>(ActionProcessed);
 		if (EffectInterface->CanUnPause(Instigator, ActionCompared))
 		{
-			EffectInterface->UnPauseAction(Instigator);
-			UE_LOG(LogTemp, Warning, TEXT("UnPauseAction: %s"), *Action->GetActionName().ToString());
+			EffectInterface->Execute_UnPauseAction(ActionProcessed, Instigator);
+			UE_LOG(LogTemp, Warning, TEXT("UnPauseAction: %s"), *ActionProcessed->GetActionName().ToString());
 		}
 	}
 }

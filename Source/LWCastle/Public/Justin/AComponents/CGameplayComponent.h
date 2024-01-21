@@ -59,6 +59,6 @@ protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	void ProcessInterruptAndPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared);
-	void ProcessUnPause(AActor* Instigator, UCAction* Action, UCAction* ActionCompared);
+	void ProcessInterruptAndPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared);
+	void ProcessUnPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared);
 };

@@ -39,7 +39,6 @@ void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 	if (Gameplay)
 	{
 		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
-		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
 }
@@ -79,7 +78,6 @@ void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
 	if (Gameplay)
 	{
 		Gameplay->ActiveGameplayTags.RemoveTags(GetGrantedTags());
-		Gameplay->PauseGameplayTags.RemoveTags(GetGrantedTags());
 	}
 	bIsRunning = false;
 }

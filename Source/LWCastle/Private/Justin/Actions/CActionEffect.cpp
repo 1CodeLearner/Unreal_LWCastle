@@ -35,7 +35,14 @@ void UCActionEffect::StartAction_Implementation(AActor* InstigatorActor)
 void UCActionEffect::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
-	bIsPausing = false;
+
+	if (IsPausing())
+	{
+		UnPauseAction(InstigatorActor);
+	}
+
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	GetGameplayComponent()->RemoveAction(this);
 }
 
 void UCActionEffect::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -50,10 +57,10 @@ bool UCActionEffect::CanPause(AActor* InstigatorActor, UCAction* OtherAction) co
 {
 	if (bCanPause)
 	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()) &&
-			!GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
+		if (PausedTags.HasAny(OtherAction->GetGrantedTags())
+			&& !GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
 		{
-			return !bIsPausing && OtherAction->IsRunning();
+			return !bIsPausing;
 		}
 	}
 
@@ -81,10 +88,11 @@ bool UCActionEffect::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) 
 {
 	if (bCanPause)
 	{
+
 		if (PausedTags.HasAny(OtherAction->GetGrantedTags()) &&
 			GetGameplayComponent()->PauseGameplayTags.HasAllExact(GetGrantedTags()))
 		{
-			return bIsPausing && OtherAction->IsRunning();
+			return bIsPausing;
 		}
 	}
 
