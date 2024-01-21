@@ -70,9 +70,20 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 		}
 		if (ActionFound)
 		{
+			TArray<UCAction*> ActionsToInterrupt;
 			for (auto Action : Actions)
 			{
-				ProcessInterruptAndPause(InstigatorActor, Action, ActionFound);
+				UCAction* ActionTemp = ProcessInterruptAndPause(InstigatorActor, Action, ActionFound);
+				if (ActionTemp)
+					ActionsToInterrupt.Add(ActionTemp);
+			}
+
+			if (!ActionsToInterrupt.IsEmpty())
+			{
+				for (auto Action : ActionsToInterrupt)
+				{
+					Action->InterruptAction(InstigatorActor);
+				}
 			}
 		}
 	}
@@ -125,11 +136,25 @@ void UCGameplayComponent::StartActionBy(AActor* InstigatorActor, UCAction* Actio
 
 		if (HasStarted)
 		{
+			TArray<UCAction*> ActionsToInterrupt;
 			for (auto Action : Actions)
 			{
-				ProcessInterruptAndPause(InstigatorActor, Action, ActionToStart);
+				UCAction* ActionTemp = ProcessInterruptAndPause(InstigatorActor, Action, ActionToStart);
+				if (ActionTemp)
+					ActionsToInterrupt.Add(ActionTemp);
+
 			}
+
+			if (!ActionsToInterrupt.IsEmpty())
+			{
+				for (auto Action : ActionsToInterrupt)
+				{
+					Action->InterruptAction(InstigatorActor);
+				}
+			}
+
 		}
+
 	}
 }
 
@@ -196,15 +221,15 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 }
 
 
-void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
+UCAction* UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
 {
 	if (ActionProcessed != ActionCompared)
 	{
 		if (ActionProcessed->CanInterrupt(Instigator, ActionCompared))
 		{
 			ProcessUnPause(Instigator, ActionProcessed, ActionCompared);
-			ActionProcessed->InterruptAction(Instigator);
 			UE_LOG(LogTemp, Warning, TEXT("InterruptAction: %s"), *ActionProcessed->GetActionName().ToString());
+			return ActionProcessed;
 		}
 		else
 		{
@@ -219,6 +244,7 @@ void UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAction*
 			}
 		}
 	}
+	return nullptr;
 }
 
 void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
