@@ -18,7 +18,6 @@ UCLASS(BlueprintType, Blueprintable)
 class LWCASTLE_API UCMagic : public UObject
 {
 	GENERATED_BODY()
-
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Magic")
 	void Initialize(AActor* InstigatorActor);

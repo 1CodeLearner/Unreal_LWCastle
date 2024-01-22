@@ -18,7 +18,7 @@
 // Sets default values
 Auwol_test::Auwol_test()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Mesh Load and set location, rotation
@@ -35,7 +35,7 @@ Auwol_test::Auwol_test()
 	springArmComp->TargetArmLength = 400;
 	//springArmComp->bUsePawnControlRotation = true;
 	//springArmComp->bUsePawnControlRotation = false;
-	
+
 	tpsCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("TpsCamComp"));
 	tpsCamComp->SetupAttachment(springArmComp);
 	//tpsCamComp->bUsePawnControlRotation = false;
@@ -62,7 +62,7 @@ Auwol_test::Auwol_test()
 		//gunMeshComp->SetRelativeScale3D(FVector(1.0f));
 
 	}
-	
+
 	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
 	GameplayComp = CreateDefaultSubobject<UCGameplayComponent>("GameplayComp");
 	CombatComp = CreateDefaultSubobject<UCCombatComponent>("CombatComp");
@@ -81,7 +81,7 @@ void Auwol_test::BeginPlay()
 	_FocusUI = CreateWidget(GetWorld(), sniperFac);
 
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
-	
+
 }
 
 void Auwol_test::PostInitializeComponents()
@@ -94,7 +94,7 @@ void Auwol_test::PostInitializeComponents()
 void Auwol_test::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	Move(DeltaTime);
 
 }
@@ -127,11 +127,11 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Released, this, &Auwol_test::SniperAim);
 
 	// Rkey
-	PlayerInputComponent->BindAction(TEXT("R"), IE_Pressed, this, &Auwol_test::CastR);
+	PlayerInputComponent->BindAction(TEXT("SwitchElement"), IE_Pressed, this, &Auwol_test::SwitchElement);
 
 	// Dodge Binding
 	PlayerInputComponent->BindAction(TEXT("Dodge"), IE_Pressed, this, &Auwol_test::Dodge);
-	
+
 	// Run Binding
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &Auwol_test::RunP);
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
@@ -183,8 +183,8 @@ void Auwol_test::Move(float DeltaTime)
 
 void Auwol_test::InputFirePressed()
 {
-	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
-	anim->PlayAttackAnim();
+	/*auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	anim->PlayAttackAnim();*/
 
 	GameplayComp->StartActionByName(this, "Attack");
 
@@ -238,23 +238,39 @@ void Auwol_test::SniperAim()
 	}
 }
 
-void Auwol_test::CastR()
+void Auwol_test::SwitchElement()
 {
-	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
+	static long value = 0;
+	++value;
+	UE_LOG(LogTemp, Warning, TEXT("Value: %d"), value);
+	if (value % 2 == 1)
+	{
+		CombatComp->SwitchElementByName("Arcane");
+	}
+	else
+	{
+		CombatComp->SwitchElementByName("Ice");
+	}
+
+	/*GetCharacterMovement()->MaxWalkSpeed /= 3.0;
 	//movespeed = 0.5f;
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);*/
 }
+
+/*
 
 void Auwol_test::speedchange()
 {
 	//movespeed = 1.0f;
 	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
-}
+}*/
 
 void Auwol_test::Dodge()
 {
-	if (!IsDodging)
+	GameplayComp->StartActionByName(this, "Roll");
+
+	/*if (!IsDodging)
 	{
 		UAnimInstance* pAnimInst = GetMesh()->GetAnimInstance();
 		if (pAnimInst != nullptr)
@@ -269,14 +285,14 @@ void Auwol_test::Dodge()
 			FTimerHandle UnusedHandle;
 			GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::ResetDodgeState, 1.0f, false);
 		}
-	}
+	}*/
 }
 
 void Auwol_test::RunP()
 {
 	//movespeed = 1.5f;
 	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
-	
+
 }
 
 void Auwol_test::RunR()

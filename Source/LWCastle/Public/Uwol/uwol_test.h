@@ -100,11 +100,12 @@ public:
 	TSubclassOf<class UUserWidget> sniperFac;
 	class UUserWidget* _FocusUI;
 
-	void CastR();
+	void SwitchElement();
 
 	float movespeed = 1.0;
 
-	void speedchange();
+	//void speedchange();
+
 	void RunP();
 	void RunR();
 	
