@@ -214,7 +214,7 @@ void Auwol_test::SniperAim()
 	{
 		bSniperAim = true;
 		_FocusUI->AddToViewport();
-		tpsCamComp->SetFieldOfView(45.0f);
+		//tpsCamComp->SetFieldOfView(45.0f);
 	}
 	else
 	{

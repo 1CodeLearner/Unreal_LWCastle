@@ -34,6 +34,7 @@ void UCPlayerAttributeComp::BeginPlay()
 	CurrentHealth = MaxHealth;
 	CurrentMana = MaxMana;
 	CurrentStamina = MaxStamina;
+	RecoverToFull();
 }
 
 void UCPlayerAttributeComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
