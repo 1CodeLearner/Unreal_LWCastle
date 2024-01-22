@@ -20,7 +20,6 @@ void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorAct
 	GetActiveElement()->Release(InstigatorActor);
 }
 
-
 bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
 {
 	if (GetActiveElement())
@@ -33,12 +32,6 @@ bool UCAction_AttackManager::IsRunning() const
 	if (GetActiveElement())
 		return GetActiveElement()->IsPressing();
 	return false;
-}
-
-
-FGameplayTagContainer UCAction_AttackManager::GetGrantedTags() const
-{
-	return GetActiveElement()->GetGrantedTags();
 }
 
 UCAction_AttackManager::UCAction_AttackManager()

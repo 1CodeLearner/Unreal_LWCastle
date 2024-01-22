@@ -7,6 +7,8 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
+
+#include "AssetTypeCategories.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/AComponents/CGameplayComponent.h"
@@ -114,7 +116,10 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &Auwol_test::InputJump);
 
 	// Fire binding
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &Auwol_test::InputFire);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &Auwol_test::InputFirePressed);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &Auwol_test::InputFireReleased);
+
+
 
 	// Aim binding
 	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Pressed, this, &Auwol_test::SniperAim);
@@ -158,12 +163,11 @@ void Auwol_test::InputVertical(float value)
 
 void Auwol_test::InputJump()
 {
-	Jump();
+	GameplayComp->StartActionByName(this, "Jump");
 }
 
 void Auwol_test::Move(float DeltaTime)
 {
-
 	FRotator rot = GetControlRotation();
 	FVector forward = UKismetMathLibrary::GetForwardVector(rot);
 	FVector right = UKismetMathLibrary::GetRightVector(rot);
@@ -177,10 +181,14 @@ void Auwol_test::Move(float DeltaTime)
 	direction = FVector::ZeroVector;
 }
 
-void Auwol_test::InputFire()
+void Auwol_test::InputFirePressed()
 {
 	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	anim->PlayAttackAnim();
+
+	GameplayComp->StartActionByName(this, "Attack");
+
+	/*
 	//isattackingmagic = true;
 
 	// 발사
@@ -205,7 +213,13 @@ void Auwol_test::InputFire()
 
 	// 발사
 	// GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
+	*/
 
+}
+
+void Auwol_test::InputFireReleased()
+{
+	GameplayComp->CompleteActionByName(this, "Attack");
 }
 
 void Auwol_test::SniperAim()

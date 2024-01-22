@@ -15,8 +15,3 @@ void UAction_Dodge::StartAction_Implementation(AActor* InstigatorActor)
 		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimationMontage, MontageRate);
 	}
 }
-
-void UAction_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
-{
-	Super::CompleteAction_Implementation(InstigatorActor);
-}

@@ -11,6 +11,7 @@
  *
  */
 
+class UCPlayerAttributeComp;
  DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
 
 UCLASS(BlueprintType, Blueprintable)
@@ -63,6 +64,8 @@ protected:
 	FGameplayTagContainer GrantedTags;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UCPlayerAttributeComp> AttributeComp;
 
 	UPROPERTY()
 	UAnimInstance* AnimInstance;
@@ -70,6 +73,9 @@ private:
 	float InBlendOutTime;
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.1"), Category = "Magic")
 	float InPlayRate;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"), Category = "Magic")
+	float ManaSpendAmount;
+
 
 	bool bIsPressing;
 

@@ -5,6 +5,7 @@
 #include "Justin/CGameplayLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
 
 void UCMagic::Press_Implementation(AActor* InstigatorActor)
 {
@@ -26,9 +27,9 @@ void UCMagic::Reset(AActor* InstigatorActor)
 		StopMontage();
 	}
 
-	if(AnimInstance->OnPlayMontageNotifyBegin.IsBound())
+	if (AnimInstance->OnPlayMontageNotifyBegin.IsBound())
 	{
-		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");	
+		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
@@ -36,23 +37,37 @@ void UCMagic::Reset(AActor* InstigatorActor)
 
 void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
-
-	FVector Origin = InstigatorActor->GetActorLocation();
-	FVector Start = Origin + 100.f * InstigatorActor->GetActorForwardVector();
-	FVector End = Start + 2000.f * InstigatorActor->GetActorForwardVector();
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(InstigatorActor);
-	FHitResult Hit;
-	FColor DebugColorLocal;
-	bool Success = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
-	if (Success)
+	if (AttributeComp)
 	{
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.f, 32, FColor::Red, false, 3.0f);
-		UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor(), 8);
+		if (AttributeComp->GetCurrentMana() - ManaSpendAmount >= 0.f)
+		{
+			AttributeComp->SpendMana(ManaSpendAmount);
 
+			//Testing purpose
+			UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
+
+			FVector Origin = InstigatorActor->GetActorLocation();
+			FVector Start = Origin + 100.f * InstigatorActor->GetActorForwardVector();
+			FVector End = Start + 2000.f * InstigatorActor->GetActorForwardVector();
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(InstigatorActor);
+			FHitResult Hit;
+			FColor DebugColorLocal;
+			bool Success = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
+			if (Success)
+			{
+				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 200.f, 32, FColor::Red, false, 3.0f);
+				UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor(), 8);
+
+			}
+			DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
+		}
+		else
+		{
+			//Special effect for showing empty mana
+			DrawDebugCircle(GetWorld(), InstigatorActor->GetActorLocation(), 20.f, 12, FColor::Blue);
+		}
 	}
-	DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
 }
 
 void UCMagic::StartMontage()
@@ -62,7 +77,7 @@ void UCMagic::StartMontage()
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UCMagic::OnNotifyBegin);
 		AnimInstance->Montage_Play(Montage, InPlayRate);
 
-		if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!"))) 
+		if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
 			return;
 
 		AnimInstance->Montage_JumpToSection(MontageSection, Montage);
@@ -121,6 +136,12 @@ void UCMagic::Initialize_Implementation(AActor* InstigatorActor)
 			{
 				AnimInstance = Anim;
 			}
+		}
+
+		auto Attribute = InstigatorActor->GetComponentByClass<UCPlayerAttributeComp>();
+		if (Attribute)
+		{
+			AttributeComp = Attribute;
 		}
 	}
 }

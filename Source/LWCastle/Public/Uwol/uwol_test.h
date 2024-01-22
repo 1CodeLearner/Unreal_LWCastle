@@ -84,7 +84,8 @@ public:
 	TSubclassOf<class ADefaultMagic> defaultmagicfac;
 
 	// fire
-	void InputFire();
+	void InputFirePressed();
+	void InputFireReleased();
 
 	// CrossHair
 	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
@@ -106,7 +107,7 @@ public:
 	void speedchange();
 	void RunP();
 	void RunR();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
 	UAnimMontage* pDodgeMontage;
 

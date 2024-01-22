@@ -46,6 +46,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void RecoverToFull();
 
+public:
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentMana() const;
 	UFUNCTION(BlueprintCallable)
@@ -61,6 +62,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void SpendStamina(float SpendAmount);
+protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EnableSpendingStaminaByRate(bool bIsEnabled);

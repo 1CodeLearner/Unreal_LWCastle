@@ -30,6 +30,7 @@ public:
 
 	void StartActionBy(AActor* InstigatorActor, UCAction* ActionToStart);
 
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete);
 
 	UPROPERTY(VisibleAnywhere, Category = "Action")
