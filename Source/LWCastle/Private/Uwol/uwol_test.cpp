@@ -8,7 +8,10 @@
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Justin/AComponents/CCombatComponent.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 #include "Uwol/PlayerAnim.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
 
 // Sets default values
 Auwol_test::Auwol_test()
@@ -57,6 +60,10 @@ Auwol_test::Auwol_test()
 		//gunMeshComp->SetRelativeScale3D(FVector(1.0f));
 
 	}
+	
+	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
+	GameplayComp = CreateDefaultSubobject<UCGameplayComponent>("GameplayComp");
+	CombatComp = CreateDefaultSubobject<UCCombatComponent>("CombatComp");
 }
 
 
@@ -73,6 +80,12 @@ void Auwol_test::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 	
+}
+
+void Auwol_test::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	CombatComp->Initialize();
 }
 
 // Called every frame

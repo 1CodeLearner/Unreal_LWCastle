@@ -23,12 +23,16 @@ void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorAct
 
 bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
 {
-	return !GetActiveElement()->IsPressing();
+	if (GetActiveElement())
+		return !GetActiveElement()->IsPressing();
+	return false;
 }
 
 bool UCAction_AttackManager::IsRunning() const
 {
-	return GetActiveElement()->IsPressing();
+	if (GetActiveElement())
+		return GetActiveElement()->IsPressing();
+	return false;
 }
 
 
@@ -57,7 +61,7 @@ void UCAction_AttackManager::Initialize_Implementation(UCGameplayComponent* Game
 			{
 				ActiveElement = CombatComp->GetActiveElement();
 
-				if (ensure(ActiveElement.DefaultElement&& ActiveElement.ChargedElement))
+				if (ensure(ActiveElement.DefaultElement && ActiveElement.ChargedElement))
 				{
 					CombatComp->OnActiveElementSwitched.AddDynamic(this, &UCAction_AttackManager::OnElementSwitched);
 					CombatComp->OnChargeStateActivated.AddDynamic(this, &UCAction_AttackManager::OnChargeStateActivated);
@@ -94,11 +98,11 @@ void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElement
 			//ResetElementTags(GetActiveElement()->GetGrantedTags());
 
 			Super::CompleteAction(InstigatorActor);
-			
+
 			SetActiveElement(SwitchedElement);
 
 			StartAction(InstigatorActor);
-			
+
 			//GetActiveElement()->Press(InstigatorActor);
 			//CompleteAction(InstigatorActor);
 		}
@@ -109,7 +113,7 @@ void UCAction_AttackManager::OnElementSwitched(AActor* InstigatorActor, FElement
 void UCAction_AttackManager::OnChargeStateActivated(AActor* InstigatorActor, bool _bIsCharged)
 {
 	if (bIsCharged != _bIsCharged) {
-		if (GetActiveElement()->IsPressing()) 
+		if (GetActiveElement()->IsPressing())
 		{
 			GetActiveElement()->Reset(InstigatorActor);
 		}
@@ -119,7 +123,7 @@ void UCAction_AttackManager::OnChargeStateActivated(AActor* InstigatorActor, boo
 
 UCMagic* UCAction_AttackManager::GetActiveElement() const
 {
-	if(bIsCharged)
+	if (bIsCharged)
 		return ActiveElement.ChargedElement;
 	else
 		return ActiveElement.DefaultElement;
