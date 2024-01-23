@@ -49,6 +49,22 @@ void UCGameplayComponent::RemoveAction(UCAction* ActionToRemove)
 	}
 }
 
+UCAction* UCGameplayComponent::GetActionByName(FName ActionName) const
+{
+	if (ensureAlways(!ActionName.IsNone()))
+	{
+		bool ActionFound = true;
+		for (auto Action : Actions)
+		{
+			if (Action->GetActionName() == ActionName)
+				return Action;
+		}
+		ensureAlwaysMsgf(ActionFound, TEXT("Action &s could not be found"), *ActionName.ToString());
+	}
+
+	return nullptr;
+}
+
 void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
 	if (ensure(!ActionName.IsNone() && InstigatorActor))

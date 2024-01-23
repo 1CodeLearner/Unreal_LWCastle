@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Justin/Actions/CActionAnimTimer.h"
+#include "Justin/Actions/CAPAnimTimer.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "GameFramework/Character.h"
 
-float UCActionAnimTimer::GetAnimMontageLength()
+float UCAPAnimTimer::GetAnimMontageLength()
 {
 	if (Montage && AnimInstance->Montage_IsPlaying(Montage))
 	{
@@ -15,7 +15,7 @@ float UCActionAnimTimer::GetAnimMontageLength()
 	return -1.f;
 }
 
-void UCActionAnimTimer::Initialize_Implementation(UCGameplayComponent* GameplayComp)
+void UCAPAnimTimer::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
 	Super::Initialize_Implementation(GameplayComp);
 	UAnimInstance* Anim;
@@ -31,13 +31,13 @@ void UCActionAnimTimer::Initialize_Implementation(UCGameplayComponent* GameplayC
 	}
 }
 
-void UCActionAnimTimer::StartMontage(UCActionAnimTimer* AnimTimer)
+void UCAPAnimTimer::StartMontage(UCAPAnimTimer* AnimTimer)
 {
-	if (AnimInstance && Montage) {
+	if (AnimInstance) {
 		//Making sure Anim Montage has notify available
-		AnimInstance->Montage_Play(Montage, InPlayRate);
 		if (ensure(Montage->IsNotifyAvailable())) {
-			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCActionAnimTimer::OnNotifyBegin);
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCAPAnimTimer::OnNotifyBegin);
+			AnimInstance->Montage_Play(Montage, InPlayRate);
 
 			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
 				return;
@@ -47,7 +47,7 @@ void UCActionAnimTimer::StartMontage(UCActionAnimTimer* AnimTimer)
 	}
 }
 
-void UCActionAnimTimer::StopMontage(UCActionAnimTimer* AnimTimer)
+void UCAPAnimTimer::StopMontage(UCAPAnimTimer* AnimTimer)
 {
 	if (AnimInstance) {
 		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
@@ -58,59 +58,53 @@ void UCActionAnimTimer::StopMontage(UCActionAnimTimer* AnimTimer)
 	}
 }
 
-bool UCActionAnimTimer::IsMontagePlaying() const
+bool UCAPAnimTimer::IsMontagePlaying() const
 {
 	return AnimInstance->Montage_IsActive(Montage);
 }
 
-void UCActionAnimTimer::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
+void UCAPAnimTimer::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Testing OnNotifyBegin override"));
 }
 
-UAnimInstance* UCActionAnimTimer::GetAnimInstance() const
+UAnimInstance* UCAPAnimTimer::GetAnimInstance() const
 {
 	return AnimInstance;
 }
 
-void UCActionAnimTimer::PauseTimer()
+void UCAPAnimTimer::PauseTimer()
 {
 	GetWorld()->GetTimerManager().PauseTimer(TimerHandle);
 }
 
-void UCActionAnimTimer::UnPauseTimer()
+void UCAPAnimTimer::UnPauseTimer()
 {
 	GetWorld()->GetTimerManager().UnPauseTimer(TimerHandle);
 }
 
-void UCActionAnimTimer::ClearTimer()
+void UCAPAnimTimer::ClearTimer()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
-bool UCActionAnimTimer::IsTimerValid()
+bool UCAPAnimTimer::IsTimerValid()
 {
 	return TimerHandle.IsValid();
 }
 
-float UCActionAnimTimer::GetTimerDuration()
-{
-	return TimerDuration;
-}
-
-void UCActionAnimTimer::StartTimer(UCActionAnimTimer* AnimTimer)
+void UCAPAnimTimer::StartTimer(UCAPAnimTimer* AnimTimer)
 {
 	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction");
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerDuration, false);
 }
 
-void UCActionAnimTimer::ExecuteAction(AActor* InstigatorActor)
+void UCAPAnimTimer::ExecuteAction(AActor* InstigatorActor)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Testing ExecuteAction override"));
 }
 
-
-UCActionAnimTimer::UCActionAnimTimer()
+UCAPAnimTimer::UCAPAnimTimer()
 {
 	TimerDuration = 0.f;
 	InBlendOutTime = 0.f;

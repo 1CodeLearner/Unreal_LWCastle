@@ -4,26 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Actions/CActionPause.h"
-#include "CActionAnimTimer.generated.h"
+#include "CAPAnimTimer.generated.h"
 
-UENUM(BlueprintType)
-enum class EActionType : uint8
+
+/*UENUM(BlueprintType)
+enum class EActionType
 {
-	START UMETA(DisplayName = "START"),
-	PAUSE UMETA(DisplayName = "PAUSE"),
-	UNPAUSE UMETA(DisplayName = "UNPAUSE"),
-	INTERRUPT UMETA(DisplayName = "INTERRUPT"),
-	COMPLETE UMETA(DisplayName = "COMPLETE"),
-	NONE UMETA(DisplayName = "NONE")
-};
+	START,
+	PAUSE,
+	UNPAUSE,
+	INTERRUPT,
+	COMPLETE,
+	NONE
+};*/
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FActionInvokedDelegate, EActionType, ActionType, AActor*, InstigatorActor, float, Duration);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FActionInvokedDelegate, EActionType, ActionType, AActor*, InstigatorActor, float, Duration);
 
 /**
  *
  */
-UCLASS()
-class LWCASTLE_API UCActionAnimTimer : public UCActionPause//, public FTickableGameObject
+UCLASS(Abstract)
+class LWCASTLE_API UCAPAnimTimer : public UCActionPause
 {
 	GENERATED_BODY()
 
@@ -31,14 +32,14 @@ public:
 
 	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 
-	UPROPERTY(BlueprintAssignable, Category = "ActionAnimTimer")
-	FActionInvokedDelegate OnActionInvoked;
+	//UPROPERTY(BlueprintAssignable, Category = "ActionAnimTimer")
+	//FActionInvokedDelegate OnActionInvoked;
 
 
 protected:
 	//Animation Montage
-	virtual void StartMontage(UCActionAnimTimer* ActionAnimTimer);
-	void StopMontage(UCActionAnimTimer* ActionAnimTimer);
+	virtual void StartMontage(UCAPAnimTimer* AnimTimer);
+	void StopMontage(UCAPAnimTimer* AnimTimer);
 	UFUNCTION(BlueprintCallable)
 	float GetAnimMontageLength();
 	UFUNCTION()
@@ -54,18 +55,17 @@ protected:
 
 protected:
 	//Timer
-	virtual void StartTimer(UCActionAnimTimer* ActionAnimTimer);
+	virtual void StartTimer(UCAPAnimTimer* AnimTimer);
 	virtual void PauseTimer();
 	virtual void UnPauseTimer();
 	virtual void ClearTimer();
 	bool IsTimerValid();
-	float GetTimerDuration();
 
-	UFUNCTION(BlueprintCallable, Category = "ActionAnimTimer")
+	UFUNCTION()
 	virtual void ExecuteAction(AActor* InstigatorActor);
 
 public:
-	UCActionAnimTimer();
+	UCAPAnimTimer();
 
 private:
 	//Animation settings
