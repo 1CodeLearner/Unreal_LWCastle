@@ -98,6 +98,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category=FocusUI)
 	TSubclassOf<class UUserWidget> sniperFac;
+	UPROPERTY()
 	class UUserWidget* _FocusUI;
 
 	void SwitchElement();
@@ -144,6 +145,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	UAnimMontage* Attack_MeleeAnim4;
+
+	UFUNCTION()
+	void StartChargingTestAutoCharge();
 
 
 	bool isDuringAttack;

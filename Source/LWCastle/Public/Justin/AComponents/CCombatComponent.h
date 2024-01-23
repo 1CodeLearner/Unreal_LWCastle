@@ -9,6 +9,7 @@
 
 class UCAction;
 class UCMagic;
+class UCGameplayComponent;
 
 USTRUCT(BlueprintType)
 struct FElement
@@ -63,7 +64,7 @@ public:
 	void SwitchElementByName(FName ElementName);
 
 protected:
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	FElement ActiveElement;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
@@ -74,4 +75,9 @@ protected:
 
 	UFUNCTION()
 	FElement GetElementFromName(FName Name) const;
+private:
+	UFUNCTION()
+	void OnChargeMagicExecuted(float CooldownLength);
+	UPROPERTY()
+	TObjectPtr<UCGameplayComponent> GameplayComp;
 };

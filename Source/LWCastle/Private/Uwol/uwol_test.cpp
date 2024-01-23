@@ -139,6 +139,8 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	// Attack Binding
 	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Released, this, &Auwol_test::Attack_Melee);
 
+
+	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartChargingTestAutoCharge);
 }
 
 void Auwol_test::Turn(float value)
@@ -350,4 +352,9 @@ void Auwol_test::Attack_Melee()
 void Auwol_test::Attack_Melee_End()
 {
 	isDuringAttack = false;
+}
+
+void Auwol_test::StartChargingTestAutoCharge()
+{
+	GameplayComp->StartActionByName(this, "ChargedState");
 }

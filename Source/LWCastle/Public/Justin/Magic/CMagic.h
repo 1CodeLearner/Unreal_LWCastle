@@ -12,7 +12,7 @@
  */
 
 class UCPlayerAttributeComp;
- DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
 
 UCLASS(BlueprintType, Blueprintable)
 class LWCASTLE_API UCMagic : public UObject
@@ -55,7 +55,7 @@ protected:
 	FColor DebugMagicColor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float DebugLineThickness;
-	
+
 	UFUNCTION()
 	UAnimInstance* GetAnimInstance() const;
 

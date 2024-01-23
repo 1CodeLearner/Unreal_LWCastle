@@ -116,10 +116,15 @@ void UCAction_AttackManager::OnChargeStateActivated(AActor* InstigatorActor, boo
 
 UCMagic* UCAction_AttackManager::GetActiveElement() const
 {
-	if (bIsCharged)
-		return ActiveElement.ChargedElement;
-	else
-		return ActiveElement.DefaultElement;
+	if (GetGameplayComponent()) 
+	{
+		static FGameplayTag ChargedStateTag = FGameplayTag::RequestGameplayTag("State.Charged");
+		if (GetGameplayComponent()->ActiveGameplayTags.HasTagExact(ChargedStateTag))
+			return ActiveElement.ChargedElement;
+		else
+			return ActiveElement.DefaultElement;
+	}
+	return nullptr;
 }
 
 void UCAction_AttackManager::SetActiveElement(FElement SwitchedElement)

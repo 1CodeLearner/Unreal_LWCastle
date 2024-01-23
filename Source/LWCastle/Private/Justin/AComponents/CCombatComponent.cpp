@@ -4,6 +4,7 @@
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/Actions/CAction_MagicAttack.h"
 #include "Justin/Magic/CMagic.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 
 UCCombatComponent::UCCombatComponent()
 {
@@ -32,6 +33,7 @@ void UCCombatComponent::Initialize()
 			Default->Initialize(GetOwner());
 			UCMagic* Charged = NewObject<UCMagic>(GetOwner(), Data->ChargedElement);
 			Charged->Initialize(GetOwner());
+			Charged->OnMagicExecuted.AddDynamic(this, &UCCombatComponent::OnChargeMagicExecuted);
 
 			ElementToAdd.DefaultElement = Default;
 			ElementToAdd.ChargedElement = Charged;
@@ -42,12 +44,19 @@ void UCCombatComponent::Initialize()
 	}
 	if (OwningElements.Num() > 0)
 		ActiveElement = OwningElements[Temp];
+
+
+	auto GameplayTemp = GetOwner()->GetComponentByClass<UCGameplayComponent>();
+	if (ensure(GameplayTemp))
+	{
+		GameplayComp = GameplayTemp;
+	}
 }
 
 void UCCombatComponent::SwitchElementByName(FName ElementName)
 {
 	if (ensure(!ElementName.IsNone())) {
-		FElementData* DTData = DT_ElementData->FindRow<FElementData>(ElementName,TEXT(""));
+		FElementData* DTData = DT_ElementData->FindRow<FElementData>(ElementName, TEXT(""));
 
 		FElementData ElementDataTemp = *DTData;
 		ActiveElement = GetElementFromName(ElementName);
@@ -59,5 +68,17 @@ void UCCombatComponent::SwitchElementByName(FName ElementName)
 FElement UCCombatComponent::GetElementFromName(FName Name) const
 {
 	return OwningElements[Name];
+}
+
+void UCCombatComponent::OnChargeMagicExecuted(float CooldownLength)
+{
+	if (GameplayComp)
+	{
+		static FGameplayTag ChargedStateTag = FGameplayTag::RequestGameplayTag("State.Charged");
+		if(GameplayComp->ActiveGameplayTags.HasTagExact(ChargedStateTag))
+		{
+			GameplayComp->CompleteActionByName(GetOwner(), "ChargedState");
+		}
+	}
 }
 

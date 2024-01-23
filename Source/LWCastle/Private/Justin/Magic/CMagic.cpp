@@ -73,14 +73,16 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 void UCMagic::StartMontage()
 {
 	if (AnimInstance) {
+		//Making sure Anim Montage has notify available
+		if (ensure(Montage->IsNotifyAvailable())) {
+			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UCMagic::OnNotifyBegin);
+			AnimInstance->Montage_Play(Montage, InPlayRate);
 
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &UCMagic::OnNotifyBegin);
-		AnimInstance->Montage_Play(Montage, InPlayRate);
+			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
+				return;
 
-		if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
-			return;
-
-		AnimInstance->Montage_JumpToSection(MontageSection, Montage);
+			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
+		}
 	}
 }
 
@@ -105,7 +107,8 @@ void UCMagic::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload
 	UE_LOG(LogTemp, Warning, TEXT("OnNotifyBegin inside CMagic.cpp"));
 	MagicExecute(BranchingPointPayload.SkelMeshComponent->GetOwner());
 	float Cooldown = GetAnimMontageLength();
-	if (Cooldown != -1)
+	//Display Cooldown on UI
+	if (Cooldown != -1.f)
 		OnMagicExecuted.Broadcast(Cooldown);
 }
 
@@ -139,7 +142,7 @@ void UCMagic::Initialize_Implementation(AActor* InstigatorActor)
 		}
 
 		auto Attribute = InstigatorActor->GetComponentByClass<UCPlayerAttributeComp>();
-		if (Attribute)
+		if (ensure(Attribute))
 		{
 			AttributeComp = Attribute;
 		}
