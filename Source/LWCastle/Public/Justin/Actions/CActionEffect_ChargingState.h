@@ -15,19 +15,5 @@ class LWCASTLE_API UCActionEffect_ChargingState : public UCActionEffect
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
-	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
-
-	UFUNCTION()
-	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
-
-	UFUNCTION()
-	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
 
 };
