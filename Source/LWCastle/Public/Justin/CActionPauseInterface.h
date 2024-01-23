@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "CActionEffectInterface.generated.h"
+#include "CActionPauseInterface.generated.h"
 
 class UCAction;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UCActionEffectInterface : public UInterface
+class UCActionPauseInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,7 +18,7 @@ class UCActionEffectInterface : public UInterface
 /**
  *
  */
-class LWCASTLE_API ICActionEffectInterface
+class LWCASTLE_API ICActionPauseInterface
 {
 	GENERATED_BODY()
 

@@ -3,7 +3,7 @@
 
 #include "Justin/AComponents/CGameplayComponent.h"
 
-#include "Justin/CActionEffectInterface.h"
+#include "Justin/CActionPauseInterface.h"
 #include "Justin/Actions/CAction.h"
 
 void UCGameplayComponent::AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass)
@@ -234,12 +234,12 @@ UCAction* UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAc
 		}
 		else
 		{
-			if (ActionProcessed->Implements<UCActionEffectInterface>())
+			if (ActionProcessed->Implements<UCActionPauseInterface>())
 			{
-				auto EffectInterface = Cast<ICActionEffectInterface>(ActionProcessed);
-				if (EffectInterface->CanPause(Instigator, ActionCompared))
+				auto PauseInterface = Cast<ICActionPauseInterface>(ActionProcessed);
+				if (PauseInterface->CanPause(Instigator, ActionCompared))
 				{
-					EffectInterface->Execute_PauseAction(ActionProcessed, Instigator);
+					PauseInterface->Execute_PauseAction(ActionProcessed, Instigator);
 					UE_LOG(LogTemp, Warning, TEXT("PauseAction: %s"), *ActionProcessed->GetActionName().ToString());
 				}
 			}
@@ -250,12 +250,12 @@ UCAction* UCGameplayComponent::ProcessInterruptAndPause(AActor* Instigator, UCAc
 
 void UCGameplayComponent::ProcessUnPause(AActor* Instigator, UCAction* ActionProcessed, UCAction* ActionCompared)
 {
-	if (ActionProcessed->Implements<UCActionEffectInterface>() && ActionProcessed != ActionCompared)
+	if (ActionProcessed->Implements<UCActionPauseInterface>() && ActionProcessed != ActionCompared)
 	{
-		auto EffectInterface = Cast<ICActionEffectInterface>(ActionProcessed);
-		if (EffectInterface->CanUnPause(Instigator, ActionCompared))
+		auto PauseInterface = Cast<ICActionPauseInterface>(ActionProcessed);
+		if (PauseInterface->CanUnPause(Instigator, ActionCompared))
 		{
-			EffectInterface->Execute_UnPauseAction(ActionProcessed, Instigator);
+			PauseInterface->Execute_UnPauseAction(ActionProcessed, Instigator);
 			UE_LOG(LogTemp, Warning, TEXT("UnPauseAction: %s"), *ActionProcessed->GetActionName().ToString());
 		}
 	}
