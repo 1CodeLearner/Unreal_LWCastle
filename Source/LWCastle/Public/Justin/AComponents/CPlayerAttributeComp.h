@@ -75,39 +75,45 @@ protected:
 	void EnableSpendingStaminaByRate(bool bIsEnabled);
 
 protected:
-	
+
 	UFUNCTION()
 	void OnStatUpdated(FStatInfo StatInfo);
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
 	float MaxMana;
 	float CurrentMana;
 
 	float ChanneledManaAmount;
 	bool bIsChannelingMana;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
 	float MaxStamina;
 	float CurrentStamina;
 
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="1.0"), Category= "PlayerAttribute")
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1.0"), Category = "PlayerAttribute")
 	float StaminaRecoveryRate;
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="1.0"), Category= "PlayerAttribute")
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1.0"), Category = "PlayerAttribute")
 	float ManaRecoveryRate;
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.5"), Category = "PlayerAttribute")
 	float StaminaRecoveryDelay;
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
-	float ManaRecoveryDelay;	
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.5"), Category = "PlayerAttribute")
+	float ManaRecoveryDelay;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.5"), Category = "PlayerAttribute")
 	float ChannelManaRecoveryDelay;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.5"), Category = "PlayerAttribute")
+	float ChannelManaDepletedDelay;
 
 private:
-	
+
 	void DisplayStats(EPlayerStat StatType);
+
+	void StartManaRecoveryCooldown();
 
 	FTimerHandle ManaRecoveryCooldownHandle;
 	FTimerHandle StaminaRecoveryCooldownHandle;
 	FTimerHandle ChannelManaRecoveryHandle;
+	FTimerHandle ChannelManaDepletedHandle;
+
 	FTimerDelegate ManaRecoveryDelegate;
 	FTimerDelegate StaminaRecoveryDelegate;
 	FTimerDelegate ChannelManaRecoveryDelegate;
@@ -120,8 +126,11 @@ private:
 	void EnableStaminaRecovery(bool bEnabled);
 	UFUNCTION()
 	void EnableChannelManaRecovery(bool bEnabled);
+	UFUNCTION()
+	void ChannelManaDepletedReset();
 
 	bool bIsManaRecovering;
 	bool bIsStaminaRecovering;
 	bool bIsChannelManaRecovering;
+	bool bIsChannelingManaDepleted;
 };

@@ -6,7 +6,7 @@
 void UCMagicFireAtRelease::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
-
+	ClearNotifyBinds();
 }
 
 void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)

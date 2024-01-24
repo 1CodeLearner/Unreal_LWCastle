@@ -15,7 +15,7 @@ class LWCASTLE_API UCChargeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Update(float MaxTime, float CurrentTime);
+	void Update(float MaxMana, float CurrentMana);
 	void SetVisibilityWidget(ESlateVisibility visibility);
 	void ResetWidget();
 	virtual void NativeConstruct() override;

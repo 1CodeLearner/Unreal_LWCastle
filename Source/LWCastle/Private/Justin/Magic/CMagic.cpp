@@ -87,11 +87,16 @@ void UCMagic::StartMontage()
 void UCMagic::StopMontage()
 {
 	if (AnimInstance) {
-		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(this, "OnNotifyBegin"))
-		{
-			AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
-		}
+		ClearNotifyBinds();
 		AnimInstance->Montage_Stop(InBlendOutTime, Montage);
+	}
+}
+
+void UCMagic::ClearNotifyBinds()
+{
+	if (AnimInstance->OnPlayMontageNotifyBegin.Contains(this, "OnNotifyBegin"))
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
 	}
 }
 

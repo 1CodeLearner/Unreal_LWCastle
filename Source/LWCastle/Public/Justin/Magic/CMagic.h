@@ -42,6 +42,7 @@ protected:
 
 	virtual void StartMontage();
 	void StopMontage();
+	void ClearNotifyBinds();
 	bool IsMontagePlaying() const;
 
 	UFUNCTION()

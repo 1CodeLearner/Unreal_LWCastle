@@ -20,10 +20,19 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 	//	*GetNameSafe(this));
 	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
 	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
-	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE"): TEXT("False")));
-	//AccumulatedMana += ManaChargingRate * DeltaTime;
-	//Widget->Update(AccumulatedMana,
-	//	CombatComp->GetActiveElementData().ChargeManaTotal);
+	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE") : TEXT("False")));
+
+	if (PlayerAttribute && PlayerAttribute->TryChannelMana(ManaChargingRate * DeltaTime))
+	{
+		AccumulatedMana += ManaChargingRate * DeltaTime;
+		Widget->Update(CombatComp->GetActiveElementData().ChargeManaTotal, AccumulatedMana);
+		if (AccumulatedMana >= CombatComp->GetActiveElementData().ChargeManaTotal)
+		{
+			ExecuteAction(GetGameplayComponent()->GetOwner());
+		}
+	}
+
+
 }
 
 TStatId UActionAnimTimer_CastCharging::GetStatId() const
@@ -50,13 +59,13 @@ void UActionAnimTimer_CastCharging::Initialize_Implementation(UCGameplayComponen
 	if (PlayerController) {
 		Widget = PlayerController->ChargeWidget;
 	}
-	auto PlayerTemp = Cast<UCPlayerAttributeComp>(GetGameplayComponent()->GetOwner());
-	if (PlayerTemp) 
+	auto Attribute = GetGameplayComponent()->GetOwner()->GetComponentByClass<UCPlayerAttributeComp>();
+	if (Attribute)
 	{
-		PlayerAttribute = PlayerTemp;
+		PlayerAttribute = Attribute;
 	}
 	auto CombatCompTemp = GetGameplayComponent()->GetOwner()->GetComponentByClass<UCCombatComponent>();
-	if (CombatCompTemp) 
+	if (CombatCompTemp)
 	{
 		CombatComp = CombatCompTemp;
 	}
@@ -68,7 +77,6 @@ void UActionAnimTimer_CastCharging::StartAction_Implementation(AActor* Instigato
 	if (ensure(!IsTimerValid() && !IsMontagePlaying()))
 	{
 		StartMontage(this);
-		//OnActionInvoked.Broadcast(EActionType::START, InstigatorActor, GetTimerDuration());
 	}
 	Widget->SetVisibilityWidget(ESlateVisibility::Visible);
 }
@@ -77,10 +85,8 @@ void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* Instig
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
 
-	if(IsMontagePlaying())
+	if (IsMontagePlaying())
 		StopMontage(this);
-	
-	ClearTimer();
 }
 
 void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* InstigatorActor)
@@ -88,22 +94,25 @@ void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* Instigato
 	Super::PauseAction_Implementation(InstigatorActor);
 	if (IsMontagePlaying())
 		StopMontage(this);
-	if (IsTimerValid())
-		PauseTimer();
+	StartTick = false;
 }
 
 void UActionAnimTimer_CastCharging::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
 	Super::UnPauseAction_Implementation(InstigatorActor);
 	StartMontage(this);
+
+	StartTick = true;
 }
 
 void UActionAnimTimer_CastCharging::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
-	ClearTimer();
 	StopMontage(this);
+	
+	AccumulatedMana = 0.f;
 	StartTick = false;
+	PlayerAttribute->CancelChannelingMana();
 	Widget->ResetWidget();
 }
 
@@ -112,13 +121,10 @@ void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
 	Super::ExecuteAction(InstigatorActor);
 
 	UE_LOG(LogTemp, Warning, TEXT("EXECUTING EACLKADJ ACTION!"));
-	//StartMontage(this);
-	//if (ensure(Cast<AActor>(GetOuter())))
-	//{
-	//	OnActionInvoked.Broadcast(EActionType::START, Cast<AActor>(GetOuter()), GetTimerDuration());
-	//}
 
+	AccumulatedMana = 0.f;
 	StartTick = false;
+	PlayerAttribute->CompleteChannelingMana();
 	GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
 	GetGameplayComponent()->StartActionByName(InstigatorActor, "ChargedState");
 }
@@ -128,9 +134,5 @@ void UActionAnimTimer_CastCharging::OnNotifyBegin(FName NotifyName, const FBranc
 	Super::OnNotifyBegin(NotifyName, BranchingPointPayload);
 
 	UnbindNotifyEvent(this);
-	if (IsTimerValid())
-		UnPauseTimer();
-	else
-		StartTimer(this);
 	StartTick = true;
 }

@@ -13,6 +13,7 @@ UCPlayerAttributeComp::UCPlayerAttributeComp()
 	bIsStaminaRecovering = false;
 	bIsChannelManaRecovering = false;
 	bIsChannelingMana = false;
+	bIsChannelingManaDepleted = false;
 }
 
 void UCPlayerAttributeComp::BeginPlay()
@@ -122,31 +123,41 @@ bool UCPlayerAttributeComp::TryChannelMana(float Value)
 		ChanneledManaAmount = CurrentMana;
 	}
 
-	if (ChanneledManaAmount - Value >= 0)
-	{
-		ChanneledManaAmount -= Value;
+	if (bIsChannelingManaDepleted)
+		return false;
 
-		bIsChannelManaRecovering = false;
-		GetWorld()->GetTimerManager().ClearTimer(ChannelManaRecoveryHandle);
+	ChanneledManaAmount -= Value;
+
+	bIsChannelManaRecovering = false;
+	GetWorld()->GetTimerManager().ClearTimer(ChannelManaRecoveryHandle);
+
+	if (ChanneledManaAmount <= 0)
+	{
+		ChanneledManaAmount = 0;
+		bIsChannelingManaDepleted = true;
+
 		ChannelManaRecoveryDelegate.BindUFunction(this, "EnableChannelManaRecovery", true);
 		GetWorld()->GetTimerManager().SetTimer(ChannelManaRecoveryHandle, ChannelManaRecoveryDelegate, 0.001f, false, ChannelManaRecoveryDelay);
+		DisplayStats(EPlayerStat::MANA);
 
-		if (ChanneledManaAmount <= 0)
-		{
-			ChanneledManaAmount = 0;
-		}
-		return true;
+		return false;
 	}
-	return false;
+
+	DisplayStats(EPlayerStat::MANA);
+	return true;
 }
 
 void UCPlayerAttributeComp::CancelChannelingMana()
 {
 	if (bIsChannelingMana)
 	{
-		bIsChannelingMana = false;
 		ChanneledManaAmount = 0.f;
+
+		bIsChannelingMana = false;
+		bIsChannelingManaDepleted = false;
+		DisplayStats(EPlayerStat::MANA);
 		GetWorld()->GetTimerManager().ClearTimer(ChannelManaRecoveryHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ChannelManaDepletedHandle);
 	}
 }
 
@@ -154,9 +165,15 @@ void UCPlayerAttributeComp::CompleteChannelingMana()
 {
 	if (bIsChannelingMana)
 	{
-		bIsChannelingMana = false;
 		CurrentMana = ChanneledManaAmount;
+		if (CurrentMana < MaxMana)
+			StartManaRecoveryCooldown();
+
+		bIsChannelingMana = false;
+		bIsChannelingManaDepleted = false;
+		DisplayStats(EPlayerStat::MANA);
 		GetWorld()->GetTimerManager().ClearTimer(ChannelManaRecoveryHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ChannelManaDepletedHandle);
 	}
 }
 
@@ -175,10 +192,7 @@ bool UCPlayerAttributeComp::TrySpendMana(float SpendAmount)
 
 	CurrentMana -= SpendAmount;
 
-	bIsManaRecovering = false;
-	GetWorld()->GetTimerManager().ClearTimer(ManaRecoveryCooldownHandle);
-	ManaRecoveryDelegate.BindUFunction(this, "EnableManaRecovery", true);
-	GetWorld()->GetTimerManager().SetTimer(ManaRecoveryCooldownHandle, ManaRecoveryDelegate, 0.001f, false, ManaRecoveryDelay);
+	StartManaRecoveryCooldown();
 
 	if (CurrentMana <= 0)
 	{
@@ -278,6 +292,14 @@ void UCPlayerAttributeComp::DisplayStats(EPlayerStat StatType)
 	}
 }
 
+void UCPlayerAttributeComp::StartManaRecoveryCooldown()
+{
+	bIsManaRecovering = false;
+	GetWorld()->GetTimerManager().ClearTimer(ManaRecoveryCooldownHandle);
+	ManaRecoveryDelegate.BindUFunction(this, "EnableManaRecovery", true);
+	GetWorld()->GetTimerManager().SetTimer(ManaRecoveryCooldownHandle, ManaRecoveryDelegate, 0.001f, false, ManaRecoveryDelay);
+}
+
 void UCPlayerAttributeComp::CheckAndDisableTick()
 {
 	if (bIsManaRecovering || bIsStaminaRecovering)
@@ -307,8 +329,20 @@ void UCPlayerAttributeComp::EnableStaminaRecovery(bool bEnabled)
 void UCPlayerAttributeComp::EnableChannelManaRecovery(bool bEnabled)
 {
 	bIsChannelManaRecovering = bEnabled;
+
 	if (bIsChannelManaRecovering && !IsComponentTickEnabled())
 	{
 		SetComponentTickEnabled(true);
 	}
+
+	if (bIsChannelingManaDepleted)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ChannelManaDepletedHandle);
+		GetWorld()->GetTimerManager().SetTimer(ChannelManaDepletedHandle, this, &UCPlayerAttributeComp::ChannelManaDepletedReset, 0.001f, false, ChannelManaDepletedDelay);
+	}
+}
+
+void UCPlayerAttributeComp::ChannelManaDepletedReset()
+{
+	bIsChannelingManaDepleted = false;
 }
