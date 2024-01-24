@@ -8,6 +8,12 @@ void UCChargeWidget::Update(float MaxTime, float CurrentTime)
 {
 	if (ensure(ChargeProgressBar)) 
 	{
-		ChargeProgressBar->Percent = CurrentTime / MaxTime;
+		ChargeProgressBar->SetPercent(CurrentTime / MaxTime);
 	}
+}
+
+void UCChargeWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	ChargeProgressBar->SetVisibility(ESlateVisibility::Collapsed);
 }

@@ -59,7 +59,7 @@ void UCActionPause::InterruptAction_Implementation(AActor* InstigatorActor)
 
 	if (IsPausing())
 	{
-		UnPauseAction(InstigatorActor);
+		Execute_UnPauseAction(this, InstigatorActor);
 	}
 }
 

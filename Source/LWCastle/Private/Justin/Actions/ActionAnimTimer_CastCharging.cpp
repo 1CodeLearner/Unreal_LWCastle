@@ -4,11 +4,16 @@
 #include "Justin/Actions/ActionAnimTimer_CastCharging.h"
 #include "Kismet/GameplayStatics.h"
 #include "Justin/CPlayerController.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Working here Calling tick from %s"),
-		*GetNameSafe(this));
+	//UE_LOG(LogTemp, Warning, TEXT("Working here Calling tick from %s"),
+	//	*GetNameSafe(this));
+	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
+	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
+	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE"): TEXT("False")));
+	
 }
 
 TStatId UActionAnimTimer_CastCharging::GetStatId() const
@@ -40,35 +45,45 @@ void UActionAnimTimer_CastCharging::Initialize_Implementation(UCGameplayComponen
 void UActionAnimTimer_CastCharging::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
-	if (ensure(!IsTimerValid()))
+	if (ensure(!IsTimerValid() && !IsMontagePlaying()))
 	{
 		StartMontage(this);
-		
-		StartTimer(this);
-
 		//OnActionInvoked.Broadcast(EActionType::START, InstigatorActor, GetTimerDuration());
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
+
 }
 
 void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
+
+	if(IsMontagePlaying())
+		StopMontage(this);
+	
+	ClearTimer();
 }
 
 void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* InstigatorActor)
 {
 	Super::PauseAction_Implementation(InstigatorActor);
+	if (IsMontagePlaying())
+		StopMontage(this);
+	if (IsTimerValid())
+		PauseTimer();
 }
 
 void UActionAnimTimer_CastCharging::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
 	Super::UnPauseAction_Implementation(InstigatorActor);
+	StartMontage(this);
 }
 
 void UActionAnimTimer_CastCharging::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
+	ClearTimer();
+	StopMontage(this);
+	StartTick = false;
 }
 
 void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
@@ -82,10 +97,19 @@ void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
 	//	OnActionInvoked.Broadcast(EActionType::START, Cast<AActor>(GetOuter()), GetTimerDuration());
 	//}
 
-	StartTick = true;
+	StartTick = false;
+	GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
+	GetGameplayComponent()->StartActionByName(InstigatorActor, "ChargedState");
 }
 
 void UActionAnimTimer_CastCharging::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	Super::OnNotifyBegin(NotifyName, BranchingPointPayload);
+
+	UnbindNotifyEvent(this);
+	if (IsTimerValid())
+		UnPauseTimer();
+	else
+		StartTimer(this);
+	StartTick = true;
 }

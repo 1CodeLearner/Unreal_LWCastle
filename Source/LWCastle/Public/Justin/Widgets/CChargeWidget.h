@@ -16,6 +16,7 @@ class LWCASTLE_API UCChargeWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	void Update(float MaxTime, float CurrentTime);
+	virtual void NativeConstruct() override;
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ChargeProgressBar;

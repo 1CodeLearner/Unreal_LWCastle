@@ -22,7 +22,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FActionInvokedDelegate, EActionTy
 /**
  *
  */
-UCLASS()
+UCLASS(Abstract)
 class LWCASTLE_API UCActionAnimTimer : public UCActionPause//, public FTickableGameObject
 {
 	GENERATED_BODY()
@@ -39,6 +39,7 @@ protected:
 	//Animation Montage
 	virtual void StartMontage(UCActionAnimTimer* ActionAnimTimer);
 	void StopMontage(UCActionAnimTimer* ActionAnimTimer);
+	void UnbindNotifyEvent(UCActionAnimTimer* AnimTimer);
 	UFUNCTION(BlueprintCallable)
 	float GetAnimMontageLength();
 	UFUNCTION()
@@ -60,6 +61,7 @@ protected:
 	virtual void ClearTimer();
 	bool IsTimerValid();
 	float GetTimerDuration();
+	float GetTimerRemaining();
 
 	UFUNCTION(BlueprintCallable, Category = "ActionAnimTimer")
 	virtual void ExecuteAction(AActor* InstigatorActor);
@@ -73,7 +75,7 @@ private:
 	UAnimInstance* AnimInstance;
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0."), Category = "AnimSetting")
 	float InBlendOutTime;
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.1"), Category = "AnimSetting")
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0."), Category = "AnimSetting")
 	float InPlayRate;
 
 	//Timer Settings

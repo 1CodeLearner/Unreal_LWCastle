@@ -50,17 +50,29 @@ void UCActionAnimTimer::StartMontage(UCActionAnimTimer* AnimTimer)
 void UCActionAnimTimer::StopMontage(UCActionAnimTimer* AnimTimer)
 {
 	if (AnimInstance) {
+		UnbindNotifyEvent(AnimTimer);
+		AnimInstance->Montage_Stop(InBlendOutTime, Montage);
+	}
+}
+
+void UCActionAnimTimer::UnbindNotifyEvent(UCActionAnimTimer* AnimTimer)
+{
+	if (AnimInstance)
+	{
 		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
 		{
 			AnimInstance->OnPlayMontageNotifyBegin.Remove(AnimTimer, "OnNotifyBegin");
 		}
-		AnimInstance->Montage_Stop(InBlendOutTime, Montage);
 	}
 }
 
 bool UCActionAnimTimer::IsMontagePlaying() const
 {
-	return AnimInstance->Montage_IsActive(Montage);
+	if (ensure(AnimInstance && Montage))
+	{
+		return AnimInstance->Montage_IsActive(Montage);
+	}
+	return false;
 }
 
 void UCActionAnimTimer::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
@@ -98,6 +110,11 @@ float UCActionAnimTimer::GetTimerDuration()
 	return TimerDuration;
 }
 
+float UCActionAnimTimer::GetTimerRemaining()
+{
+	return GetWorld()->GetTimerManager().GetTimerElapsed(TimerHandle);
+}
+
 void UCActionAnimTimer::StartTimer(UCActionAnimTimer* AnimTimer)
 {
 	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction");
@@ -114,5 +131,5 @@ UCActionAnimTimer::UCActionAnimTimer()
 {
 	TimerDuration = 0.f;
 	InBlendOutTime = 0.f;
-	InPlayRate = 0.f;
+	InPlayRate = 1.f;
 }
