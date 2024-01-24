@@ -13,10 +13,6 @@ UCActionEffect_ChargedState::UCActionEffect_ChargedState()
 
 void UCActionEffect_ChargedState::Tick(float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Working here Calling tick from %s"),
-	//	*GetNameSafe(this));
-	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), DurationTime);
-	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetWorld()->GetTimerManager().GetTimerRemaining(DurationHandle));
 	Widget->Update(DurationTime, GetWorld()->GetTimerManager().GetTimerRemaining(DurationHandle));
 }
 

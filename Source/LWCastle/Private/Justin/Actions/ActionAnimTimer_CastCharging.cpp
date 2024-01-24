@@ -16,12 +16,6 @@ UActionAnimTimer_CastCharging::UActionAnimTimer_CastCharging()
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Working here Calling tick from %s"),
-	//	*GetNameSafe(this));
-	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
-	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
-	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE") : TEXT("False")));
-
 	if (PlayerAttribute && PlayerAttribute->TryChannelMana(ManaChargingRate * DeltaTime))
 	{
 		AccumulatedMana += ManaChargingRate * DeltaTime;
