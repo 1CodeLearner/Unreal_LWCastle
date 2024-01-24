@@ -34,7 +34,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FProgressonChangedDelegate OnProgressionChanged;
-	
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -58,28 +58,70 @@ public:
 	float GetMaxStamina() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SpendMana(float SpendAmount);
+	bool TryChannelMana(float Value);
+	UFUNCTION(BlueprintCallable)
+	void CancelChannelingMana();
+	UFUNCTION(BlueprintCallable)
+	void CompleteChannelingMana();
 
 	UFUNCTION(BlueprintCallable)
+	bool TrySpendMana(float SpendAmount);
+	UFUNCTION(BlueprintCallable)
 	void SpendStamina(float SpendAmount);
+
 protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EnableSpendingStaminaByRate(bool bIsEnabled);
 
 protected:
-
+	
 	UFUNCTION()
 	void OnStatUpdated(FStatInfo StatInfo);
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
 	float MaxMana;
 	float CurrentMana;
+
+	float ChanneledManaAmount;
+	bool bIsChannelingMana;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerAttribute")
 	float MaxStamina;
 	float CurrentStamina;
+
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="1.0"), Category= "PlayerAttribute")
+	float StaminaRecoveryRate;
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="1.0"), Category= "PlayerAttribute")
+	float ManaRecoveryRate;
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
+	float StaminaRecoveryDelay;
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
+	float ManaRecoveryDelay;	
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin="0.5"), Category= "PlayerAttribute")
+	float ChannelManaRecoveryDelay;
+
 private:
-	UPROPERTY(VisibleDefaultsOnly)
-	float StaminaSpendRate;
+	
+	void DisplayStats(EPlayerStat StatType);
+
 	FTimerHandle ManaRecoveryCooldownHandle;
 	FTimerHandle StaminaRecoveryCooldownHandle;
+	FTimerHandle ChannelManaRecoveryHandle;
+	FTimerDelegate ManaRecoveryDelegate;
+	FTimerDelegate StaminaRecoveryDelegate;
+	FTimerDelegate ChannelManaRecoveryDelegate;
+
+	void CheckAndDisableTick();
+
+	UFUNCTION()
+	void EnableManaRecovery(bool bEnabled);
+	UFUNCTION()
+	void EnableStaminaRecovery(bool bEnabled);
+	UFUNCTION()
+	void EnableChannelManaRecovery(bool bEnabled);
+
+	bool bIsManaRecovering;
+	bool bIsStaminaRecovering;
+	bool bIsChannelManaRecovering;
 };

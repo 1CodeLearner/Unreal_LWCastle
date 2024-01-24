@@ -39,10 +39,8 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	if (AttributeComp)
 	{
-		if (AttributeComp->GetCurrentMana() - ManaSpendAmount >= 0.f)
+		if (AttributeComp->TrySpendMana(ManaSpendAmount))
 		{
-			AttributeComp->SpendMana(ManaSpendAmount);
-
 			//Testing purpose
 			UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
 

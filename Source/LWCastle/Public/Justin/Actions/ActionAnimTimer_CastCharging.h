@@ -7,6 +7,8 @@
 #include "Justin/Widgets/CChargeWidget.h"
 #include "ActionAnimTimer_CastCharging.generated.h"
 
+class UCPlayerAttributeComp;
+class UCCombatComponent;
 /**
  *
  */
@@ -15,7 +17,8 @@ class LWCASTLE_API UActionAnimTimer_CastCharging : public UCActionAnimTimer, pub
 {
 	GENERATED_BODY()
 public:
-	
+	UActionAnimTimer_CastCharging();
+
 	virtual void Tick(float DeltaTime) override;
 	virtual TStatId GetStatId() const override;
 	virtual bool IsTickable() const override;
@@ -31,11 +34,16 @@ public:
 protected:
 	virtual void ExecuteAction(AActor* InstigatorActor) override;
 	virtual void OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;
+	UPROPERTY(EditAnywhere, meta=(ClampMin=1.0))
+	float ManaChargingRate;
 
 private:
 	UPROPERTY()
 	TObjectPtr<UCChargeWidget> Widget;
 	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttribute;
+	UPROPERTY()
+	TObjectPtr<UCCombatComponent> CombatComp;
 	bool StartTick = false;
+	float AccumulatedMana;
 };

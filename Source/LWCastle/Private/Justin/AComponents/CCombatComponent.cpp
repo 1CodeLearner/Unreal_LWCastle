@@ -25,19 +25,23 @@ void UCCombatComponent::Initialize()
 		TArray<FName> Names = DT_ElementData->GetRowNames();
 		for (auto Name : Names)
 		{
-			FElementData* Data = DT_ElementData->FindRow<FElementData>(Name, TEXT(""));
+			FElementData* ElementDataToAdd = DT_ElementData->FindRow<FElementData>(Name, TEXT(""));
 
 			FElement ElementToAdd;
 
-			UCMagic* Default = NewObject<UCMagic>(GetOwner(), Data->DefaultElement);
+			UCMagic* Default = NewObject<UCMagic>(GetOwner(), ElementDataToAdd->DefaultElement);
 			Default->Initialize(GetOwner());
-			UCMagic* Charged = NewObject<UCMagic>(GetOwner(), Data->ChargedElement);
+			UCMagic* Charged = NewObject<UCMagic>(GetOwner(), ElementDataToAdd->ChargedElement);
 			Charged->Initialize(GetOwner());
 			Charged->OnMagicExecuted.AddDynamic(this, &UCCombatComponent::OnChargeMagicExecuted);
 
+			ElementToAdd.ElementName = Name;
 			ElementToAdd.DefaultElement = Default;
 			ElementToAdd.ChargedElement = Charged;
 			OwningElements.Add(Name, ElementToAdd);
+
+			FElementData ElementData = *ElementDataToAdd;
+			OwningElementData.Add(Name, ElementData);
 
 			Temp = Name;
 		}
@@ -63,6 +67,11 @@ void UCCombatComponent::SwitchElementByName(FName ElementName)
 
 		OnActiveElementSwitched.Broadcast(GetOwner(), ElementDataTemp, ActiveElement);
 	}
+}
+
+FElementData UCCombatComponent::GetActiveElementData() const
+{
+	return OwningElementData[ActiveElement.ElementName];
 }
 
 FElement UCCombatComponent::GetElementFromName(FName Name) const

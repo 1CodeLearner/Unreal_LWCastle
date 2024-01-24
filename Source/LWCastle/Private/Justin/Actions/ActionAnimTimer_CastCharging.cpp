@@ -6,6 +6,13 @@
 #include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
+#include "Justin/AComponents/CCombatComponent.h"
+
+UActionAnimTimer_CastCharging::UActionAnimTimer_CastCharging()
+{
+	ManaChargingRate = 1.0f;
+	AccumulatedMana = 0.f;
+}
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
@@ -14,8 +21,9 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
 	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
 	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE"): TEXT("False")));
-	if(PlayerAttribute->Mana)
-	Widget->Update(GetTimerDuration(), GetTimerRemaining());
+	//AccumulatedMana += ManaChargingRate * DeltaTime;
+	//Widget->Update(AccumulatedMana,
+	//	CombatComp->GetActiveElementData().ChargeManaTotal);
 }
 
 TStatId UActionAnimTimer_CastCharging::GetStatId() const
@@ -46,6 +54,11 @@ void UActionAnimTimer_CastCharging::Initialize_Implementation(UCGameplayComponen
 	if (PlayerTemp) 
 	{
 		PlayerAttribute = PlayerTemp;
+	}
+	auto CombatCompTemp = GetGameplayComponent()->GetOwner()->GetComponentByClass<UCCombatComponent>();
+	if (CombatCompTemp) 
+	{
+		CombatComp = CombatCompTemp;
 	}
 }
 
