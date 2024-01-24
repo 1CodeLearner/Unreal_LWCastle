@@ -118,7 +118,6 @@ void UCGameplayComponent::CompleteActionByName(AActor* InstigatorActor, FName Ac
 				{
 					Action->CompleteAction(InstigatorActor);
 					ActionFound = Action;
-					UE_LOG(LogTemp, Warning, TEXT("Inside CompleteAction"));
 					break;
 				}
 			}
@@ -187,7 +186,6 @@ void UCGameplayComponent::CompleteActionBy(AActor* InstigatorActor, UCAction* Ac
 			{
 				ActionToComplete->CompleteAction(InstigatorActor);
 				HasCompleted = true;
-				UE_LOG(LogTemp, Warning, TEXT("Inside CompleteAction"));
 			}
 		}
 

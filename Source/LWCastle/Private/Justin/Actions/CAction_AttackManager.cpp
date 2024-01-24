@@ -20,12 +20,14 @@ void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorAct
 	GetActiveElement()->Release(InstigatorActor);
 }
 
+/*
 bool UCAction_AttackManager::CanStart_Implementation(AActor* InstigatorActor) const
 {
+	return Super::CanStart_Implementation(InstigatorActor);
 	if (GetActiveElement())
 		return !GetActiveElement()->IsPressing();
 	return false;
-}
+}*/
 
 bool UCAction_AttackManager::IsRunning() const
 {

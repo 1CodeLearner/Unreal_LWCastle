@@ -10,13 +10,11 @@
 void UCMagic::Press_Implementation(AActor* InstigatorActor)
 {
 	bIsPressing = true;
-	UE_LOG(LogTemp, Warning, TEXT("Running Press %s"), *GetNameSafe(this));
 }
 
 void UCMagic::Release_Implementation(AActor* InstigatorActor)
 {
 	bIsPressing = false;
-	UE_LOG(LogTemp, Warning, TEXT("Running Release %s"), *GetNameSafe(this));
 }
 
 void UCMagic::Reset(AActor* InstigatorActor)
@@ -31,8 +29,6 @@ void UCMagic::Reset(AActor* InstigatorActor)
 	{
 		AnimInstance->OnPlayMontageNotifyBegin.Remove(this, "OnNotifyBegin");
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Running Reset %s"), *GetNameSafe(this));
 }
 
 void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
@@ -41,8 +37,6 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 	{
 		if (AttributeComp->TrySpendMana(ManaSpendAmount))
 		{
-			//Testing purpose
-			UE_LOG(LogTemp, Warning, TEXT("MagicExecute in Magic"));
 
 			FVector Origin = InstigatorActor->GetActorLocation();
 			FVector Start = Origin + 100.f * InstigatorActor->GetActorForwardVector();
@@ -79,6 +73,7 @@ void UCMagic::StartMontage()
 			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
 				return;
 
+			UE_LOG(LogTemp, Warning, TEXT("Start Montage MagicFireAtRelease"));
 			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 		}
 	}
@@ -107,7 +102,6 @@ bool UCMagic::IsMontagePlaying() const
 
 void UCMagic::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnNotifyBegin inside CMagic.cpp"));
 	MagicExecute(BranchingPointPayload.SkelMeshComponent->GetOwner());
 	float Cooldown = GetAnimMontageLength();
 	//Display Cooldown on UI

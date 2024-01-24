@@ -6,7 +6,7 @@
 void UCMagicFireAtRelease::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
-	ClearNotifyBinds();
+	/*ClearNotifyBinds();*/
 }
 
 void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
@@ -21,7 +21,6 @@ void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 void UCMagicFireAtRelease::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	Super::MagicExecute_Implementation(InstigatorActor);
-	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in MagicFireAtRelease"));
 
 	UAnimInstance* Anim = GetAnimInstance();
 
