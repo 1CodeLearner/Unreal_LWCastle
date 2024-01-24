@@ -15,5 +15,5 @@ class LWCASTLE_API UCActionEffect_ChargingState : public UCActionEffect
 	GENERATED_BODY()
 
 public:
-
+	
 };
