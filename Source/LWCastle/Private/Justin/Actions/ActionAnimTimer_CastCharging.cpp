@@ -13,7 +13,7 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
 	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
 	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE"): TEXT("False")));
-	
+	Widget->Update(GetTimerDuration(), GetTimerRemaining());
 }
 
 TStatId UActionAnimTimer_CastCharging::GetStatId() const
@@ -50,7 +50,7 @@ void UActionAnimTimer_CastCharging::StartAction_Implementation(AActor* Instigato
 		StartMontage(this);
 		//OnActionInvoked.Broadcast(EActionType::START, InstigatorActor, GetTimerDuration());
 	}
-
+	Widget->SetVisibilityWidget(ESlateVisibility::Visible);
 }
 
 void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -84,6 +84,7 @@ void UActionAnimTimer_CastCharging::InterruptAction_Implementation(AActor* Insti
 	ClearTimer();
 	StopMontage(this);
 	StartTick = false;
+	Widget->ResetWidget();
 }
 
 void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)

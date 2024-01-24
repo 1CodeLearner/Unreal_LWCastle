@@ -22,7 +22,7 @@ public:
 
 	virtual void PostInitializeComponents() override;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "ChargeWidget")
 	UCChargeWidget* ChargeWidget;
 protected:
 	virtual void BeginPlay() override;

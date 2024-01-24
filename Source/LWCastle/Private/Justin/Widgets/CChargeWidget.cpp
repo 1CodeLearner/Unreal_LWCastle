@@ -12,6 +12,18 @@ void UCChargeWidget::Update(float MaxTime, float CurrentTime)
 	}
 }
 
+void UCChargeWidget::SetVisibilityWidget(ESlateVisibility visibility)
+{
+	ChargeProgressBar->SetVisibility(visibility);
+}
+
+void UCChargeWidget::ResetWidget()
+{
+	ChargeProgressBar->SetPercent(0.f);
+
+	ChargeProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+}
+
 void UCChargeWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
