@@ -35,5 +35,7 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UCChargeWidget> Widget;
+	UPROPERTY()
+	TObjectPtr<UCPlayerAttributeComp> PlayerAttribute;
 	bool StartTick = false;
 };

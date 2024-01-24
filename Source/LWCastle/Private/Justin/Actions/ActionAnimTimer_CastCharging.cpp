@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
@@ -13,6 +14,7 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 	UE_LOG(LogTemp, Warning, TEXT("Show duration: %f"), GetTimerDuration());
 	UE_LOG(LogTemp, Warning, TEXT("Show Remaining: %f"), GetTimerRemaining());
 	UE_LOG(LogTemp, Warning, TEXT("Is Animation Playing? %s"), (IsMontagePlaying() ? TEXT("TRUE"): TEXT("False")));
+	if(PlayerAttribute->Mana)
 	Widget->Update(GetTimerDuration(), GetTimerRemaining());
 }
 
@@ -39,6 +41,11 @@ void UActionAnimTimer_CastCharging::Initialize_Implementation(UCGameplayComponen
 	auto PlayerController = Cast<ACPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	if (PlayerController) {
 		Widget = PlayerController->ChargeWidget;
+	}
+	auto PlayerTemp = Cast<UCPlayerAttributeComp>(GetGameplayComponent()->GetOwner());
+	if (PlayerTemp) 
+	{
+		PlayerAttribute = PlayerTemp;
 	}
 }
 
