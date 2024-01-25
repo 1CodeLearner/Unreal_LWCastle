@@ -94,7 +94,10 @@ void Auwol_test::PostInitializeComponents()
 void Auwol_test::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GameplayComp->ActiveGameplayTags.HasAny(StunContainer))
+	{
+		return;
+	}
 	Move(DeltaTime);
 
 }
@@ -140,7 +143,7 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Released, this, &Auwol_test::Attack_Melee);
 
 
-	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartChargingTestAutoCharge);
+	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartCharging);
 }
 
 void Auwol_test::Turn(float value)
@@ -357,7 +360,7 @@ void Auwol_test::Attack_Melee_End()
 	isDuringAttack = false;
 }
 
-void Auwol_test::StartChargingTestAutoCharge()
+void Auwol_test::StartCharging()
 {
-	GameplayComp->StartActionByName(this, "ChargedState");
+	GameplayComp->StartActionByName(this, "Charging");
 }

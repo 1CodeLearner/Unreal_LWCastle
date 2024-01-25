@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagContainer.h"
 #include "uwol_test.generated.h"
 
 
@@ -45,6 +46,9 @@ public:
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
 	class UCameraComponent* tpsCamComp;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer StunContainer;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	//UAnimMontage* m_pDodgeMomtage;
@@ -149,7 +153,7 @@ public:
 	UAnimMontage* Attack_MeleeAnim4;
 
 	UFUNCTION()
-	void StartChargingTestAutoCharge();
+	void StartCharging();
 
 
 	bool isDuringAttack;
