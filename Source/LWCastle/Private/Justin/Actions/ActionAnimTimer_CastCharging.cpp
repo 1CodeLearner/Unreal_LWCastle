@@ -84,8 +84,7 @@ void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* Instig
 void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* InstigatorActor)
 {
 	Super::PauseAction_Implementation(InstigatorActor);
-	if (IsMontagePlaying())
-		StopMontage(this);
+	UnbindNotifyEvent(this);
 	StartTick = false;
 }
 

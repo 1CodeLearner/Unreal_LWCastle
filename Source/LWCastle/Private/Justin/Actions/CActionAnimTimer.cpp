@@ -36,7 +36,9 @@ void UCActionAnimTimer::StartMontage(UCActionAnimTimer* AnimTimer)
 	if (AnimInstance && Montage) {
 		//Making sure Anim Montage has notify available
 		AnimInstance->Montage_Play(Montage, InPlayRate);
-		if (ensure(Montage->IsNotifyAvailable())) {
+		if (ensureAlways(Montage->IsNotifyAvailable()) && 
+			ensureAlways(!AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))) 
+		{
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCActionAnimTimer::OnNotifyBegin);
 
 			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
@@ -59,7 +61,7 @@ void UCActionAnimTimer::UnbindNotifyEvent(UCActionAnimTimer* AnimTimer)
 {
 	if (AnimInstance)
 	{
-		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
+		if (AnimInstance->OnPlayMontageNotifyBegin.IsBound())
 		{
 			AnimInstance->OnPlayMontageNotifyBegin.Remove(AnimTimer, "OnNotifyBegin");
 		}
