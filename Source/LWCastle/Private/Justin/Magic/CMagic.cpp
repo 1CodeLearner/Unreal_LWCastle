@@ -17,9 +17,12 @@ void UCMagic::Release_Implementation(AActor* InstigatorActor)
 	bIsPressing = false;
 }
 
-void UCMagic::Reset(AActor* InstigatorActor)
+void UCMagic::Reset(AActor* InstigatorActor, bool bIsPausing)
 {
-	bIsPressing = false;
+	if (!bIsPausing)
+	{
+		bIsPressing = false;
+	}
 
 	if (AnimInstance->Montage_IsActive(Montage)) {
 		StopMontage();

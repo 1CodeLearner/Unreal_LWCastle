@@ -205,7 +205,7 @@ bool UCPlayerAttributeComp::TrySpendMana(float SpendAmount)
 	return true;
 }
 
-void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
+bool UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 {
 	if (CurrentStamina > 0.f)
 	{
@@ -222,9 +222,11 @@ void UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 	else if (CurrentStamina <= 0.f)
 	{
 		OnStaminaDepleted.Broadcast();
+		return false;
 	}
 
 	DisplayStats(EPlayerStat::STAMINA);
+	return true;
 }
 
 void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)

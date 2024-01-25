@@ -67,7 +67,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TrySpendMana(float SpendAmount);
 	UFUNCTION(BlueprintCallable)
-	void SpendStamina(float SpendAmount);
+	bool SpendStamina(float SpendAmount);
 
 protected:
 

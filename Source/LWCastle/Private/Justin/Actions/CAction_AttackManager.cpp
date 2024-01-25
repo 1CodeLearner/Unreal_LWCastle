@@ -14,6 +14,23 @@ void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 	GetActiveElement()->Press(InstigatorActor);
 }
 
+void UCAction_AttackManager::PauseAction_Implementation(AActor* InstigatorActor)
+{
+	Super::PauseAction_Implementation(InstigatorActor);
+	//Magic will remain paused forever if not set to true
+	GetActiveElement()->Reset(InstigatorActor, true);
+}
+
+void UCAction_AttackManager::UnPauseAction_Implementation(AActor* InstigatorActor)
+{
+	Super::UnPauseAction_Implementation(InstigatorActor);
+	if (IsRunning())
+	{
+		GetActiveElement()->Press(InstigatorActor);
+
+	}
+}
+
 void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
@@ -118,7 +135,7 @@ void UCAction_AttackManager::OnChargeStateActivated(AActor* InstigatorActor, boo
 
 UCMagic* UCAction_AttackManager::GetActiveElement() const
 {
-	if (GetGameplayComponent()) 
+	if (GetGameplayComponent())
 	{
 		static FGameplayTag ChargedStateTag = FGameplayTag::RequestGameplayTag("State.Charged");
 		if (GetGameplayComponent()->ActiveGameplayTags.HasTagExact(ChargedStateTag))

@@ -109,7 +109,8 @@ public:
 	//void speedchange();
 
 	void RunP();
-	void RunR();
+
+	//void RunR();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
 	UAnimMontage* pDodgeMontage;

@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Magic")
 	void Release(AActor* InstigatorActor);
 	UFUNCTION(BlueprintCallable, Category = "Magic")
-	void Reset(AActor* InstigatorActor);
+	void Reset(AActor* InstigatorActor, bool bIsPausing = false);
 	UFUNCTION(BlueprintCallable)
 	bool IsPressing() const;
 	UFUNCTION(BlueprintCallable)

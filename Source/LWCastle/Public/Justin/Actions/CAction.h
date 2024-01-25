@@ -25,8 +25,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StartAction(AActor* InstigatorActor);
 
-	UFUNCTION(BlueprintCallable, Category = "Action")
-	bool CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const;
+	UFUNCTION(BlueprintNativeEvent, Category = "Action")
+	bool CanInterrupt(AActor* InstigatorActor, UCAction* StartingAction) const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void InterruptAction(AActor* InstigatorActor);
 

@@ -134,7 +134,7 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// Run Binding
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &Auwol_test::RunP);
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
+	//PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
 
 	// Attack Binding
 	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Released, this, &Auwol_test::Attack_Melee);
@@ -293,16 +293,18 @@ void Auwol_test::Dodge()
 void Auwol_test::RunP()
 {
 	//movespeed = 1.5f;
-	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
+	//GetCharacterMovement()->MaxWalkSpeed *= 3.0;
 	GameplayComp->StartActionByName(this, "Sprint");
 }
 
+/*
 void Auwol_test::RunR()
 {
 	//movespeed = 1.0f;
-	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
+	//GetCharacterMovement()->MaxWalkSpeed /= 3.0;
 	GameplayComp->CompleteActionByName(this, "Sprint");
 }
+*/
 
 void Auwol_test::ResetDodgeState()
 {
