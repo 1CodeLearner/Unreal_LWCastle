@@ -23,6 +23,9 @@ public:
 	void RemoveAction(UCAction* ActionToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
+	UCAction* GetActionByName(FName ActionName) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void StartActionByName(AActor* InstigatorActor, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -30,6 +33,7 @@ public:
 
 	void StartActionBy(AActor* InstigatorActor, UCAction* ActionToStart);
 
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete);
 
 	UPROPERTY(VisibleAnywhere, Category = "Action")

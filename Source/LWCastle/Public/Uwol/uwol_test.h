@@ -6,6 +6,10 @@
 #include "GameFramework/Character.h"
 #include "uwol_test.generated.h"
 
+
+class UCGameplayComponent;
+class UCCombatComponent;
+class UCPlayerAttributeComp;
 UCLASS()
 class LWCASTLE_API Auwol_test : public ACharacter
 {
@@ -19,6 +23,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCGameplayComponent> GameplayComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	TObjectPtr<UCCombatComponent> CombatComp;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -70,7 +84,8 @@ public:
 	TSubclassOf<class ADefaultMagic> defaultmagicfac;
 
 	// fire
-	void InputFire();
+	void InputFirePressed();
+	void InputFireReleased();
 
 	// CrossHair
 	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
@@ -83,16 +98,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category=FocusUI)
 	TSubclassOf<class UUserWidget> sniperFac;
+	UPROPERTY()
 	class UUserWidget* _FocusUI;
 
-	void CastR();
+	void SwitchElement();
 
 	float movespeed = 1.0;
 
-	void speedchange();
+	//void speedchange();
+
 	void RunP();
 	void RunR();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
 	UAnimMontage* pDodgeMontage;
 
@@ -128,6 +145,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	UAnimMontage* Attack_MeleeAnim4;
+
+	UFUNCTION()
+	void StartChargingTestAutoCharge();
 
 
 	bool isDuringAttack;

@@ -9,13 +9,15 @@
 
 class UCAction;
 class UCMagic;
+class UCGameplayComponent;
 
 USTRUCT(BlueprintType)
 struct FElement
 {
 	GENERATED_BODY()
 public:
-
+	
+	FName ElementName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UCMagic> DefaultElement;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -31,6 +33,8 @@ struct FElementData : public FTableRowBase
 	TSubclassOf<UCMagic> DefaultElement;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UCMagic> ChargedElement;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ChargeManaTotal;
 };
 
 
@@ -62,16 +66,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SwitchElementByName(FName ElementName);
 
+	UFUNCTION()
+	FElementData GetActiveElementData() const;
+
 protected:
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	FElement ActiveElement;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TMap<FName, FElement> OwningElements;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TMap<FName, FElementData> OwningElementData;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	UDataTable* DT_ElementData;
 
 	UFUNCTION()
 	FElement GetElementFromName(FName Name) const;
+
+private:
+	UFUNCTION()
+	void OnChargeMagicExecuted(float CooldownLength);
+	UPROPERTY()
+	TObjectPtr<UCGameplayComponent> GameplayComp;
 };

@@ -20,8 +20,6 @@ bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
 
 void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Running StartAction %s"), *this->GetName());
-
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -33,8 +31,6 @@ void UCAction::StartAction_Implementation(AActor* InstigatorActor)
 
 void UCAction::CompleteAction_Implementation(AActor* InstigatorActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Running CompleteAction %s"), *this->GetName());
-
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -72,8 +68,6 @@ bool UCAction::CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) cons
 
 void UCAction::InterruptAction_Implementation(AActor* InstigatorActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Running InterruptAction %s"), *this->GetName());
-
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{

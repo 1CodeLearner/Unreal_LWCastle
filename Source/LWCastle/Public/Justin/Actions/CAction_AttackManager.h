@@ -11,7 +11,7 @@ class UCAction_MagicAttack;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LWCASTLE_API UCAction_AttackManager : public UCAction
 {
 	GENERATED_BODY()
@@ -21,7 +21,7 @@ public:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 	UFUNCTION()
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
-	virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
+	//virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
 
 	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 	virtual bool IsRunning() const override;
@@ -39,8 +39,6 @@ protected:
 
 	UFUNCTION()
 	void OnChargeStateActivated(AActor* InstigatorActor, bool _bIsCharged);
-
-	virtual FGameplayTagContainer GetGrantedTags() const override;
 
 private:
 	UCMagic* GetActiveElement() const;

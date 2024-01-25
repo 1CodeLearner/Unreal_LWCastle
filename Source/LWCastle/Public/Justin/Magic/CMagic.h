@@ -11,13 +11,13 @@
  *
  */
 
- DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
+class UCPlayerAttributeComp;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
 
 UCLASS(BlueprintType, Blueprintable)
 class LWCASTLE_API UCMagic : public UObject
 {
 	GENERATED_BODY()
-
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Magic")
 	void Initialize(AActor* InstigatorActor);
@@ -42,6 +42,7 @@ protected:
 
 	virtual void StartMontage();
 	void StopMontage();
+	void ClearNotifyBinds();
 	bool IsMontagePlaying() const;
 
 	UFUNCTION()
@@ -55,7 +56,7 @@ protected:
 	FColor DebugMagicColor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	float DebugLineThickness;
-	
+
 	UFUNCTION()
 	UAnimInstance* GetAnimInstance() const;
 
@@ -63,6 +64,8 @@ protected:
 	FGameplayTagContainer GrantedTags;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UCPlayerAttributeComp> AttributeComp;
 
 	UPROPERTY()
 	UAnimInstance* AnimInstance;
@@ -70,6 +73,9 @@ private:
 	float InBlendOutTime;
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.1"), Category = "Magic")
 	float InPlayRate;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0.0"), Category = "Magic")
+	float ManaSpendAmount;
+
 
 	bool bIsPressing;
 

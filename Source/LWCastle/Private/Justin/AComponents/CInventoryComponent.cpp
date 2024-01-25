@@ -14,6 +14,7 @@ void UCInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Currency = 120;
+	OnCurrencySpent.Broadcast(Currency);
 }
 
 int UCInventoryComponent::GetCurrency() const

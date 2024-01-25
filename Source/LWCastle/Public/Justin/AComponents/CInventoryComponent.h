@@ -31,7 +31,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-
 	friend class UCPlayerAttributeManagerComp;
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
 	void AddCurrency(int AmountToAdd);

@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "AComponents/CPlayerAttributeManagerComp.h"
 #include "CPlayerController.generated.h"
+
+class UCChargeWidget;
 /**
  * 
  */
@@ -19,10 +21,19 @@ public:
 	ACPlayerController();
 
 	virtual void PostInitializeComponents() override;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "ChargeWidget")
+	UCChargeWidget* ChargeWidget;
 protected:
+	virtual void BeginPlay() override;
+
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Manager")
 	TObjectPtr<UCPlayerAttributeManagerComp> StatManagerComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly);
 	int value;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<UCChargeWidget> ChargeWidgetClass;
 };

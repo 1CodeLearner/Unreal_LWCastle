@@ -36,11 +36,6 @@ void UCActionEffect::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 
-	if (IsPausing())
-	{
-		Execute_UnPauseAction(this, InstigatorActor);
-	}
-
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	if (bDeleteAtEnd && ensure(GetGameplayComponent()))
 	{
@@ -52,27 +47,13 @@ void UCActionEffect::InterruptAction_Implementation(AActor* InstigatorActor)
 void UCActionEffect::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
-	ensure(!bIsPausing);
 
-	bIsPausing = false;
-}
-
-bool UCActionEffect::CanPause(AActor* InstigatorActor, UCAction* OtherAction) const
-{
-	if (bCanPause)
-	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
-		{
-			return !bIsPausing && IsRunning();
-		}
-	}
-
-	return false;
 }
 
 void UCActionEffect::PauseAction_Implementation(AActor* InstigatorActor)
 {
 	//ensureAlways(IsRunning());
+	Super::PauseAction_Implementation(InstigatorActor);
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -82,28 +63,12 @@ void UCActionEffect::PauseAction_Implementation(AActor* InstigatorActor)
 		GetWorld()->GetTimerManager().PauseTimer(DurationHandle);
 		GetWorld()->GetTimerManager().PauseTimer(IntervalHandle);
 	}
-
-	bIsPausing = true;
-}
-
-
-bool UCActionEffect::CanUnPause(AActor* InstigatorActor, UCAction* OtherAction) const
-{
-	if (bCanPause)
-	{
-		if (PausedTags.HasAny(OtherAction->GetGrantedTags()))
-		{
-			return bIsPausing && IsRunning();
-		}
-	}
-
-	return false;
 }
 
 void UCActionEffect::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
 	//ensureAlways(IsRunning());
-
+	Super::UnPauseAction_Implementation(InstigatorActor);
 	auto Gameplay = GetGameplayComponent();
 	if (Gameplay)
 	{
@@ -113,15 +78,7 @@ void UCActionEffect::UnPauseAction_Implementation(AActor* InstigatorActor)
 		GetWorld()->GetTimerManager().UnPauseTimer(DurationHandle);
 		GetWorld()->GetTimerManager().UnPauseTimer(IntervalHandle);
 	}
-
-	bIsPausing = false;
 }
-
-bool UCActionEffect::IsPausing() const
-{
-	return bIsPausing;
-}
-
 
 void UCActionEffect::DurationEnd(AActor* InstigatorActor)
 {
@@ -139,6 +96,17 @@ void UCActionEffect::DurationEnd(AActor* InstigatorActor)
 		GetGameplayComponent()->RemoveAction(this);
 		ConditionalBeginDestroy();
 	}
+
+}
+
+float UCActionEffect::GetDuration() const
+{
+	return DurationTime;
+}
+
+float UCActionEffect::GetIntervalTime() const
+{
+	return IntervalTime;
 }
 
 void UCActionEffect::IntervalStart(AActor* InstigatorActor)
@@ -148,7 +116,5 @@ void UCActionEffect::IntervalStart(AActor* InstigatorActor)
 
 UCActionEffect::UCActionEffect()
 {
-	bIsPausing = false;
-	bCanPause = false;
 	bDeleteAtEnd = false;
 }

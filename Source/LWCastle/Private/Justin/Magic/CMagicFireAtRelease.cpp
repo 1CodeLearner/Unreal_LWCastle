@@ -6,13 +6,14 @@
 void UCMagicFireAtRelease::Press_Implementation(AActor* InstigatorActor)
 {
 	Super::Press_Implementation(InstigatorActor);
+	/*ClearNotifyBinds();*/
 }
 
 void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 {
 	Super::Release_Implementation(InstigatorActor);
-
-	if (IsMontagePlaying()) return;
+	if(IsMontagePlaying())
+		return;
 
 	StartMontage();
 }
@@ -20,8 +21,7 @@ void UCMagicFireAtRelease::Release_Implementation(AActor* InstigatorActor)
 void UCMagicFireAtRelease::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	Super::MagicExecute_Implementation(InstigatorActor);
-	UE_LOG(LogTemp, Warning, TEXT("MagicExecute in MagicFireAtRelease"));
-	
+
 	UAnimInstance* Anim = GetAnimInstance();
 
 	if (!Anim)

@@ -64,7 +64,7 @@ protected:
 	FGameplayTagContainer BlockedTags;
 	/*Stops on-going Action in GameplayComponent if the same Tag exists in starting Action's GrantedTags.
 	Takes first priority over paused Tags*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tags")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer InterruptedTags;
 
 	UPROPERTY(EditDefaultsOnly, Category = "ActionSettings")

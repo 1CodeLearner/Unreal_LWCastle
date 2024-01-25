@@ -16,8 +16,6 @@ class LWCASTLE_API UAction_Dodge : public UCAction
 protected:
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 
-	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
-
 	UPROPERTY(EditAnywhere, Category = "Dodge")
 	TObjectPtr<UAnimMontage> AnimationMontage;
 
