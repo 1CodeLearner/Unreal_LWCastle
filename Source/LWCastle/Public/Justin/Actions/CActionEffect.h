@@ -45,6 +45,12 @@ protected:
 	UFUNCTION()
 	void DurationEnd(AActor* InstigatorActor);
 
+	UFUNCTION(BlueprintCallable, Category = "ActionEffect")
+	float GetDuration() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ActionEffect")
+	float GetIntervalTime() const;
+
 	UFUNCTION()
 	virtual void IntervalStart(AActor* InstigatorActor);
 

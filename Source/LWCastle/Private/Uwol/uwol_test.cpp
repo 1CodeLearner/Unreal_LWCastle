@@ -294,13 +294,14 @@ void Auwol_test::RunP()
 {
 	//movespeed = 1.5f;
 	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
-
+	GameplayComp->StartActionByName(this, "Sprint");
 }
 
 void Auwol_test::RunR()
 {
 	//movespeed = 1.0f;
 	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
+	GameplayComp->CompleteActionByName(this, "Sprint");
 }
 
 void Auwol_test::ResetDodgeState()

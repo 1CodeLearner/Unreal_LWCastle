@@ -8,14 +8,15 @@
 
 UCAction_Sprint::UCAction_Sprint()
 {
-	bool StartTick = false;
+	StartTick = false;
+	StaminaSpendRate = 1.0f;
 }
 
 void UCAction_Sprint::Tick(float DeltaTime)
 {
-	if (AttributeComp && AttributeComp->TrySpendMana())
+	if (AttributeComp)
 	{
-
+		AttributeComp->SpendStamina(StaminaSpendRate * DeltaTime);
 	}
 }
 
@@ -35,6 +36,12 @@ bool UCAction_Sprint::IsAllowedToTick() const
 	return StartTick;
 }
 
+void UCAction_Sprint::OnStaminaDepleted()
+{
+	StartTick = false; 
+	AttributeComp->OnStaminaDepleted.Remove(this, "OnStaminaDepleted");
+	GetGameplayComponent()->StartActionByName(GetGameplayComponent()->GetOwner(), "FallStun");
+}
 
 void UCAction_Sprint::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
@@ -50,17 +57,20 @@ void UCAction_Sprint::Initialize_Implementation(UCGameplayComponent* GameplayCom
 void UCAction_Sprint::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
+	AttributeComp->OnStaminaDepleted.AddDynamic(this, &UCAction_Sprint::OnStaminaDepleted);
 	StartTick = true;
 }
 
 void UCAction_Sprint::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
+	AttributeComp->OnStaminaDepleted.Remove(this, "OnStaminaDepleted");
 	StartTick = false;
 }
 
 void UCAction_Sprint::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
+	AttributeComp->OnStaminaDepleted.Remove(this, "OnStaminaDepleted");
 	StartTick = false;
 }

@@ -99,6 +99,16 @@ void UCActionEffect::DurationEnd(AActor* InstigatorActor)
 
 }
 
+float UCActionEffect::GetDuration() const
+{
+	return DurationTime;
+}
+
+float UCActionEffect::GetIntervalTime() const
+{
+	return IntervalTime;
+}
+
 void UCActionEffect::IntervalStart(AActor* InstigatorActor)
 {
 	//Empty

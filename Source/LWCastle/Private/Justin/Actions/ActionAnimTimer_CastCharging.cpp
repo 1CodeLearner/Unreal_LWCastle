@@ -25,8 +25,6 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 			ExecuteAction(GetGameplayComponent()->GetOwner());
 		}
 	}
-
-
 }
 
 TStatId UActionAnimTimer_CastCharging::GetStatId() const

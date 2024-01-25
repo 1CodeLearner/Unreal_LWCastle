@@ -11,7 +11,7 @@ class UCPlayerAttributeComp;
  *
  */
 UCLASS()
-class LWCASTLE_API UCAction_Sprint : public UCAction, FTickableGameObject
+class LWCASTLE_API UCAction_Sprint : public UCAction, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
@@ -27,10 +27,14 @@ public:
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 protected:
 	float MaxSprintSpeed = 800;
-	float 
+	UPROPERTY(EditDefaultsOnly, meta= (ClampMin="0.0"), Category = "Sprint")
+	float StaminaSpendRate;
 
 private:
 	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> AttributeComp;
 	bool StartTick;
+
+	UFUNCTION()
+	void OnStaminaDepleted();
 };
