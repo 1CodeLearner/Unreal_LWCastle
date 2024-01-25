@@ -39,8 +39,7 @@ bool UCAction_Sprint::IsAllowedToTick() const
 void UCAction_Sprint::OnStaminaDepleted()
 {
 	StartTick = false; 
-	AttributeComp->OnStaminaDepleted.Remove(this, "OnStaminaDepleted");
-	GetGameplayComponent()->StartActionByName(GetGameplayComponent()->GetOwner(), "FallStun");
+	GetGameplayComponent()->AddAction(GetGameplayComponent()->GetOwner(), ActionEffectStunClass);
 }
 
 void UCAction_Sprint::Initialize_Implementation(UCGameplayComponent* GameplayComp)

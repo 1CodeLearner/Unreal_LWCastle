@@ -91,6 +91,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
 	TSubclassOf<class UUserWidget> crosshairUIFactory;
 	// CrossHair Instance
+	UPROPERTY()
 	class UUserWidget* _crosshairUI;
 
 	void SniperAim();

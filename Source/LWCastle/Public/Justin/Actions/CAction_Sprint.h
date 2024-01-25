@@ -7,6 +7,7 @@
 #include "CAction_Sprint.generated.h"
 
 class UCPlayerAttributeComp;
+class UCActionEffect;
 /**
  *
  */
@@ -34,7 +35,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> AttributeComp;
 	bool StartTick;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
+	TSubclassOf<UCAction> ActionEffectStunClass;
 	UFUNCTION()
 	void OnStaminaDepleted();
+
 };
