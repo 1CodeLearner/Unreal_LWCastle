@@ -7,7 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
-
+#include "GameFramework/Character.h"
 
 UCAction_Sprint::UCAction_Sprint()
 {
@@ -18,7 +18,12 @@ UCAction_Sprint::UCAction_Sprint()
 
 void UCAction_Sprint::Tick(float DeltaTime)
 {
-	if (AttributeComp)
+	if (Character->GetCharacterMovement()->Velocity.SquaredLength() <= 0.f) 
+	{
+		StartTick = false;
+		GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+	}
+	else if (AttributeComp)
 	{
 		AttributeComp->SpendStamina(StaminaSpendRate * DeltaTime);
 	}
@@ -39,6 +44,7 @@ bool UCAction_Sprint::IsAllowedToTick() const
 {
 	return StartTick;
 }
+
 
 void UCAction_Sprint::OnStaminaDepleted()
 {

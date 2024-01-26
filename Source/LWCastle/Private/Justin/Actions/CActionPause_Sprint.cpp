@@ -21,10 +21,14 @@ UCActionPause_Sprint::UCActionPause_Sprint()
 
 void UCActionPause_Sprint::Tick(float DeltaTime)
 {
-	if (AttributeComp)
+	if (Character->GetCharacterMovement()->Velocity.SquaredLength() <= 0.f)
+	{
+		StartTick = false;
+		GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+	}
+	else if (AttributeComp)
 	{
 		AttributeComp->SpendStamina(StaminaSpendRate * DeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("What"));
 	}
 }
 

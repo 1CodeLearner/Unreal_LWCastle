@@ -12,6 +12,8 @@
  */
 
 class UCPlayerAttributeComp;
+class UParticleSystem;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
 
 UCLASS(BlueprintType, Blueprintable)
@@ -62,6 +64,21 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Magic")
 	FGameplayTagContainer GrantedTags;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MagicSetting")
+	FName HandSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MagicSetting")
+	float SweepRadius;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MagicSetting")
+	float SweepDistanceFallback;
+
+	UPROPERTY(EditAnywhere, Category = "MagicSetting")
+	UParticleSystem* MagicEffectFactory;
+
+	UPROPERTY(EditAnywhere, Category = "MagicSetting")
+	FName GunComponentTagName;
 
 private:
 	UPROPERTY()

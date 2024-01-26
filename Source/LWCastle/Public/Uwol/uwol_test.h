@@ -42,6 +42,10 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	virtual FVector GetPawnViewLocation() const override;
+
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)

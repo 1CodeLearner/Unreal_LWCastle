@@ -146,6 +146,11 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartCharging);
 }
 
+FVector Auwol_test::GetPawnViewLocation() const
+{
+	return tpsCamComp->GetComponentLocation();
+}
+
 void Auwol_test::Turn(float value)
 {
 	AddControllerYawInput(value);
@@ -193,32 +198,32 @@ void Auwol_test::InputFirePressed()
 
 	GameplayComp->StartActionByName(this, "Attack");
 
-	/*
+	
 	//isattackingmagic = true;
 
 	// 발사
 	//FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
 
 	// Linetrace
-	FVector startPos = tpsCamComp->GetComponentLocation();
-	FVector endPos = tpsCamComp->GetComponentLocation() + tpsCamComp->GetForwardVector() * 5000;
-	FHitResult hitInfo;
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
-	if (bHit)
-	{
-		FTransform magicTrans;
-		magicTrans.SetLocation(hitInfo.ImpactPoint);
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
-	}
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
+	//FVector startPos = tpsCamComp->GetComponentLocation();
+	//FVector endPos = tpsCamComp->GetComponentLocation() + tpsCamComp->GetForwardVector() * 5000;
+	//FHitResult hitInfo;
+	//FCollisionQueryParams params;
+	//params.AddIgnoredActor(this);
+	//bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+	//if (bHit)
+	//{
+	//	FTransform magicTrans;
+	//	magicTrans.SetLocation(hitInfo.ImpactPoint);
+	//	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
+	//}
+	//FTimerHandle UnusedHandle;
+	//GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
 	//isattackingmagic = false;
 
 	// 발사
 	// GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
-	*/
+	
 
 }
 
