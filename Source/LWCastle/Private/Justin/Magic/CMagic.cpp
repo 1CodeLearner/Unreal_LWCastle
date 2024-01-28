@@ -41,6 +41,8 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	if (AttributeComp)
 	{
+		FHitResult hitInfo;
+
 		if (AttributeComp->TrySpendMana(ManaSpendAmount))
 		{
 			TArray<UActorComponent*> MeshComps = InstigatorActor->GetComponentsByTag(USkeletalMeshComponent::StaticClass(), GunComponentTagName);
@@ -58,7 +60,7 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 
 				FVector startPos = CameraComp->GetComponentLocation() + FVector::OneVector * SweepRadius;
 				FVector endPos = CameraComp->GetComponentLocation() + CameraComp->GetForwardVector() * SweepDistanceFallback;
-				FHitResult hitInfo;
+
 				FCollisionQueryParams params;
 				params.AddIgnoredActor(InstigatorActor);
 				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
@@ -73,8 +75,32 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 		}
 		else
 		{
+			TArray<UActorComponent*> MeshComps = InstigatorActor->GetComponentsByTag(USkeletalMeshComponent::StaticClass(), GunComponentTagName);
+			USkeletalMeshComponent* GunMeshComp = nullptr;
+
+			ensure(MeshComps.Num() == 1);
+			for (auto MeshComp : MeshComps)
+			{
+				GunMeshComp = Cast<USkeletalMeshComponent>(MeshComp);
+			}
+			UCameraComponent* CameraComp = InstigatorActor->GetComponentByClass<UCameraComponent>();
+
+			if (ensure(GunMeshComp) && ensure(CameraComp)) {
+				FTransform fireposition = GunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
+
+				FVector startPos = CameraComp->GetComponentLocation() + FVector::OneVector * SweepRadius;
+				FVector endPos = CameraComp->GetComponentLocation() + CameraComp->GetForwardVector() * SweepDistanceFallback;
+
+				FCollisionQueryParams params;
+				params.AddIgnoredActor(InstigatorActor);
+				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+				if (bHit)
+				{
+					DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 32.f, 24, FColor::Blue, false, 2.f);
+				}
+			}
 			//Special effect for showing empty mana
-			DrawDebugCircle(GetWorld(), InstigatorActor->GetActorLocation(), 200.f, 12, FColor::Blue);
+			//DrawDebugCircle(GetWorld(), InstigatorActor->GetActorLocation(), 200.f, 12, FColor::Blue);
 		}
 	}
 }

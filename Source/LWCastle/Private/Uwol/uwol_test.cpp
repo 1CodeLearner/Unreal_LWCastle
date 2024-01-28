@@ -330,6 +330,8 @@ void Auwol_test::StartDodgeAnimation()
 
 void Auwol_test::Attack_Melee()
 {
+	GameplayComp->StartActionByName(this, "Melee");
+
 	switch (ComboAttack_Num)
 	{
 	case 0:

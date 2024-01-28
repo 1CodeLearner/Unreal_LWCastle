@@ -229,6 +229,21 @@ bool UCPlayerAttributeComp::SpendStamina(float SpendAmount)
 	return true;
 }
 
+void UCPlayerAttributeComp::RecoverMana(float Value)
+{
+	if (bIsChannelingMana)
+	{
+		ChanneledManaAmount += Value;
+		if (ChanneledManaAmount >= MaxMana)
+		{
+			ChanneledManaAmount = MaxMana;
+			OnManaFullReached.Broadcast();
+		}
+	}
+
+	DisplayStats(EPlayerStat::MANA);
+}
+
 void UCPlayerAttributeComp::EnableSpendingStaminaByRate(bool bIsEnabled)
 {
 	SetComponentTickEnabled(bIsEnabled);

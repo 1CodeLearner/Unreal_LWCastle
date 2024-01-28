@@ -142,18 +142,18 @@ public:
 	void Attack_Melee_End();
 
 
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim1;
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim2;
 
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim3;
 
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim4;
 
 	UFUNCTION()
