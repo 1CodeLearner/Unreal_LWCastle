@@ -53,11 +53,11 @@ void UCAction::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 	}
 }
 
-bool UCAction::CanInterrupt(AActor* InstigatorActor, UCAction* OtherAction) const
+bool UCAction::CanInterrupt_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
 {
 	if (bCanInterrupt)
 	{
-		if (IsRunning() && InterruptedTags.HasAny(OtherAction->GetGrantedTags()))
+		if (IsRunning() && StartingAction->GetGrantedTags().HasAny(InterruptedTags))
 		{
 			return true;
 		}

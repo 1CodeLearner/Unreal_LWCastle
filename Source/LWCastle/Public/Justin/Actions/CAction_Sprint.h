@@ -7,6 +7,7 @@
 #include "CAction_Sprint.generated.h"
 
 class UCPlayerAttributeComp;
+class UCActionEffect;
 /**
  *
  */
@@ -26,7 +27,8 @@ public:
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 protected:
-	float MaxSprintSpeed = 800;
+	UPROPERTY(EditDefaultsOnly, meta= (ClampMin="0.0"),  Category = "Sprint")
+	float MaxSprintSpeed;
 	UPROPERTY(EditDefaultsOnly, meta= (ClampMin="0.0"), Category = "Sprint")
 	float StaminaSpendRate;
 
@@ -34,7 +36,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> AttributeComp;
 	bool StartTick;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
+	TSubclassOf<UCAction> ActionEffectStunClass;
 	UFUNCTION()
 	void OnStaminaDepleted();
+	UFUNCTION()
+	void OnLand( const FHitResult& Hit);
+	float PrevSpeed;
+	UPROPERTY()
+	ACharacter* Character;
 };

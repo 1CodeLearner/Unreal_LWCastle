@@ -94,7 +94,10 @@ void Auwol_test::PostInitializeComponents()
 void Auwol_test::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GameplayComp->ActiveGameplayTags.HasAny(StunContainer))
+	{
+		return;
+	}
 	Move(DeltaTime);
 
 }
@@ -134,13 +137,18 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// Run Binding
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &Auwol_test::RunP);
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
+	//PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &Auwol_test::RunR);
 
 	// Attack Binding
 	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Released, this, &Auwol_test::Attack_Melee);
 
 
-	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartChargingTestAutoCharge);
+	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartCharging);
+}
+
+FVector Auwol_test::GetPawnViewLocation() const
+{
+	return tpsCamComp->GetComponentLocation();
 }
 
 void Auwol_test::Turn(float value)
@@ -190,32 +198,32 @@ void Auwol_test::InputFirePressed()
 
 	GameplayComp->StartActionByName(this, "Attack");
 
-	/*
+	
 	//isattackingmagic = true;
 
 	// 발사
 	//FTransform fireposition = gunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
 
 	// Linetrace
-	FVector startPos = tpsCamComp->GetComponentLocation();
-	FVector endPos = tpsCamComp->GetComponentLocation() + tpsCamComp->GetForwardVector() * 5000;
-	FHitResult hitInfo;
-	FCollisionQueryParams params;
-	params.AddIgnoredActor(this);
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
-	if (bHit)
-	{
-		FTransform magicTrans;
-		magicTrans.SetLocation(hitInfo.ImpactPoint);
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
-	}
-	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
+	//FVector startPos = tpsCamComp->GetComponentLocation();
+	//FVector endPos = tpsCamComp->GetComponentLocation() + tpsCamComp->GetForwardVector() * 5000;
+	//FHitResult hitInfo;
+	//FCollisionQueryParams params;
+	//params.AddIgnoredActor(this);
+	//bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+	//if (bHit)
+	//{
+	//	FTransform magicTrans;
+	//	magicTrans.SetLocation(hitInfo.ImpactPoint);
+	//	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
+	//}
+	//FTimerHandle UnusedHandle;
+	//GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::speedchange, 7.0f, false);
 	//isattackingmagic = false;
 
 	// 발사
 	// GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
-	*/
+	
 
 }
 
@@ -293,16 +301,18 @@ void Auwol_test::Dodge()
 void Auwol_test::RunP()
 {
 	//movespeed = 1.5f;
-	GetCharacterMovement()->MaxWalkSpeed *= 3.0;
+	//GetCharacterMovement()->MaxWalkSpeed *= 3.0;
 	GameplayComp->StartActionByName(this, "Sprint");
 }
 
+/*
 void Auwol_test::RunR()
 {
 	//movespeed = 1.0f;
-	GetCharacterMovement()->MaxWalkSpeed /= 3.0;
+	//GetCharacterMovement()->MaxWalkSpeed /= 3.0;
 	GameplayComp->CompleteActionByName(this, "Sprint");
 }
+*/
 
 void Auwol_test::ResetDodgeState()
 {
@@ -320,6 +330,8 @@ void Auwol_test::StartDodgeAnimation()
 
 void Auwol_test::Attack_Melee()
 {
+	GameplayComp->StartActionByName(this, "Melee");
+
 	switch (ComboAttack_Num)
 	{
 	case 0:
@@ -355,7 +367,7 @@ void Auwol_test::Attack_Melee_End()
 	isDuringAttack = false;
 }
 
-void Auwol_test::StartChargingTestAutoCharge()
+void Auwol_test::StartCharging()
 {
-	GameplayComp->StartActionByName(this, "ChargedState");
+	GameplayComp->StartActionByName(this, "Charging");
 }

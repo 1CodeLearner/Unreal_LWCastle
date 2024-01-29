@@ -13,6 +13,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStaminaDepletedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManaDepletedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FManaFullReachedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FProgressonChangedDelegate, EPlayerStat, StatTypeEnum, float, MaxAmount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttributeChangeDelegate, EPlayerStat, StatTypeEnum, float, Current, float, MaxAmount);
 
@@ -31,6 +32,9 @@ public:
 	FStaminaDepletedDelegate OnStaminaDepleted;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Attribute")
 	FManaDepletedDelegate OnManaDepleted;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Attribute")
+	FManaFullReachedDelegate OnManaFullReached;
+	
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FProgressonChangedDelegate OnProgressionChanged;
@@ -67,7 +71,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TrySpendMana(float SpendAmount);
 	UFUNCTION(BlueprintCallable)
-	void SpendStamina(float SpendAmount);
+	bool SpendStamina(float SpendAmount);
+
+	UFUNCTION(BlueprintCallable)
+	void RecoverMana(float Value);
 
 protected:
 

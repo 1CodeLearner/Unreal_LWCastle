@@ -5,7 +5,10 @@
 #include "Justin/CGameplayLibrary.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
+#include "Particles/ParticleSystem.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 void UCMagic::Press_Implementation(AActor* InstigatorActor)
 {
@@ -17,9 +20,12 @@ void UCMagic::Release_Implementation(AActor* InstigatorActor)
 	bIsPressing = false;
 }
 
-void UCMagic::Reset(AActor* InstigatorActor)
+void UCMagic::Reset(AActor* InstigatorActor, bool bIsPausing)
 {
-	bIsPressing = false;
+	if (!bIsPausing)
+	{
+		bIsPressing = false;
+	}
 
 	if (AnimInstance->Montage_IsActive(Montage)) {
 		StopMontage();
@@ -35,29 +41,66 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 {
 	if (AttributeComp)
 	{
+		FHitResult hitInfo;
+
 		if (AttributeComp->TrySpendMana(ManaSpendAmount))
 		{
+			TArray<UActorComponent*> MeshComps = InstigatorActor->GetComponentsByTag(USkeletalMeshComponent::StaticClass(), GunComponentTagName);
+			USkeletalMeshComponent* GunMeshComp = nullptr;
 
-			FVector Origin = InstigatorActor->GetActorLocation();
-			FVector Start = Origin + 100.f * InstigatorActor->GetActorForwardVector();
-			FVector End = Start + 2000.f * InstigatorActor->GetActorForwardVector();
-			FCollisionQueryParams QueryParams;
-			QueryParams.AddIgnoredActor(InstigatorActor);
-			FHitResult Hit;
-			FColor DebugColorLocal;
-			bool Success = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, QueryParams);
-			if (Success)
+			ensure(MeshComps.Num() == 1);
+			for (auto MeshComp : MeshComps)
 			{
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 200.f, 32, FColor::Red, false, 3.0f);
-				UCGameplayLibrary::ApplyDamage(InstigatorActor, Hit.GetActor(), 8);
-
+				GunMeshComp = Cast<USkeletalMeshComponent>(MeshComp);
 			}
-			DrawDebugLine(GetWorld(), Start, End, this->DebugMagicColor, false, 5.f, DebugLineThickness);
+			UCameraComponent* CameraComp = InstigatorActor->GetComponentByClass<UCameraComponent>();
+
+			if (ensure(GunMeshComp) && ensure(CameraComp)) {
+				FTransform fireposition = GunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
+
+				FVector startPos = CameraComp->GetComponentLocation() + FVector::OneVector * SweepRadius;
+				FVector endPos = CameraComp->GetComponentLocation() + CameraComp->GetForwardVector() * SweepDistanceFallback;
+
+				FCollisionQueryParams params;
+				params.AddIgnoredActor(InstigatorActor);
+				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+				if (bHit)
+				{
+					FTransform magicTrans;
+					magicTrans.SetLocation(hitInfo.ImpactPoint);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MagicEffectFactory, magicTrans);
+				}
+			}
+
 		}
 		else
 		{
+			TArray<UActorComponent*> MeshComps = InstigatorActor->GetComponentsByTag(USkeletalMeshComponent::StaticClass(), GunComponentTagName);
+			USkeletalMeshComponent* GunMeshComp = nullptr;
+
+			ensure(MeshComps.Num() == 1);
+			for (auto MeshComp : MeshComps)
+			{
+				GunMeshComp = Cast<USkeletalMeshComponent>(MeshComp);
+			}
+			UCameraComponent* CameraComp = InstigatorActor->GetComponentByClass<UCameraComponent>();
+
+			if (ensure(GunMeshComp) && ensure(CameraComp)) {
+				FTransform fireposition = GunMeshComp->GetSocketTransform(TEXT("FirePosition2"));
+
+				FVector startPos = CameraComp->GetComponentLocation() + FVector::OneVector * SweepRadius;
+				FVector endPos = CameraComp->GetComponentLocation() + CameraComp->GetForwardVector() * SweepDistanceFallback;
+
+				FCollisionQueryParams params;
+				params.AddIgnoredActor(InstigatorActor);
+				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, ECC_Visibility, params);
+				if (bHit)
+				{
+					DrawDebugSphere(GetWorld(), hitInfo.ImpactPoint, 32.f, 24, FColor::Blue, false, 2.f);
+				}
+			}
 			//Special effect for showing empty mana
-			DrawDebugCircle(GetWorld(), InstigatorActor->GetActorLocation(), 20.f, 12, FColor::Blue);
+			//DrawDebugCircle(GetWorld(), InstigatorActor->GetActorLocation(), 200.f, 12, FColor::Blue);
 		}
 	}
 }

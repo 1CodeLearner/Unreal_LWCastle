@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagContainer.h"
 #include "uwol_test.generated.h"
 
 
@@ -41,10 +42,17 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	virtual FVector GetPawnViewLocation() const override;
+
 	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
 	class UCameraComponent* tpsCamComp;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer StunContainer;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	//UAnimMontage* m_pDodgeMomtage;
@@ -91,6 +99,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
 	TSubclassOf<class UUserWidget> crosshairUIFactory;
 	// CrossHair Instance
+	UPROPERTY()
 	class UUserWidget* _crosshairUI;
 
 	void SniperAim();
@@ -108,7 +117,8 @@ public:
 	//void speedchange();
 
 	void RunP();
-	void RunR();
+
+	//void RunR();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
 	UAnimMontage* pDodgeMontage;
@@ -132,22 +142,22 @@ public:
 	void Attack_Melee_End();
 
 
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim1;
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim2;
 
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim3;
 
 	
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
+	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim4;
 
 	UFUNCTION()
-	void StartChargingTestAutoCharge();
+	void StartCharging();
 
 
 	bool isDuringAttack;

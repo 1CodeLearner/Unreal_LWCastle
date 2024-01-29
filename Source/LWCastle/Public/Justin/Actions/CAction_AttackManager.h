@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Justin/Actions/CAction.h"
+#include "Justin/Actions/CActionPause.h"
 #include "Justin/AComponents/CCombatComponent.h"
 #include "CAction_AttackManager.generated.h"
 
@@ -12,13 +12,17 @@ class UCAction_MagicAttack;
  * 
  */
 UCLASS(Abstract)
-class LWCASTLE_API UCAction_AttackManager : public UCAction
+class LWCASTLE_API UCAction_AttackManager : public UCActionPause
 {
 	GENERATED_BODY()
 public:
 
 	UCAction_AttackManager();
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
+
+	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
+	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
+
 	UFUNCTION()
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 	//virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
