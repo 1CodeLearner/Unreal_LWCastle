@@ -8,4 +8,9 @@ how to convert PMX to FBX: https://www.youtube.com/watch?v=r8oKoQmyEtc
 			https://www.blender.org/download/lts/2-93/
 
 
+Fixing Mixamo Root Motion Animations in Unreal Engine 
+	https://www.youtube.com/watch?v=gq8k5ZOBjww
 
+reset default character pose: https://www.youtube.com/watch?v=WyUfaGqjAfk
+
+Shape Keys: https://www.youtube.com/watch?v=7WGtmADZCzU
