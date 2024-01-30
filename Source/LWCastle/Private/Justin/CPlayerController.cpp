@@ -16,9 +16,8 @@ void ACPlayerController::PostInitializeComponents()
 
 }
 
-void ACPlayerController::BeginPlay()
+void ACPlayerController::Initialize()
 {
-	Super::BeginPlay();
 	if (ChargeWidgetClass) {
 		auto Widget = CreateWidget<UCChargeWidget>(this, ChargeWidgetClass);
 		if (Widget) {
@@ -26,4 +25,10 @@ void ACPlayerController::BeginPlay()
 			ChargeWidget = Widget;
 		}
 	}
+}
+
+void ACPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
 }

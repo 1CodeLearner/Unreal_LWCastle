@@ -2,14 +2,19 @@
 
 
 #include "Justin/AComponents/CCombatComponent.h"
-#include "Justin/Actions/CAction_MagicAttack.h"
+
+#include "Justin/CPlayerController.h"
 #include "Justin/Magic/CMagic.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Justin/Widgets/CChargeWidget.h"
 
 UCCombatComponent::UCCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	AccumulatedMana = 0.f;
+	bIsChannelManaActive = false;
 }
 
 FElement UCCombatComponent::GetActiveElement() const
@@ -49,11 +54,25 @@ void UCCombatComponent::Initialize()
 	if (OwningElements.Num() > 0)
 		ActiveElement = OwningElements[Temp];
 
-
 	auto GameplayTemp = GetOwner()->GetComponentByClass<UCGameplayComponent>();
 	if (ensure(GameplayTemp))
 	{
 		GameplayComp = GameplayTemp;
+	}
+}
+
+void UCCombatComponent::InitializeWidget()
+{
+	if (!Widget)
+	{
+		auto PlayerController = Cast<ACPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+		if (PlayerController) {
+			if (!PlayerController->ChargeWidget)
+			{
+				PlayerController->Initialize();
+			}
+			Widget = PlayerController->ChargeWidget;
+		}
 	}
 }
 
@@ -79,12 +98,52 @@ FElement UCCombatComponent::GetElementFromName(FName Name) const
 	return OwningElements[Name];
 }
 
+void UCCombatComponent::StartChannelMana()
+{
+	Widget->SetVisibilityWidget(ESlateVisibility::Visible);
+	bIsChannelManaActive = true;
+}
+
+void UCCombatComponent::AddChannelMana(float Value)
+{
+	if (bIsChannelManaActive)
+	{
+		AccumulatedMana += Value;
+
+		Widget->UpdateWidget(GetActiveElementData().ChargeManaTotal, AccumulatedMana);
+		if (AccumulatedMana >= GetActiveElementData().ChargeManaTotal)
+		{
+			AccumulatedMana = GetActiveElementData().ChargeManaTotal;
+			Widget->UpdateWidget(GetActiveElementData().ChargeManaTotal, AccumulatedMana);
+			AccumulatedMana = 0.f;
+			if (OnManaCharged.IsBound())
+			{
+				OnManaCharged.Execute(GetOwner());
+			}
+			bIsChannelManaActive = false;
+		}
+	}
+}
+
+void UCCombatComponent::ResetChannelMana()
+{
+	AccumulatedMana = 0.f;
+	Widget->ResetWidget();
+	bIsChannelManaActive = false;
+}
+
+void UCCombatComponent::CompleteChannelMana()
+{
+	AccumulatedMana = 0.f;
+	bIsChannelManaActive = false;
+}
+
 void UCCombatComponent::OnChargeMagicExecuted(float CooldownLength)
 {
 	if (GameplayComp)
 	{
 		static FGameplayTag ChargedStateTag = FGameplayTag::RequestGameplayTag("State.Charged");
-		if(GameplayComp->ActiveGameplayTags.HasTagExact(ChargedStateTag))
+		if (GameplayComp->ActiveGameplayTags.HasTagExact(ChargedStateTag))
 		{
 			GameplayComp->CompleteActionByName(GetOwner(), "ChargedState");
 		}
