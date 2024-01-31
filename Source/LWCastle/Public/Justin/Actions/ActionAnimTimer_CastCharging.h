@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Actions/CActionAnimTimer.h"
-#include "Justin/Widgets/CChargeWidget.h"
 #include "ActionAnimTimer_CastCharging.generated.h"
 
 class UCPlayerAttributeComp;
@@ -39,11 +38,8 @@ protected:
 
 private:
 	UPROPERTY()
-	TObjectPtr<UCChargeWidget> Widget;
-	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttribute;
 	UPROPERTY()
 	TObjectPtr<UCCombatComponent> CombatComp;
 	bool StartTick = false;
-	float AccumulatedMana;
 };

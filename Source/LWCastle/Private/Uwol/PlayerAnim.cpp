@@ -30,14 +30,10 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 		checkattack = player->isattackingmagic;
 
 	}
-
-
-
 }
 
 void UPlayerAnim::PlayAttackAnim()
 {
 	Montage_Play(attackAnimMontage);
 }
-
 

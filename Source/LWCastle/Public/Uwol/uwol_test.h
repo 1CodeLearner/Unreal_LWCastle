@@ -34,7 +34,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
 	TObjectPtr<UCCombatComponent> CombatComp;
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -46,9 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetPawnViewLocation() const override;
 
-	UPROPERTY(VisibleAnywhere, Category=Camera)
+	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp;
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category=Camera)
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera)
 	class UCameraComponent* tpsCamComp;
 
 	UPROPERTY(EditAnywhere)
@@ -88,7 +88,7 @@ public:
 	class USkeletalMeshComponent* gunMeshComp;
 
 	// DafulatMagic factory
-	UPROPERTY(EditDefaultsOnly, Category=MagicFactory)
+	UPROPERTY(EditDefaultsOnly, Category = MagicFactory)
 	TSubclassOf<class ADefaultMagic> defaultmagicfac;
 
 	// fire
@@ -96,7 +96,7 @@ public:
 	void InputFireReleased();
 
 	// CrossHair
-	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
+	UPROPERTY(EditDefaultsOnly, Category = SniperUI)
 	TSubclassOf<class UUserWidget> crosshairUIFactory;
 	// CrossHair Instance
 	UPROPERTY()
@@ -105,7 +105,7 @@ public:
 	void SniperAim();
 	bool bSniperAim = false;
 
-	UPROPERTY(EditDefaultsOnly, Category=FocusUI)
+	UPROPERTY(EditDefaultsOnly, Category = FocusUI)
 	TSubclassOf<class UUserWidget> sniperFac;
 	UPROPERTY()
 	class UUserWidget* _FocusUI;
@@ -119,17 +119,17 @@ public:
 	void RunP();
 
 	//void RunR();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	UAnimMontage* pDodgeMontage;
 
 	void Dodge();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	bool IsDodging = false;
 
 	void ResetDodgeState();
 
-	UPROPERTY(EditDefaultsOnly, Category=PlayerAnim)
+	UPROPERTY(EditDefaultsOnly, Category = PlayerAnim)
 	class UAnimMontage* DodgeAnimMontage;
 
 	UFUNCTION(BlueprintCallable, Category = "Animation")
@@ -139,22 +139,35 @@ public:
 	class UParticleSystem* MagicEffectFactory;
 
 	void Attack_Melee();
+	UFUNCTION(BlueprintCallable)
 	void Attack_Melee_End();
+	UFUNCTION(BlueprintCallable)
+	void MeleeCombo_Reset();
 
 
 	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim1;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim2;
 
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim3;
 
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim4;
+
+	UFUNCTION()
+	void OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void OnEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FGameplayTagContainer MeleeBlockTags;
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	FGameplayTagContainer MeleeGrantedTags;
 
 	UFUNCTION()
 	void StartCharging();

@@ -13,7 +13,7 @@ UCActionEffect_ChargedState::UCActionEffect_ChargedState()
 
 void UCActionEffect_ChargedState::Tick(float DeltaTime)
 {
-	Widget->Update(DurationTime, GetWorld()->GetTimerManager().GetTimerRemaining(DurationHandle));
+	Widget->UpdateWidget(DurationTime, GetWorld()->GetTimerManager().GetTimerRemaining(DurationHandle));
 }
 
 TStatId UCActionEffect_ChargedState::GetStatId() const
@@ -37,17 +37,20 @@ void UCActionEffect_ChargedState::Initialize_Implementation(UCGameplayComponent*
 {
 	Super::Initialize_Implementation(GameplayComp);
 
-	auto PlayerController = Cast<ACPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PlayerController) {
-		Widget = PlayerController->ChargeWidget;
-	}
-}
 
+}
 
 void UCActionEffect_ChargedState::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
 	StartTick = true;
+	if (!Widget)
+	{
+		auto PlayerController = Cast<ACPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+		if (ensure(PlayerController)) {
+			Widget = PlayerController->ChargeWidget;
+		}
+	}
 }
 
 void UCActionEffect_ChargedState::CompleteAction_Implementation(AActor* InstigatorActor)

@@ -24,6 +24,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "ChargeWidget")
 	UCChargeWidget* ChargeWidget;
+
+	void Initialize();
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -240,6 +240,14 @@ void UCPlayerAttributeComp::RecoverMana(float Value)
 			OnManaFullReached.Broadcast();
 		}
 	}
+	else
+	{
+		CurrentMana += Value;
+		if(CurrentMana >= MaxMana)
+		{
+			CurrentMana = MaxMana;
+		}
+	}
 
 	DisplayStats(EPlayerStat::MANA);
 }

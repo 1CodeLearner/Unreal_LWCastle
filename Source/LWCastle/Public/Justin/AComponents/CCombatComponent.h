@@ -7,6 +7,7 @@
 #include "CCombatComponent.generated.h"
 
 
+class UCChargeWidget;
 class UCAction;
 class UCMagic;
 class UCGameplayComponent;
@@ -40,6 +41,7 @@ struct FElementData : public FTableRowBase
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FActiveElementSwitchedDelegate, AActor*, InstigatorActor, FElementData, ElementData, FElement, ActiveElement);
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FManaChargedDelegate, AActor*, InstigatorActor);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FChargeStateActivatedDelegate, AActor*, InstigatorActor, bool, bIsCharged);
 
@@ -57,17 +59,31 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Combat")
 	FChargeStateActivatedDelegate OnChargeStateActivated;
 
+	FManaChargedDelegate OnManaCharged;
+
 	UFUNCTION(BlueprintCallable)
 	FElement GetActiveElement() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void Initialize();
+	void InitializeWidget();
 
 	UFUNCTION(BlueprintCallable)
 	void SwitchElementByName(FName ElementName);
 
 	UFUNCTION()
 	FElementData GetActiveElementData() const;
+	
+	UFUNCTION()
+	void StartChannelMana();
+
+	UFUNCTION(BlueprintCallable)
+	void AddChannelMana(float Value);
+
+	UFUNCTION()
+	void ResetChannelMana();
+
+	void CompleteChannelMana();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
@@ -89,4 +105,9 @@ private:
 	void OnChargeMagicExecuted(float CooldownLength);
 	UPROPERTY()
 	TObjectPtr<UCGameplayComponent> GameplayComp;
+	float AccumulatedMana;
+
+	bool bIsChannelManaActive;
+	UPROPERTY()
+	TObjectPtr<UCChargeWidget> Widget;
 };

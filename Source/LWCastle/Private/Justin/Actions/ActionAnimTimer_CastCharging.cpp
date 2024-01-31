@@ -2,8 +2,6 @@
 
 
 #include "Justin/Actions/ActionAnimTimer_CastCharging.h"
-#include "Kismet/GameplayStatics.h"
-#include "Justin/CPlayerController.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
 #include "Justin/AComponents/CCombatComponent.h"
@@ -11,19 +9,14 @@
 UActionAnimTimer_CastCharging::UActionAnimTimer_CastCharging()
 {
 	ManaChargingRate = 1.0f;
-	AccumulatedMana = 0.f;
 }
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
 	if (PlayerAttribute && PlayerAttribute->TryChannelMana(ManaChargingRate * DeltaTime))
 	{
-		AccumulatedMana += ManaChargingRate * DeltaTime;
-		Widget->Update(CombatComp->GetActiveElementData().ChargeManaTotal, AccumulatedMana);
-		if (AccumulatedMana >= CombatComp->GetActiveElementData().ChargeManaTotal)
-		{
-			ExecuteAction(GetGameplayComponent()->GetOwner());
-		}
+		CombatComp->AddChannelMana(ManaChargingRate * DeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("RUNNING"));
 	}
 }
 
@@ -47,10 +40,6 @@ void UActionAnimTimer_CastCharging::Initialize_Implementation(UCGameplayComponen
 {
 	Super::Initialize_Implementation(GameplayComp);
 
-	auto PlayerController = Cast<ACPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PlayerController) {
-		Widget = PlayerController->ChargeWidget;
-	}
 	auto Attribute = GetGameplayComponent()->GetOwner()->GetComponentByClass<UCPlayerAttributeComp>();
 	if (Attribute)
 	{
@@ -70,7 +59,10 @@ void UActionAnimTimer_CastCharging::StartAction_Implementation(AActor* Instigato
 	{
 		StartMontage(this);
 	}
-	Widget->SetVisibilityWidget(ESlateVisibility::Visible);
+	CombatComp->StartChannelMana();
+
+	if (!CombatComp->OnManaCharged.IsBound())
+		CombatComp->OnManaCharged.BindUFunction(this, "ExecuteAction");
 }
 
 void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -96,15 +88,17 @@ void UActionAnimTimer_CastCharging::UnPauseAction_Implementation(AActor* Instiga
 	StartTick = true;
 }
 
+
 void UActionAnimTimer_CastCharging::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
-	
-	AccumulatedMana = 0.f;
+
+	CombatComp->ResetChannelMana();
 	StartTick = false;
 	PlayerAttribute->CancelChannelingMana();
-	Widget->ResetWidget();
+	if (CombatComp->OnManaCharged.IsBound())
+		CombatComp->OnManaCharged.Clear();
 }
 
 void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
@@ -113,9 +107,11 @@ void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
 
 	UE_LOG(LogTemp, Warning, TEXT("EXECUTING EACLKADJ ACTION!"));
 
-	AccumulatedMana = 0.f;
 	StartTick = false;
+	CombatComp->CompleteChannelMana();
 	PlayerAttribute->CompleteChannelingMana();
+	if (CombatComp->OnManaCharged.IsBound())
+		CombatComp->OnManaCharged.Clear();
 	GetGameplayComponent()->CompleteActionBy(InstigatorActor, this);
 	GetGameplayComponent()->StartActionByName(InstigatorActor, "ChargedState");
 }

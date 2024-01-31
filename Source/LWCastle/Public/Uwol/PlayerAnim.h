@@ -42,6 +42,4 @@ public:
 	bool checkattack = false;
 
 
-
-
 };

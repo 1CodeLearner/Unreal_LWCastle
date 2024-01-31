@@ -81,7 +81,7 @@ void Auwol_test::BeginPlay()
 	_FocusUI = CreateWidget(GetWorld(), sniperFac);
 
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
-
+	CombatComp->InitializeWidget();
 }
 
 void Auwol_test::PostInitializeComponents()
@@ -184,7 +184,9 @@ void Auwol_test::Move(float DeltaTime)
 	direction = direction.Y * right + direction.X * forward;
 	direction.Normalize();
 
-	if (isDuringAttack == false)
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Movement.Jump");
+
+	if (!GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags) || GameplayComp->ActiveGameplayTags.HasTagExact(Tag))
 	{
 		AddMovementInput(direction, movespeed);
 	}
@@ -198,7 +200,7 @@ void Auwol_test::InputFirePressed()
 
 	GameplayComp->StartActionByName(this, "Attack");
 
-	
+
 	//isattackingmagic = true;
 
 	// 발사
@@ -223,7 +225,7 @@ void Auwol_test::InputFirePressed()
 
 	// 발사
 	// GetWorld()->SpawnActor<ADefaultMagic>(defaultmagicfac, fireposition);
-	
+
 
 }
 
@@ -330,41 +332,113 @@ void Auwol_test::StartDodgeAnimation()
 
 void Auwol_test::Attack_Melee()
 {
+	if (isDuringAttack)
+		return;
+
+	if(GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
+		return;
+
 	GameplayComp->StartActionByName(this, "Melee");
+	FOnMontageEnded BlendDelegate;
+	FOnMontageEnded EndDelegate;
+	BlendDelegate.BindUFunction(this, "OnBlendingOutStarted");
+	EndDelegate.BindUObject(this, &Auwol_test::OnEnded);
+	UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+
+	if (Anim->OnMontageBlendingOut.IsBound())
+	{
+		Anim->OnMontageBlendingOut.Clear();
+	}
+
+	if (Anim->OnMontageEnded.IsBound())
+	{
+		Anim->OnMontageEnded.Clear();
+	}
 
 	switch (ComboAttack_Num)
 	{
 	case 0:
 		PlayAnimMontage(Attack_MeleeAnim1, 1.0f);
+		Anim->Montage_SetBlendingOutDelegate(BlendDelegate, Attack_MeleeAnim1);
+		Anim->Montage_SetEndDelegate(EndDelegate, Attack_MeleeAnim1);
 		isDuringAttack = true;
 		ComboAttack_Num++;
 		break;
 	case 1:
 		PlayAnimMontage(Attack_MeleeAnim2, 1.0f);
+		Anim->Montage_SetBlendingOutDelegate(BlendDelegate, Attack_MeleeAnim2);
+		Anim->Montage_SetEndDelegate(EndDelegate, Attack_MeleeAnim2);
 		isDuringAttack = true;
 		ComboAttack_Num++;
 		break;
 	case 2:
 		PlayAnimMontage(Attack_MeleeAnim3, 1.0f);
+		Anim->Montage_SetBlendingOutDelegate(BlendDelegate, Attack_MeleeAnim3);
+		Anim->Montage_SetEndDelegate(EndDelegate, Attack_MeleeAnim3);
 		isDuringAttack = true;
 		ComboAttack_Num++;
 		break;
 	case 3:
 		PlayAnimMontage(Attack_MeleeAnim4, 1.0f);
+		Anim->Montage_SetBlendingOutDelegate(BlendDelegate, Attack_MeleeAnim4);
+		Anim->Montage_SetEndDelegate(EndDelegate, Attack_MeleeAnim4);
 		isDuringAttack = true;
 		ComboAttack_Num++;
 		break;
 	default:
 		ComboAttack_Num = 0;
-
 	}
-	FTimerHandle TH_Attack_End;
-	GetWorldTimerManager().SetTimer(TH_Attack_End, this, &Auwol_test::Attack_Melee_End, 1.7f, false);
+
 }
 
 void Auwol_test::Attack_Melee_End()
 {
 	isDuringAttack = false;
+}
+
+void Auwol_test::MeleeCombo_Reset()
+{
+	ComboAttack_Num = 0;
+
+}
+
+void Auwol_test::OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (bInterrupted && isDuringAttack)
+	{
+		Attack_Melee_End();
+		MeleeCombo_Reset();
+		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		GameplayComp->CompleteActionByName(this, "Melee");
+
+	}
+	else if (bInterrupted && !isDuringAttack && GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
+	{
+		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+
+		GameplayComp->CompleteActionByName(this, "Melee");
+	}
+	else if (GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags))
+	{
+		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		return;
+	}
+	else
+	{
+		GameplayComp->CompleteActionByName(this, "Melee");
+	}
+}
+
+void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (!bInterrupted)
+	{
+		Attack_Melee_End();
+		MeleeCombo_Reset();
+		UE_LOG(LogTemp, Warning, TEXT("Here %s"), *GetNameSafe(Montage));
+		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		GameplayComp->CompleteActionByName(this, "Melee");
+	}
 }
 
 void Auwol_test::StartCharging()
