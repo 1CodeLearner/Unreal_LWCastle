@@ -14,5 +14,5 @@ class LWCASTLE_API UCAPAnimTimer_Dodge : public UCAPAnimTimer
 {
 	GENERATED_BODY()
 public:
-	virtual void StartAction_Implementation()
+	//virtual void StartAction_Implementation()
 };
