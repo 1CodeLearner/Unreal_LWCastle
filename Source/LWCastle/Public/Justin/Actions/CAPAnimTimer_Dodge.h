@@ -9,10 +9,17 @@
 /**
  *
  */
-UCLASS()
+UCLASS(Blueprintable)
 class LWCASTLE_API UCAPAnimTimer_Dodge : public UCAPAnimTimer
 {
 	GENERATED_BODY()
 public:
-	//virtual void StartAction_Implementation()
+	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
+
+	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
+
+	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
+
+private:
+	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
 };

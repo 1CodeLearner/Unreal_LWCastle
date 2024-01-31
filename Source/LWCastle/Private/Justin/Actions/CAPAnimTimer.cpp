@@ -35,15 +35,13 @@ void UCAPAnimTimer::StartMontage(UCAPAnimTimer* AnimTimer)
 {
 	if (AnimInstance) {
 		//Making sure Anim Montage has notify available
-		if (ensure(Montage->IsNotifyAvailable())) {
+		if (Montage->IsNotifyAvailable()) {
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCAPAnimTimer::OnNotifyBegin);
 			AnimInstance->Montage_Play(Montage, InPlayRate);
-
-			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
-				return;
-
-			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 		}
+
+		if (!MontageSection.IsNone())
+			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 	}
 }
 
