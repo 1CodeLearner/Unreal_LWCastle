@@ -20,6 +20,8 @@ public:
 
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 
+	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
+
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
 };

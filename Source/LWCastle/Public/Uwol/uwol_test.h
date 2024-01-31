@@ -8,6 +8,8 @@
 #include "uwol_test.generated.h"
 
 
+class UCAction;
+class UCActionEffect;
 class UCGameplayComponent;
 class UCCombatComponent;
 class UCPlayerAttributeComp;
@@ -172,6 +174,12 @@ public:
 	UFUNCTION()
 	void StartCharging();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Teleport")
+	float TeleportDistance;
+	UFUNCTION(BlueprintCallable, Category = "Teleport")
+	void StartTeleport();
+	UFUNCTION(BlueprintCallable, Category = "Teleport")
+	void EndTeleport();
 
 	bool isDuringAttack;
 	// 좌클릭 공격 사용 중

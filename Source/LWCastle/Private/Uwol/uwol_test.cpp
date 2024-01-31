@@ -335,7 +335,7 @@ void Auwol_test::Attack_Melee()
 	if (isDuringAttack)
 		return;
 
-	if(GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
+	if (GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
 		return;
 
 	GameplayComp->StartActionByName(this, "Melee");
@@ -444,4 +444,35 @@ void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
 void Auwol_test::StartCharging()
 {
 	GameplayComp->StartActionByName(this, "Charging");
+}
+
+void Auwol_test::StartTeleport()
+{
+	GetController()->SetIgnoreMoveInput(true);
+	GetMesh()->SetVisibility(false);
+	gunMeshComp->SetVisibility(false);
+	FVector Vel = GetCharacterMovement()->Velocity;
+	FVector Dir;
+
+	if (FVector::DotProduct(Vel, Vel) == 0)
+	{
+		Dir = GetActorForwardVector() * -1;
+	}
+	else
+	{
+		Vel.Normalize();
+		Dir = UKismetMathLibrary::GetForwardVector(FRotationMatrix::MakeFromX(Vel).Rotator());//UKismetMathLibrary::GetForwardVector();
+	}
+
+	Dir *= TeleportDistance;
+	FVector Dest = GetActorLocation() + Dir;
+
+	TeleportTo(Dest, GetActorRotation());
+}
+
+void Auwol_test::EndTeleport()
+{
+	GetController()->ResetIgnoreMoveInput();
+	gunMeshComp->SetVisibility(true);
+	GetMesh()->SetVisibility(true);
 }

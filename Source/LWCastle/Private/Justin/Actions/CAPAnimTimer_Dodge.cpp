@@ -30,8 +30,14 @@ void UCAPAnimTimer_Dodge::InterruptAction_Implementation(AActor* InstigatorActor
 	StopMontage(this);
 }
 
+void UCAPAnimTimer_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
+{
+	Super::CompleteAction_Implementation(InstigatorActor);
+
+	StopMontage(this);
+}
+
 void UCAPAnimTimer_Dodge::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
 	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
-	StopMontage(this);
 }

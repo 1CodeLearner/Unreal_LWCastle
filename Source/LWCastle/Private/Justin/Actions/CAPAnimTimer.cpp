@@ -34,11 +34,11 @@ void UCAPAnimTimer::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 void UCAPAnimTimer::StartMontage(UCAPAnimTimer* AnimTimer)
 {
 	if (AnimInstance) {
-		//Making sure Anim Montage has notify available
 		if (Montage->IsNotifyAvailable()) {
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCAPAnimTimer::OnNotifyBegin);
-			AnimInstance->Montage_Play(Montage, InPlayRate);
 		}
+
+		AnimInstance->Montage_Play(Montage, InPlayRate);
 
 		if (!MontageSection.IsNone())
 			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
