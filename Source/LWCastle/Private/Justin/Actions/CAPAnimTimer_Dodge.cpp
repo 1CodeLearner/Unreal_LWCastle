@@ -8,7 +8,11 @@ void UCAPAnimTimer_Dodge::Initialize_Implementation(UCGameplayComponent* Gamepla
 {
 	Super::Initialize_Implementation(GameplayComp);
 
-
+	auto AttTemp = GameplayComp->GetOwner()->GetComponentByClass<UCPlayerAttributeComp>();
+	if (AttTemp)
+	{
+		AttComp = AttTemp;
+	}
 }
 
 void UCAPAnimTimer_Dodge::StartAction_Implementation(AActor* InstigatorActor)
@@ -22,12 +26,23 @@ void UCAPAnimTimer_Dodge::StartAction_Implementation(AActor* InstigatorActor)
 	FOnMontageEnded MontageEndDelegate;
 	MontageEndDelegate.BindUObject(this, &UCAPAnimTimer_Dodge::OnMontageEnd);
 	GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, Montage);
+
+	FScriptDelegate Script;
+	Script.BindUFunction(this, "OnStaminaDepleted");
+	AttComp->OnStaminaDepleted.AddUnique(Script);
+
+	AttComp->SpendStamina(StaminaSpendAmount);
 }
 
 void UCAPAnimTimer_Dodge::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
+
+	if (AttComp->OnStaminaDepleted.IsBound())
+	{
+		AttComp->OnStaminaDepleted.Clear();
+	}
 }
 
 void UCAPAnimTimer_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -35,9 +50,27 @@ void UCAPAnimTimer_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
 	Super::CompleteAction_Implementation(InstigatorActor);
 
 	StopMontage(this);
+
+	if (AttComp->OnStaminaDepleted.IsBound())
+	{
+		AttComp->OnStaminaDepleted.Clear();
+	}
 }
 
 void UCAPAnimTimer_Dodge::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
 	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+}
+
+void UCAPAnimTimer_Dodge::OnStaminaDepleted()
+{
+	if (ensure(StunActionClass))
+	{
+		GetGameplayComponent()->AddAction(GetGameplayComponent()->GetOwner(), StunActionClass);
+	}
+
+	if (AttComp->OnStaminaDepleted.IsBound())
+	{
+		AttComp->OnStaminaDepleted.Clear();
+	}
 }

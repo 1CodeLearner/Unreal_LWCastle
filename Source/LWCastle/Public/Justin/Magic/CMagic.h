@@ -13,6 +13,7 @@
 
 class UCPlayerAttributeComp;
 class UParticleSystem;
+class AUMBaseProjectile;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMagicExecuted, float, CooldownLength);
 
@@ -75,7 +76,7 @@ protected:
 	float SweepDistanceFallback;
 
 	UPROPERTY(EditAnywhere, Category = "MagicSetting")
-	UParticleSystem* MagicEffectFactory;
+	TSubclassOf<AUMBaseProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "MagicSetting")
 	FName GunComponentTagName;

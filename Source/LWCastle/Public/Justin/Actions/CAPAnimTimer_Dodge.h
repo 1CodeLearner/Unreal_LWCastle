@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Actions/CAPAnimTimer.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
 #include "CAPAnimTimer_Dodge.generated.h"
 
 /**
@@ -22,6 +23,18 @@ public:
 
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Roll")
+	float StaminaSpendAmount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Roll")
+	TSubclassOf<UCAction> StunActionClass;
+
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
+	UPROPERTY()
+	TObjectPtr<UCPlayerAttributeComp> AttComp;
+
+	UFUNCTION()
+	void OnStaminaDepleted();
 };
