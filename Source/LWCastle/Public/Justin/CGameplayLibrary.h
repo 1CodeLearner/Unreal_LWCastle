@@ -19,6 +19,4 @@ public:
 	static void ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
 
 private:
-	void SlowDownTime();
-	void RestoreTime();
 };

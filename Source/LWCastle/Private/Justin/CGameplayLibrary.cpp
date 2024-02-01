@@ -5,10 +5,12 @@
 #include "GameplayTagContainer.h"
 #include "Justin/AComponents/CAttributeComponent.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Justin/CGameModeBase.h"
 
 void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage)
 {
-	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("State.Invulnerable");
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("State.Dodge");
 
 	if (ensure(Invoker && AppliedActor))
 	{
@@ -18,6 +20,12 @@ void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 		{
 			if (AppliedGameplayComp && AppliedGameplayComp->ActiveGameplayTags.HasTagExact(Tag)) 
 			{
+				auto GameMode = UGameplayStatics::GetGameMode(Invoker);
+				ACGameModeBase* Base = Cast<ACGameModeBase>(GameMode);
+				if (Base) 
+				{
+					Base->SlowDownTime(Invoker);
+				}
 				return;
 			}
 
@@ -27,14 +35,4 @@ void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 			}
 		}
 	}
-}
-
-void UCGameplayLibrary::SlowDownTime()
-{
-
-}
-
-void UCGameplayLibrary::RestoreTime()
-{
-
 }
