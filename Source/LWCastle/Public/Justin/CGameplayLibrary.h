@@ -7,7 +7,7 @@
 #include "CGameplayLibrary.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API UCGameplayLibrary : public UBlueprintFunctionLibrary
@@ -15,5 +15,10 @@ class LWCASTLE_API UCGameplayLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "GameplayLibrary")
 	static void ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
+
+private:
+	void SlowDownTime();
+	void RestoreTime();
 };
