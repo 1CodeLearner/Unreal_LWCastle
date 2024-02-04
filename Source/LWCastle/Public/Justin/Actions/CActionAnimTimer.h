@@ -65,7 +65,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "ActionAnimTimer")
 	virtual void ExecuteAction(AActor* InstigatorActor);
-
+		
 public:
 	UCActionAnimTimer();
 

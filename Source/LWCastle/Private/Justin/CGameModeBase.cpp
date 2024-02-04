@@ -3,6 +3,7 @@
 
 #include "Justin/CGameModeBase.h"
 #include "Justin/CItemBase.h"
+#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 UClass* ACGameModeBase::GetItemClassByName(FName ItemName)
 {
@@ -144,4 +145,21 @@ FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum) const
 		return FName();
 	}
 	}
+}
+
+
+void ACGameModeBase::RestoreTime(AActor* ActorContext)
+{
+	UGameplayStatics::SetGlobalTimeDilation(ActorContext, 1.f);
+}
+
+
+void ACGameModeBase::SlowDownTime(AActor* ActorContext)
+{
+	UGameplayStatics::SetGlobalTimeDilation(ActorContext, .1f);
+	FTimerDelegate Delegate;
+	FTimerHandle Handle;
+	Delegate.BindUFunction(this, "RestoreTime", this);
+
+	GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, .05f, false);
 }

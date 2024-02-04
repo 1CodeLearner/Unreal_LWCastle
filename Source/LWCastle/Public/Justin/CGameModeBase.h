@@ -28,6 +28,12 @@ public:
 	UFUNCTION()
 	TArray<FStruct_Level> GetCurrentLevels() const;
 
+	
+	UFUNCTION()
+	void SlowDownTime(AActor* ActorContext);
+	UFUNCTION()
+	void RestoreTime(AActor* ActorContext);
+
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 

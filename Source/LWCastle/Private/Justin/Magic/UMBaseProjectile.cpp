@@ -14,10 +14,11 @@ AUMBaseProjectile::AUMBaseProjectile()
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 	RootComponent = SphereComp;
 
-	SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
+	SphereComp->SetCollisionObjectType(ECC_GameTraceChannel3);
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Block);
 	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	SphereComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
 
 	ParticleSysComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSysComp");
 	ParticleSysComp->SetupAttachment(RootComponent);
