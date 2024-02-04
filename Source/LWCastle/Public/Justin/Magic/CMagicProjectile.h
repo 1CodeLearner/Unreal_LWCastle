@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Justin/Magic/UMBaseProjectile.h"
+#include "GameplayTagContainer.h"
 #include "CMagicProjectile.generated.h"
 
 /**
@@ -22,4 +23,7 @@ public:
 	
 	UFUNCTION()
 	void OnHitBegin(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	FGameplayTagContainer OwnedTag;
+
 };

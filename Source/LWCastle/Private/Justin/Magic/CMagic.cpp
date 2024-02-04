@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Particles/ParticleSystem.h"
 #include "Justin/Magic/UMBaseProjectile.h"
+#include "Justin/Magic/CMagicProjectile.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Camera/CameraComponent.h>
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
@@ -86,6 +87,13 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 					CollisionHandle, ESpawnActorScaleMethod::MultiplyWithRoot);
 
 				Projectile->SetInstigator(Cast<APawn>(InstigatorActor));
+
+				auto Magic = Cast<ACMagicProjectile>(Projectile);
+
+				if(ensure(Magic))
+				{
+					Magic->OwnedTag.AppendTags(GrantedTags);
+				}
 
 				UGameplayStatics::FinishSpawningActor(Projectile, fireposition);
 			}
