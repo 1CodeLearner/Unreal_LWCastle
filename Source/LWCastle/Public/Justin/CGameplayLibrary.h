@@ -16,7 +16,7 @@ class LWCASTLE_API UCGameplayLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "GameplayLibrary")
-	static void ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
+	static bool ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
 
 private:
 };

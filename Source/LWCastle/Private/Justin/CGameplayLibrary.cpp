@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Justin/CGameModeBase.h"
 
-void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage)
+bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage)
 {
 	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("State.Dodge");
 
@@ -26,13 +26,13 @@ void UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 				{
 					Base->SlowDownTime(Invoker);
 				}
-				return;
 			}
-
-			if (AppliedAttComp->IsAlive())
+			else if (AppliedAttComp->IsAlive())
 			{
 				AppliedAttComp->ApplyDamage(Invoker, Damage);
+				return true; 
 			}
 		}
 	}
+	return false;
 }

@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void CompleteActionBy(AActor* InstigatorActor, UCAction* ActionToComplete);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Action")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Action")
 	FGameplayTagContainer ActiveGameplayTags;
 
 	UPROPERTY(VisibleAnywhere, Category = "Action")
