@@ -16,6 +16,9 @@ class LWCASTLE_API UCGameplayComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+
+	UCGameplayComponent();
+
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void AddAction(AActor* InstigatorActor, TSubclassOf<UCAction> NewActionClass);
 
@@ -54,8 +57,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Action")
 	TArray<UCAction*> Actions;
 
-public:
-	UCGameplayComponent();
+
 
 protected:
 	virtual void BeginPlay() override;

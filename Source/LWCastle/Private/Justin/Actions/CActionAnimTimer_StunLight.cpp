@@ -3,11 +3,13 @@
 
 #include "Justin/Actions/CActionAnimTimer_StunLight.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Justin/Actions/CAPAnimTimer_Dodge.h"
 
 void UCActionAnimTimer_StunLight::Initialize_Implementation(UCGameplayComponent* GameplayComp)
 {
 	Super::Initialize_Implementation(GameplayComp);
-	bCanInterrupt = false;
+	DodgeAction = Cast<UCAPAnimTimer_Dodge>(GetGameplayComponent()->GetActionByName("Roll"));
+	ensure(DodgeAction);
 }
 
 void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorActor)
@@ -18,14 +20,19 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 	{
 		StopMontage(this);
 		StartMontage(this);
+		DodgeAction->AddBlockedTag();
+		ClearTimer();
+		StartTimer(this);
 		return;
 	}
+
 
 	StartMontage(this);
 	FOnMontageEnded MontageEndDelegate;
 	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
 	GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, Montage);
 
+	DodgeAction->AddBlockedTag();
 	StartTimer(this);
 }
 
@@ -33,6 +40,8 @@ void UCActionAnimTimer_StunLight::InterruptAction_Implementation(AActor* Instiga
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
+	DodgeAction->RemoveBlockedTag();
+	ClearTimer();
 }
 
 void UCActionAnimTimer_StunLight::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -58,5 +67,5 @@ void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool 
 
 void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
 {
-	bCanInterrupt = true;
+	DodgeAction->RemoveBlockedTag();
 }

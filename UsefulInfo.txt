@@ -1,7 +1,5 @@
 toon shading: https://www.youtube.com/watch?v=mzydOmgN7mc
 
-PMX importer for Unreal 5: https://github.com/axilesoft/IM-for-UE5
-
 how to convert PMX to FBX: https://www.youtube.com/watch?v=r8oKoQmyEtc
 			https://www.youtube.com/watch?v=X-kR-pK04ws
 			https://github.com/absolute-quantum/cats-blender-plugin
@@ -11,6 +9,4 @@ how to convert PMX to FBX: https://www.youtube.com/watch?v=r8oKoQmyEtc
 Fixing Mixamo Root Motion Animations in Unreal Engine 
 	https://www.youtube.com/watch?v=gq8k5ZOBjww
 
-reset default character pose: https://www.youtube.com/watch?v=WyUfaGqjAfk
-
-Shape Keys: https://www.youtube.com/watch?v=7WGtmADZCzU
+Retargeting Animations: https://www.youtube.com/watch?v=eYal6taYUfE

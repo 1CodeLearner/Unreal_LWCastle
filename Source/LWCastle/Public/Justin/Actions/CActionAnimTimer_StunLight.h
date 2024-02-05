@@ -6,6 +6,8 @@
 #include "Justin/Actions/CActionAnimTimer.h"
 #include "CActionAnimTimer_StunLight.generated.h"
 
+class UCAPAnimTimer_Dodge;
+
 /**
  * 
  */
@@ -28,4 +30,6 @@ public:
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
 	virtual void ExecuteAction(AActor* InstigatorActor) override;
+	UPROPERTY()
+	UCAPAnimTimer_Dodge* DodgeAction;
 };

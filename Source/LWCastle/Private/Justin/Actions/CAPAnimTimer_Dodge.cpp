@@ -74,3 +74,16 @@ void UCAPAnimTimer_Dodge::OnStaminaDepleted()
 		AttComp->OnStaminaDepleted.Clear();
 	}
 }
+
+
+void UCAPAnimTimer_Dodge::AddBlockedTag()
+{
+	if (!BlockedTags.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun")))
+		BlockedTags.AddTag(FGameplayTag::RequestGameplayTag("State.Stun"));
+}
+
+void UCAPAnimTimer_Dodge::RemoveBlockedTag()
+{
+	if (BlockedTags.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun")))
+		BlockedTags.RemoveTag(FGameplayTag::RequestGameplayTag("State.Stun"));
+}

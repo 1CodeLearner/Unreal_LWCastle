@@ -14,6 +14,9 @@ UCLASS(Blueprintable)
 class LWCASTLE_API UCAPAnimTimer_Dodge : public UCAPAnimTimer
 {
 	GENERATED_BODY()
+
+	friend class UCActionAnimTimer_StunLight;
+
 public:
 	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 
@@ -22,6 +25,7 @@ public:
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Roll")
@@ -37,4 +41,7 @@ private:
 
 	UFUNCTION()
 	void OnStaminaDepleted();
+
+	void AddBlockedTag();
+	void RemoveBlockedTag();
 };
