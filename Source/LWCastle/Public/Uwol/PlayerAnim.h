@@ -41,5 +41,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=PlayerAnim)
 	bool checkattack = false;
 
+	UPROPERTY(BlueprintReadOnly, Category = "PlayerAnim")
+	bool bIsAiming = false;
 
 };

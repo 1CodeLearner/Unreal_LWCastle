@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Justin/Actions/CAPAnimTimer.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
+#include "GameplayTagContainer.h"
 #include "CAPAnimTimer_Dodge.generated.h"
 
 /**
@@ -16,6 +17,7 @@ class LWCASTLE_API UCAPAnimTimer_Dodge : public UCAPAnimTimer
 	GENERATED_BODY()
 
 	friend class UCActionAnimTimer_StunLight;
+	friend class UCActionAnimTimer_StunFall;
 
 public:
 	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
@@ -26,6 +28,7 @@ public:
 
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
+	virtual bool CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Roll")
@@ -42,6 +45,6 @@ private:
 	UFUNCTION()
 	void OnStaminaDepleted();
 
-	void AddBlockedTag();
-	void RemoveBlockedTag();
+	void AddBlockedTag(FGameplayTagContainer AddedTags);
+	void RemoveBlockedTag(FGameplayTagContainer AddedTags);
 };

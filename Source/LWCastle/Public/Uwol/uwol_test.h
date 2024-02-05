@@ -104,7 +104,8 @@ public:
 	UPROPERTY()
 	class UUserWidget* _crosshairUI;
 
-	void SniperAim();
+	void SniperAimHold();
+	void SniperAimRelease();
 	bool bSniperAim = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = FocusUI)

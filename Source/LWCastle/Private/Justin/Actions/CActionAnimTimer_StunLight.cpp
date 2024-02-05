@@ -20,7 +20,6 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 	{
 		StopMontage(this);
 		StartMontage(this);
-		DodgeAction->AddBlockedTag();
 		ClearTimer();
 		StartTimer(this);
 		return;
@@ -32,7 +31,7 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
 	GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, Montage);
 
-	DodgeAction->AddBlockedTag();
+	DodgeAction->AddBlockedTag(GetGrantedTags());
 	StartTimer(this);
 }
 
@@ -40,7 +39,7 @@ void UCActionAnimTimer_StunLight::InterruptAction_Implementation(AActor* Instiga
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
-	DodgeAction->RemoveBlockedTag();
+	DodgeAction->RemoveBlockedTag(GetGrantedTags());
 	ClearTimer();
 }
 
@@ -67,5 +66,5 @@ void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool 
 
 void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
 {
-	DodgeAction->RemoveBlockedTag();
+	DodgeAction->RemoveBlockedTag(GetGrantedTags());
 }

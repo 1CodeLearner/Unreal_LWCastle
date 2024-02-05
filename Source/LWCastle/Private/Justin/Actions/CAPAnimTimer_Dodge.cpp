@@ -32,6 +32,7 @@ void UCAPAnimTimer_Dodge::StartAction_Implementation(AActor* InstigatorActor)
 	AttComp->OnStaminaDepleted.AddUnique(Script);
 
 	AttComp->SpendStamina(StaminaSpendAmount);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *BlockedTags.ToString());
 }
 
 void UCAPAnimTimer_Dodge::InterruptAction_Implementation(AActor* InstigatorActor)
@@ -57,6 +58,22 @@ void UCAPAnimTimer_Dodge::CompleteAction_Implementation(AActor* InstigatorActor)
 	}
 }
 
+bool UCAPAnimTimer_Dodge::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
+{
+	if (!BlockedTags.IsEmpty())
+	{
+		return false;
+	}
+	else if(AttComp->GetCurrentStamina() <= 0.f)
+	{
+		GetGameplayComponent()->AddAction(GetGameplayComponent()->GetOwner(), StunActionClass);
+		return false;
+	}
+
+	return Super::CanStart_Implementation(InstigatorActor, StartingAction);
+
+}
+
 void UCAPAnimTimer_Dodge::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
 	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
@@ -76,14 +93,14 @@ void UCAPAnimTimer_Dodge::OnStaminaDepleted()
 }
 
 
-void UCAPAnimTimer_Dodge::AddBlockedTag()
+void UCAPAnimTimer_Dodge::AddBlockedTag(FGameplayTagContainer AddedTags)
 {
-	if (!BlockedTags.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun")))
-		BlockedTags.AddTag(FGameplayTag::RequestGameplayTag("State.Stun"));
+	if (!BlockedTags.HasAny(AddedTags))
+		BlockedTags.AppendTags(AddedTags);
 }
 
-void UCAPAnimTimer_Dodge::RemoveBlockedTag()
+void UCAPAnimTimer_Dodge::RemoveBlockedTag(FGameplayTagContainer AddedTags)
 {
-	if (BlockedTags.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun")))
-		BlockedTags.RemoveTag(FGameplayTag::RequestGameplayTag("State.Stun"));
+	if (BlockedTags.HasAnyExact(AddedTags))
+		BlockedTags.RemoveTags(AddedTags);
 }

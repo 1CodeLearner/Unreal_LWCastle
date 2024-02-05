@@ -31,8 +31,8 @@ Auwol_test::Auwol_test()
 	// Set Camera
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->TargetOffset = FVector(0, 70, 90);
-	springArmComp->TargetArmLength = 400;
+	springArmComp->TargetOffset = FVector(0, 20, 30);
+	springArmComp->TargetArmLength = 200;
 	//springArmComp->bUsePawnControlRotation = true;
 	//springArmComp->bUsePawnControlRotation = false;
 
@@ -125,9 +125,9 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 
 	// Aim binding
-	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Pressed, this, &Auwol_test::SniperAim);
+	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Pressed, this, &Auwol_test::SniperAimHold);
 	// Release binding
-	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Released, this, &Auwol_test::SniperAim);
+	PlayerInputComponent->BindAction(TEXT("Focus"), IE_Released, this, &Auwol_test::SniperAimRelease);
 
 	// Rkey
 	PlayerInputComponent->BindAction(TEXT("SwitchElement"), IE_Pressed, this, &Auwol_test::SwitchElement);
@@ -200,7 +200,6 @@ void Auwol_test::InputFirePressed()
 
 	GameplayComp->StartActionByName(this, "Attack");
 
-
 	//isattackingmagic = true;
 
 	// น฿ป็
@@ -234,21 +233,16 @@ void Auwol_test::InputFireReleased()
 	GameplayComp->CompleteActionByName(this, "Attack");
 }
 
-void Auwol_test::SniperAim()
+void Auwol_test::SniperAimHold()
 {
-	if (bSniperAim == false)
-	{
-		bSniperAim = true;
-		_FocusUI->AddToViewport();
-		tpsCamComp->SetFieldOfView(45.0f);
-	}
-	else
-	{
-		bSniperAim = false;
-		_FocusUI->RemoveFromParent();
-		tpsCamComp->SetFieldOfView(90.0f);
-	}
+	GameplayComp->StartActionByName(this, "ADS");	
 }
+
+void Auwol_test::SniperAimRelease()
+{
+	GameplayComp->CompleteActionByName(this, "ADS");	
+}
+
 
 void Auwol_test::SwitchElement()
 {

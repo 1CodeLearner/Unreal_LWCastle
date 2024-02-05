@@ -12,6 +12,8 @@ void ACMagicProjectile::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ACMagicProjectile::OnOverlapBegin);
 	SphereComp->OnComponentHit.AddDynamic(this, &ACMagicProjectile::OnHitBegin);
+	SphereComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	SphereComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 }
 
 void ACMagicProjectile::BeginPlay()

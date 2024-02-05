@@ -4,6 +4,8 @@
 #include "Uwol/PlayerAnim.h"
 #include "Uwol/uwol_test.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include "GameplayTagContainer.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 
 void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -28,7 +30,11 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 		checkdodge = player->IsDodging;
 		checkattack = player->isattackingmagic;
-
+		auto Gameplay = player->GetComponentByClass<UCGameplayComponent>();
+		if (Gameplay)
+		{
+			bIsAiming = Gameplay->ActiveGameplayTags.HasTagExact(FGameplayTag::RequestGameplayTag("Combat.Magic")) || player->bSniperAim;
+		}
 	}
 }
 
