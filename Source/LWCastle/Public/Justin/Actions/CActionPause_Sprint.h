@@ -29,7 +29,7 @@ public:
 	virtual void UnPauseAction_Implementation(AActor* InstigatorActor) override;
 	virtual void InterruptAction_Implementation(AActor* InstigatorActor) override;
 
-	virtual bool CanStart_Implementation(AActor* InstigatorActor) const override; 
+	virtual bool CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const override; 
 
 protected:
 	UPROPERTY(EditDefaultsOnly, meta= (ClampMin="0.0"),  Category = "Sprint")

@@ -5,7 +5,7 @@
 #include "Justin/AComponents/CGameplayComponent.h"
 
 
-bool UCAction::CanStart_Implementation(AActor* InstigatorActor) const
+bool UCAction::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
 {
 	if (IsRunning())
 		return false;

@@ -21,7 +21,7 @@ public:
 	void Initialize(UCGameplayComponent* GameplayComp);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
-	bool CanStart(AActor* InstigatorActor) const;
+	bool CanStart(AActor* InstigatorActor, UCAction* StartingAction) const;
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Action")
 	void StartAction(AActor* InstigatorActor);
 

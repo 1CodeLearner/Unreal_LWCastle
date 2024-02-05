@@ -58,9 +58,9 @@ void UCActionPause_Sprint::Initialize_Implementation(UCGameplayComponent* Gamepl
 	}
 }
 
-bool UCActionPause_Sprint::CanStart_Implementation(AActor* InstigatorActor) const
+bool UCActionPause_Sprint::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
 {
-	bool bRunning = Super::CanStart_Implementation(InstigatorActor);
+	bool bRunning = Super::CanStart_Implementation(InstigatorActor, StartingAction);
 	return bRunning || isSprinting;
 }
 

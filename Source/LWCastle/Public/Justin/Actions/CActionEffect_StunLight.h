@@ -7,11 +7,12 @@
 #include "CActionEffect_StunLight.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API UCActionEffect_StunLight : public UCActionEffect
 {
 	GENERATED_BODY()
+public:
 	
 };

@@ -33,19 +33,17 @@ void UCActionAnimTimer::Initialize_Implementation(UCGameplayComponent* GameplayC
 
 void UCActionAnimTimer::StartMontage(UCActionAnimTimer* AnimTimer)
 {
-	if (AnimInstance && Montage) {
+	if (AnimInstance && ensureAlways(Montage)) {
 		//Making sure Anim Montage has notify available
 		AnimInstance->Montage_Play(Montage, InPlayRate);
-		if (ensureAlways(Montage->IsNotifyAvailable()) && 
-			ensureAlways(!AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))) 
+		if (Montage->IsNotifyAvailable() &&
+			!AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
 		{
 			AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(AnimTimer, &UCActionAnimTimer::OnNotifyBegin);
-
-			if (!ensureMsgf(!MontageSection.IsNone(), TEXT("Magic must have montage Section Name assigned!")))
-				return;
-
-			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 		}
+
+		if (!MontageSection.IsNone())
+			AnimInstance->Montage_JumpToSection(MontageSection, Montage);
 	}
 }
 

@@ -26,14 +26,26 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		return;
 	if (UCGameplayLibrary::ApplyDamage(GetInstigator(), OtherActor, GetDamage()))
 	{
-		auto GameplayComp = GetInstigator()->GetComponentByClass<UCGameplayComponent>();
-		if(OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
+		auto OtherGameplayComp = OtherActor->GetComponentByClass<UCGameplayComponent>();
+		
+		if (OtherGameplayComp)
 		{
-			GetInstigator()->GetComponentByClass<UCGameplayComponent>()->StartActionByName(GetInstigator(), "StunHard");
-		}
-		else if(OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
-		{
-			GetInstigator()->GetComponentByClass<UCGameplayComponent>()->StartActionByName(GetInstigator(), "StunLight");
+			FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation() ;
+
+			VectorDir.Normalize();
+			FRotator Rotation = VectorDir.Rotation();
+			Rotation.Roll = 0.f;
+
+			OtherActor->SetActorRotation(Rotation);
+
+			if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
+			{
+				//OtherGameplayComp->StartActionByName(GetInstigator(), "Stunhard");
+			}
+			else if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
+			{
+				OtherGameplayComp->StartActionByName(GetInstigator(), "StunLight");
+			}
 		}
 		Destroy();
 	}

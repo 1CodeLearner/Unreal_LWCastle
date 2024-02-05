@@ -74,7 +74,7 @@ void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName Actio
 		{
 			if (Action && Action->GetActionName() == ActionName)
 			{
-				if (Action->CanStart(InstigatorActor))
+				if (Action->CanStart(InstigatorActor, Action))
 				{
 					Action->StartAction(InstigatorActor);
 
@@ -140,7 +140,7 @@ void UCGameplayComponent::StartActionBy(AActor* InstigatorActor, UCAction* Actio
 
 		if (Actions.Contains(ActionToStart))
 		{
-			if (ActionToStart->CanStart(InstigatorActor))
+			if (ActionToStart->CanStart(InstigatorActor, ActionToStart))
 			{
 				ActionToStart->StartAction(InstigatorActor);
 

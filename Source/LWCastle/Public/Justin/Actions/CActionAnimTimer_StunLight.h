@@ -23,7 +23,9 @@ public:
 
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
+	virtual bool CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const;
 
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
+	virtual void ExecuteAction(AActor* InstigatorActor) override;
 };

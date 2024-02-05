@@ -31,7 +31,7 @@ Auwol_test::Auwol_test()
 	// Set Camera
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->SetRelativeLocation(FVector(0, 70, 90));
+	springArmComp->TargetOffset = FVector(0, 70, 90);
 	springArmComp->TargetArmLength = 400;
 	//springArmComp->bUsePawnControlRotation = true;
 	//springArmComp->bUsePawnControlRotation = false;
