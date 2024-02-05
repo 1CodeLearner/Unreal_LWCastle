@@ -15,6 +15,7 @@ class LWCASTLE_API ACMagicProjectile : public AUMBaseProjectile
 {
 	GENERATED_BODY()
 public:
+	ACMagicProjectile();
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
