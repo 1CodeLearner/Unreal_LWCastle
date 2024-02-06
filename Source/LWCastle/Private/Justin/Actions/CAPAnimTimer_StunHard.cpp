@@ -19,7 +19,7 @@ void UCAPAnimTimer_StunHard::StartAction_Implementation(AActor* InstigatorActor)
 	if (ensure(Player))
 	{
 		Player->bIsStunned = true;
-		
+
 		if (GetGameplayComponent()->ActiveGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Movement.Roll")))
 		{
 			Player->EndTeleport();
@@ -44,7 +44,6 @@ void UCAPAnimTimer_StunHard::InterruptAction_Implementation(AActor* InstigatorAc
 void UCAPAnimTimer_StunHard::CompleteAction_Implementation(AActor* InstigatorActor)
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
-
 	StopMontage(this);
 	ClearTimer();
 }
@@ -56,9 +55,12 @@ bool UCAPAnimTimer_StunHard::CanStart_Implementation(AActor* InstigatorActor, UC
 
 void UCAPAnimTimer_StunHard::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
-	if (!bInterrupted)
+	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+
+	auto Player = Cast<Auwol_test>(GetOuter());
+	if (Player)
 	{
-		GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+		Player->bIsStunned = false;
 	}
 }
 

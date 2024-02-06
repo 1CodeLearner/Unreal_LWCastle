@@ -9,7 +9,7 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 {
 	Super::StartAction_Implementation(InstigatorActor);
 
-	if (IsMontagePlaying()) 
+	if (IsMontagePlaying())
 	{
 		StopMontage(this);
 		//ClearTimer();
@@ -45,10 +45,7 @@ bool UCActionAnimTimer_StunLight::CanStart_Implementation(AActor* InstigatorActo
 
 void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
-	if(!bInterrupted)
-	{
-		GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
-	}
+	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
 }
 
 /*void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)

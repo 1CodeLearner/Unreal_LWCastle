@@ -59,5 +59,8 @@ bool UCGameplayLibrary::ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGame
 		{
 			OtherGameplayComp->StartActionByName(Invoker, "StunLight");
 		}
+		return true;
 	}
+
+	return false;
 }
