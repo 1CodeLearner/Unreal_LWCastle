@@ -7,8 +7,10 @@
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Justin/CGameModeBase.h"
+#include "CAIController.h"
+#include "Justin/AComponents/CInventoryComponent.h"
 
-bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage)
+bool UCGameplayLibrary::ApplyDamage(AActor * Invoker, AActor * AppliedActor, float Damage)
 {
 	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("State.Dodge");
 
@@ -24,7 +26,7 @@ bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 				ACGameModeBase* Base = Cast<ACGameModeBase>(GameMode);
 				if (Base)
 				{
-					Base->SlowDownTime(Invoker);
+					Base->SlowDownTime(AppliedActor);
 				}
 			}
 			else if (AppliedAttComp->IsAlive())
@@ -37,8 +39,8 @@ bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 	return false;
 }
 
-bool UCGameplayLibrary::ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGameplayTagContainer StunTag)
-{	
+bool UCGameplayLibrary::ApplyStunOn(AActor * Invoker, AActor * AppliedActor, FGameplayTagContainer StunTag)
+{
 	auto OtherGameplayComp = AppliedActor->GetComponentByClass<UCGameplayComponent>();
 
 	if (OtherGameplayComp)
@@ -62,5 +64,28 @@ bool UCGameplayLibrary::ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGame
 		return true;
 	}
 
+	auto AIController = Cast<ACAIController>(AppliedActor->GetInstigatorController());
+	if (AIController)
+	{
+		if (StunTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
+		{
+			AIController->SetStunState();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UCGameplayLibrary::AddCurrency(AActor* ActorWithInventory)
+{
+	if (ensure(ActorWithInventory))
+	{
+		auto Inventory = ActorWithInventory->GetComponentByClass<UCInventoryComponent>();
+		if (Inventory)
+		{
+			Inventory->AddCurrency(5.f);
+			return true;
+		}
+	}
 	return false;
 }

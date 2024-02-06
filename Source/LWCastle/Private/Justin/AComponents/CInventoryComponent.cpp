@@ -14,7 +14,7 @@ void UCInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	Currency = 120;
-	OnCurrencySpent.Broadcast(Currency);
+	OnCurrencyValueChange.Broadcast(Currency);
 }
 
 int UCInventoryComponent::GetCurrency() const
@@ -25,12 +25,13 @@ int UCInventoryComponent::GetCurrency() const
 void UCInventoryComponent::AddCurrency(int AmountToAdd)
 {
 	Currency += AmountToAdd;
+	OnCurrencyValueChange.Broadcast(GetCurrency());
 }
 
 void UCInventoryComponent::SpendCurrency(int AmountToSpend)	
 {
 	Currency -= AmountToSpend;
-	OnCurrencySpent.Broadcast(Currency);
+	OnCurrencyValueChange.Broadcast(GetCurrency());
 }
 
 bool UCInventoryComponent::HasEnoughCurrency(int AmountToSpend) const

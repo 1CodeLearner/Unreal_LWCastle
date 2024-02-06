@@ -7,7 +7,7 @@
 #include "CActionAnimTimer_StunLight.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API UCActionAnimTimer_StunLight : public UCActionAnimTimer
@@ -25,4 +25,9 @@ public:
 
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
+
+	FOnMontageEnded MontageEndDelegate;
+	
+
+	void UnbindDelegate();
 };

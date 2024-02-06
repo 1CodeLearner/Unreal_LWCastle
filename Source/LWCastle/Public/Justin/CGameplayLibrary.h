@@ -20,6 +20,9 @@ public:
 	static bool ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
 
 	static bool ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGameplayTagContainer StunTag);
+	
+	UFUNCTION(BlueprintCallable, Category = "GameplayLibrary")
+	static bool AddCurrency(AActor* ActorWithInventory);
 
 private:
 };

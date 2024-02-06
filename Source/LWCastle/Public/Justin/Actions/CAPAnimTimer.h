@@ -40,6 +40,7 @@ protected:
 	//Animation Montage
 	virtual void StartMontage(UCAPAnimTimer* AnimTimer);
 	void StopMontage(UCAPAnimTimer* AnimTimer);
+	void UnbindNotifyDelegate(UCAPAnimTimer* AnimTimer);
 	UFUNCTION(BlueprintCallable)
 	float GetAnimMontageLength();
 	UFUNCTION()

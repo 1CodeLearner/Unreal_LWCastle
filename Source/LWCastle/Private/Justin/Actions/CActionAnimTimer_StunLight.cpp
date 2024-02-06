@@ -11,14 +11,17 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 
 	if (IsMontagePlaying())
 	{
+		UnbindDelegate();
 		StopMontage(this);
 		//ClearTimer();
 	}
 
 	StartMontage(this);
-	FOnMontageEnded MontageEndDelegate;
-	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
-	GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
+	if (ensureAlways(!GetAnimInstance()->Montage_GetBlendingOutDelegate()->IsBound()))
+	{
+		MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
+		GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
+	}
 
 	//StartTimer(this);
 }
@@ -46,6 +49,8 @@ bool UCActionAnimTimer_StunLight::CanStart_Implementation(AActor* InstigatorActo
 void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
 	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+
+	UnbindDelegate();
 }
 
 /*void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
@@ -56,3 +61,13 @@ void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool 
 		Player->bIsStunned = false;
 	}
 }*/
+
+void UCActionAnimTimer_StunLight::UnbindDelegate()
+{
+	auto Delegate = GetAnimInstance()->Montage_GetBlendingOutDelegate();
+
+	if (Delegate && Delegate->IsBound())
+	{
+		GetAnimInstance()->Montage_GetBlendingOutDelegate()->Unbind();
+	}
+}

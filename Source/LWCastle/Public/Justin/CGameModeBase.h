@@ -34,8 +34,8 @@ public:
 	UFUNCTION()
 	void RestoreTime(AActor* ActorContext);
 
-	UFUNCTION(BlueprintCallable, Category = "SpawnActor")
-	void RespawnPlayer(AController* Controller);
+	//UFUNCTION(BlueprintCallable, Category = "SpawnActor")
+	//void RespawnPlayer(AController* Controller);
 
 protected:
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
