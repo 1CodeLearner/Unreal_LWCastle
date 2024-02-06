@@ -281,7 +281,7 @@ void Auwol_test::Dodge()
 {
 	if (!GameplayComp->ActiveGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Movement.Roll")) && !bIsStunned)
 	{
-		if(PlayerAttributeComp->GetCurrentStamina() <= 0.f)
+		if (PlayerAttributeComp->GetCurrentStamina() <= 0.f)
 		{
 			bIsStunned = true;
 			OnStaminaDepleted();
@@ -386,23 +386,27 @@ void Auwol_test::OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted)
 		MeleeCombo_Reset();
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 		GameplayComp->CompleteActionByName(this, "Melee");
-
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
 	else if (bInterrupted && !isDuringAttack && GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
 	{
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 
 		GameplayComp->CompleteActionByName(this, "Melee");
-	}
-	else if (GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags))
-	{
-		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
-		return;
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
 	else
 	{
 		GameplayComp->CompleteActionByName(this, "Melee");
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
+
+	/*UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	auto Delegate = Anim->Montage_GetBlendingOutDelegate();
+	if (Delegate && ensureAlways(Delegate->IsBound()))
+	{
+		Delegate->Unbind();
+	}*/
 }
 
 void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -414,6 +418,8 @@ void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
 		UE_LOG(LogTemp, Warning, TEXT("Here %s"), *GetNameSafe(Montage));
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 		GameplayComp->CompleteActionByName(this, "Melee");
+		
+		UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	}
 }
 

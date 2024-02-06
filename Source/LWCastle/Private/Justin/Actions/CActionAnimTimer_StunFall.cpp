@@ -20,13 +20,25 @@ void UCActionAnimTimer_StunFall::StartAction_Implementation(AActor* InstigatorAc
 		ClearTimer();
 	}
 
-	StartMontage(this);
+	auto Player = Cast<Auwol_test>(GetOuter());
+	if (ensure(Player))
+	{
+		Player->bIsStunned = true;
 
-	FOnMontageEnded MontageEndDelegate;
-	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunFall::OnMontageEnd);
-	GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
+		if (GetGameplayComponent()->ActiveGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Movement.Roll")))
+		{
+			Player->EndTeleport();
+		}
 
-	StartTimer(this);
+		StartMontage(this);
+		if (ensureAlways(!GetAnimInstance()->Montage_GetBlendingOutDelegate()->IsBound()))
+		{
+			MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunFall::OnMontageEnd);
+			GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
+		}
+
+		StartTimer(this);
+	}
 }
 
 void UCActionAnimTimer_StunFall::InterruptAction_Implementation(AActor* InstigatorActor)
