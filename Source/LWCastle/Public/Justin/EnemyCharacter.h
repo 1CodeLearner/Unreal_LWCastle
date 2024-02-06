@@ -7,6 +7,9 @@
 #include "EnemyCharacter.generated.h"
 
 class UCAttributeComponent;
+class UBoxComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMeleeSuccessDelegate);
 
 UCLASS()
 class LWCASTLE_API AEnemyCharacter : public ACharacter
@@ -16,11 +19,24 @@ class LWCASTLE_API AEnemyCharacter : public ACharacter
 public:
 	AEnemyCharacter();
 
+	UPROPERTY(BlueprintAssignable, Category = "Enemy")
+	FMeleeSuccessDelegate OnMeleeSuccess;
+
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "EnemyAttribute")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enemy")
 	UCAttributeComponent* AttributeComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UBoxComponent* MeleeBoxComp;
+
+	UFUNCTION()
+	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float MeleeDamage;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
