@@ -28,23 +28,12 @@ public:
 
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 
-	virtual bool CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const override;
-
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Roll")
 	float StaminaSpendAmount;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Roll")
-	TSubclassOf<UCAction> StunActionClass;
 
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
 	UPROPERTY()
 	TObjectPtr<UCPlayerAttributeComp> AttComp;
-
-	UFUNCTION()
-	void OnStaminaDepleted();
-
-	void AddBlockedTag(FGameplayTagContainer AddedTags);
-	void RemoveBlockedTag(FGameplayTagContainer AddedTags);
 };

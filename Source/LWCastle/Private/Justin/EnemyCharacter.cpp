@@ -30,7 +30,7 @@ void AEnemyCharacter::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	if (OtherActor != Cast<AActor>(this))
 		if(ensure(OnMeleeSuccess.IsBound()))
 		{
-			if (UCGameplayLibrary::ApplyDamage(this, OtherActor, MeleeDamage))
+			if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -MeleeDamage))
 			{
 				OnMeleeSuccess.Broadcast();
 			}

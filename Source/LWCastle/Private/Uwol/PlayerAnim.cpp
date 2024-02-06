@@ -29,7 +29,6 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 		auto movement = player->GetCharacterMovement();
 		isInAir = movement->IsFalling();
 
-		checkdodge = player->IsDodging;
 		checkattack = player->isattackingmagic;
 		auto Gameplay = player->GetComponentByClass<UCGameplayComponent>();
 		if (Gameplay)

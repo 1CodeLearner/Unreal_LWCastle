@@ -13,6 +13,7 @@ class UCActionEffect;
 class UCGameplayComponent;
 class UCCombatComponent;
 class UCPlayerAttributeComp;
+
 UCLASS()
 class LWCASTLE_API Auwol_test : public ACharacter
 {
@@ -28,13 +29,13 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCPlayerAttributeComp> PlayerAttributeComp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCGameplayComponent> GameplayComp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Test")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCCombatComponent> CombatComp;
 public:
 	// Called every frame
@@ -43,7 +44,43 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public:
+
+	void Dodge();
+
+	// Horizontal rotation
+	void Turn(float value);
+	// Vertical rotation
+	void LookUp(float value);
+
+	// Horizontal movement
+	void InputHorizontal(float value);
+	// Vertical movement
+	void InputVertical(float value);
+
+	// Jump
+	void InputJump();
+
+	// Player movement
+	void Move(float DeltaTime);
+
+	// fire
+	void InputFirePressed();
+	void InputFireReleased();
+
+	void SniperAimHold();
+	void SniperAimRelease();
+	
+	void SwitchElement();
+
+	void Attack_Melee();
+
+	void RunP();
+
+	UFUNCTION()
+	void OnStaminaDepleted();
+	UPROPERTY(EditDefaultsOnly, Category = "Actions")
+	TSubclassOf<UCAction> ActionEffectStunClass;
+	bool bIsStunned = false;
 
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetPawnViewLocation() const override;
@@ -63,27 +100,12 @@ public:
 	//bool m_bIsDodging = false;
 
 
-	// Horizontal rotation
-	void Turn(float value);
-	// Vertical rotation
-	void LookUp(float value);
-
 	// moving velocity
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed = 200;
 	// direction
 	FVector direction;
 
-	// Horizontal movement
-	void InputHorizontal(float value);
-	// Vertical movement
-	void InputVertical(float value);
-
-	// Jump
-	void InputJump();
-
-	// Player movement
-	void Move(float DeltaTime);
 
 	// DefaultMagic skeletal mesh
 	UPROPERTY(VisibleAnywhere, Category = GunMesh)
@@ -93,10 +115,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = MagicFactory)
 	TSubclassOf<class ADefaultMagic> defaultmagicfac;
 
-	// fire
-	void InputFirePressed();
-	void InputFireReleased();
-
 	// CrossHair
 	UPROPERTY(EditDefaultsOnly, Category = SniperUI)
 	TSubclassOf<class UUserWidget> crosshairUIFactory;
@@ -104,8 +122,6 @@ public:
 	UPROPERTY()
 	class UUserWidget* _crosshairUI;
 
-	void SniperAimHold();
-	void SniperAimRelease();
 	bool bSniperAim = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = FocusUI)
@@ -113,40 +129,17 @@ public:
 	UPROPERTY()
 	class UUserWidget* _FocusUI;
 
-	void SwitchElement();
 
 	float movespeed = 1.0;
 
 	//void speedchange();
 
-	void RunP();
-
 	//void RunR();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	UAnimMontage* pDodgeMontage;
-
-	void Dodge();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	bool IsDodging = false;
-
-	void ResetDodgeState();
-
-	UPROPERTY(EditDefaultsOnly, Category = PlayerAnim)
-	class UAnimMontage* DodgeAnimMontage;
-
-	UFUNCTION(BlueprintCallable, Category = "Animation")
-	void StartDodgeAnimation();
-
-	UPROPERTY(EditAnywhere, Category = BulletEffect)
-	class UParticleSystem* MagicEffectFactory;
-
-	void Attack_Melee();
 	UFUNCTION(BlueprintCallable)
 	void Attack_Melee_End();
 	UFUNCTION(BlueprintCallable)
 	void MeleeCombo_Reset();
-
 
 	UPROPERTY(EditDefaultsOnly, Category = Melee)
 	UAnimMontage* Attack_MeleeAnim1;

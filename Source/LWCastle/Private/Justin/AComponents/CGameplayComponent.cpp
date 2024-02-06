@@ -67,29 +67,30 @@ UCAction* UCGameplayComponent::GetActionByName(FName ActionName) const
 
 void UCGameplayComponent::StartActionByName(AActor* InstigatorActor, FName ActionName)
 {
+	UCAction* ActionStarted = nullptr;
+
 	if (ensure(!ActionName.IsNone() && InstigatorActor))
 	{
-		UCAction* ActionFound = nullptr;
 		for (auto Action : Actions)
 		{
 			if (Action && Action->GetActionName() == ActionName)
 			{
 				if (Action->CanStart(InstigatorActor, Action))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("StartAction: %s"), *Action->GetActionName().ToString());
 					Action->StartAction(InstigatorActor);
 
-					UE_LOG(LogTemp, Warning, TEXT("StartAction: %s"), *Action->GetActionName().ToString());
-					ActionFound = Action;
+					ActionStarted = Action;
 					break;
 				}
 			}
 		}
-		if (ActionFound)
+		if (ActionStarted)
 		{
 			TArray<UCAction*> ActionsToInterrupt;
 			for (auto Action : Actions)
 			{
-				UCAction* ActionTemp = ProcessInterruptAndPause(InstigatorActor, Action, ActionFound);
+				UCAction* ActionTemp = ProcessInterruptAndPause(InstigatorActor, Action, ActionStarted);
 				if (ActionTemp)
 					ActionsToInterrupt.Add(ActionTemp);
 			}

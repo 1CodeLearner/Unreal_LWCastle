@@ -16,7 +16,6 @@ void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 	if (PlayerAttribute && PlayerAttribute->TryChannelMana(ManaChargingRate * DeltaTime))
 	{
 		CombatComp->AddChannelMana(ManaChargingRate * DeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("RUNNING"));
 	}
 }
 

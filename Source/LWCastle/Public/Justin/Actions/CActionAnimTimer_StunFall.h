@@ -25,7 +25,6 @@ public:
 
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
+
 	virtual void ExecuteAction(AActor* InstigatorActor) override;
-	UPROPERTY()
-	UCAPAnimTimer_Dodge* DodgeAction;
 };
