@@ -78,9 +78,11 @@ public:
 
 	UFUNCTION()
 	void OnStaminaDepleted();
-	UPROPERTY(EditDefaultsOnly, Category = "Actions")
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	TSubclassOf<UCAction> ActionEffectStunClass;
 	bool bIsStunned = false;
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	FGameplayTagContainer StunTag;
 
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetPawnViewLocation() const override;

@@ -93,7 +93,7 @@ bool UCAPAnimTimer::IsTimerValid()
 
 void UCAPAnimTimer::StartTimer(UCAPAnimTimer* AnimTimer)
 {
-	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction");
+	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction", GetOuter());
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerDuration, false);
 }
 

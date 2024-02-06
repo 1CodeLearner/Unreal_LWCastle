@@ -279,7 +279,7 @@ void Auwol_test::speedchange()
 
 void Auwol_test::Dodge()
 {
-	if (!GameplayComp->ActiveGameplayTags.HasTagExact(FGameplayTag::RequestGameplayTag("Movement.Roll")) && !bIsStunned)
+	if (!GameplayComp->ActiveGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Movement.Roll")) && !bIsStunned)
 	{
 		if(PlayerAttributeComp->GetCurrentStamina() <= 0.f)
 		{
@@ -289,7 +289,6 @@ void Auwol_test::Dodge()
 		}
 		GameplayComp->StartActionByName(this, "Roll");
 	}
-
 }
 
 void Auwol_test::RunP()

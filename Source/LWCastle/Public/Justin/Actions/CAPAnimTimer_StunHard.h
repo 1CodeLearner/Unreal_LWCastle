@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Justin/Actions/CActionAnimTimer.h"
-#include "CActionAnimTimer_StunLight.generated.h"
+#include "Justin/Actions/CAPAnimTimer.h"
+#include "CAPAnimTimer_StunHard.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
-class LWCASTLE_API UCActionAnimTimer_StunLight : public UCActionAnimTimer
+class LWCASTLE_API UCAPAnimTimer_StunHard : public UCAPAnimTimer
 {
 	GENERATED_BODY()
 
@@ -25,4 +25,6 @@ public:
 
 private:
 	void OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted);
+
+	virtual void ExecuteAction(AActor* InstigatorActor) override;
 };

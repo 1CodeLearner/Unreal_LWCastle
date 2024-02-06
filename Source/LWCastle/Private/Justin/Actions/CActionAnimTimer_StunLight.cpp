@@ -3,13 +3,7 @@
 
 #include "Justin/Actions/CActionAnimTimer_StunLight.h"
 #include "Justin/AComponents/CGameplayComponent.h"
-#include "Justin/Actions/CAPAnimTimer_Dodge.h"
 #include "Uwol/uwol_test.h"
-
-void UCActionAnimTimer_StunLight::Initialize_Implementation(UCGameplayComponent* GameplayComp)
-{
-	Super::Initialize_Implementation(GameplayComp);
-}
 
 void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorActor)
 {
@@ -18,7 +12,7 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 	if (IsMontagePlaying()) 
 	{
 		StopMontage(this);
-		ClearTimer();
+		//ClearTimer();
 	}
 
 	StartMontage(this);
@@ -26,14 +20,14 @@ void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorA
 	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
 	GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
 
-	StartTimer(this);
+	//StartTimer(this);
 }
 
 void UCActionAnimTimer_StunLight::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
-	ClearTimer();
+	//ClearTimer();
 }
 
 void UCActionAnimTimer_StunLight::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -41,7 +35,7 @@ void UCActionAnimTimer_StunLight::CompleteAction_Implementation(AActor* Instigat
 	Super::CompleteAction_Implementation(InstigatorActor);
 
 	StopMontage(this);
-	ClearTimer();
+	//ClearTimer();
 }
 
 bool UCActionAnimTimer_StunLight::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
@@ -57,11 +51,11 @@ void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool 
 	}
 }
 
-void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
+/*void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
 {
 	auto Player = Cast<Auwol_test>(InstigatorActor);
 	if(Player)
 	{
 		Player->bIsStunned = false;
 	}
-}
+}*/

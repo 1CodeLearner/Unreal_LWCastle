@@ -36,21 +36,20 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 		if (OtherGameplayComp)
 		{
+			FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation();
 
+			VectorDir.Normalize();
+			FRotator Rotation = VectorDir.Rotation();
+			Rotation.Roll = 0.f;
+
+			OtherActor->SetActorRotation(Rotation);
 
 			if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
 			{
-				//OtherGameplayComp->StartActionByName(GetInstigator(), "Stunhard");
+				OtherGameplayComp->StartActionByName(GetInstigator(), "StunHard");
 			}
 			else if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
 			{
-				FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation();
-
-				VectorDir.Normalize();
-				FRotator Rotation = VectorDir.Rotation();
-				Rotation.Roll = 0.f;
-
-				OtherActor->SetActorRotation(Rotation);
 				OtherGameplayComp->StartActionByName(GetInstigator(), "StunLight");
 			}
 		}
