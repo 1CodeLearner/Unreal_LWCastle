@@ -2,22 +2,22 @@
 
 
 #include "Justin/Magic/CMagicProjectile.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Justin/AComponents/CAttributeComponent.h"
 #include "Justin/CGameplayLibrary.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 
 ACMagicProjectile::ACMagicProjectile()
 {
-	SphereComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	SphereComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	BoxComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	BoxComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 }
 
 void ACMagicProjectile::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ACMagicProjectile::OnOverlapBegin);
-	SphereComp->OnComponentHit.AddDynamic(this, &ACMagicProjectile::OnHitBegin);
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ACMagicProjectile::OnOverlapBegin);
+	BoxComp->OnComponentHit.AddDynamic(this, &ACMagicProjectile::OnHitBegin);
 }
 
 void ACMagicProjectile::BeginPlay()
@@ -33,16 +33,10 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	if (UCGameplayLibrary::ApplyDamage(GetInstigator(), OtherActor, GetDamage()))
 	{
 		auto OtherGameplayComp = OtherActor->GetComponentByClass<UCGameplayComponent>();
-		
+
 		if (OtherGameplayComp)
 		{
-			FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation() ;
 
-			VectorDir.Normalize();
-			FRotator Rotation = VectorDir.Rotation();
-			Rotation.Roll = 0.f;
-
-			OtherActor->SetActorRotation(Rotation);
 
 			if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
 			{
@@ -50,6 +44,13 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 			}
 			else if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
 			{
+				FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation();
+
+				VectorDir.Normalize();
+				FRotator Rotation = VectorDir.Rotation();
+				Rotation.Roll = 0.f;
+
+				OtherActor->SetActorRotation(Rotation);
 				OtherGameplayComp->StartActionByName(GetInstigator(), "StunLight");
 			}
 		}

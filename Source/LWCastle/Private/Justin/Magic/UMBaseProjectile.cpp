@@ -2,7 +2,7 @@
 
 
 #include "Justin/Magic/UMBaseProjectile.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -11,14 +11,14 @@ AUMBaseProjectile::AUMBaseProjectile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	RootComponent = SphereComp;
+	BoxComp = CreateDefaultSubobject<UBoxComponent>("BoxComp");
+	RootComponent = BoxComp;
 
-	SphereComp->SetCollisionObjectType(ECC_GameTraceChannel3);
-	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	SphereComp->SetCollisionResponseToAllChannels(ECR_Block);
-	SphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	SphereComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
+	BoxComp->SetCollisionObjectType(ECC_GameTraceChannel3);
+	BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BoxComp->SetCollisionResponseToAllChannels(ECR_Block);
+	BoxComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	BoxComp->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
 
 	ParticleSysComp = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSysComp");
 	ParticleSysComp->SetupAttachment(RootComponent);
@@ -44,7 +44,7 @@ void AUMBaseProjectile::PreInitializeComponents()
 	APawn* InstigatorPawn = GetInstigator();
 	if (InstigatorPawn)
 	{
-		SphereComp->IgnoreActorWhenMoving(InstigatorPawn, true);
+		BoxComp->IgnoreActorWhenMoving(InstigatorPawn, true);
 		if (!InstigatorPawn->IsMoveInputIgnored())
 		{
 			InstigatorPawn->MoveIgnoreActorAdd(this);

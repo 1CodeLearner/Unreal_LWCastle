@@ -24,7 +24,7 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class USphereComponent* SphereComp;
+	class UBoxComponent* BoxComp;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UParticleSystemComponent* ParticleSysComp;
