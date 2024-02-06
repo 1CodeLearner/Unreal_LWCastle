@@ -31,7 +31,7 @@ Auwol_test::Auwol_test()
 	// Set Camera
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->TargetOffset = FVector(0, 20, 30);
+	springArmComp->SocketOffset = FVector(0, 50, 60);
 	springArmComp->TargetArmLength = 200;
 	//springArmComp->bUsePawnControlRotation = true;
 	//springArmComp->bUsePawnControlRotation = false;
@@ -99,7 +99,6 @@ void Auwol_test::Tick(float DeltaTime)
 		return;
 	}
 	Move(DeltaTime);
-
 }
 
 // Called to bind functionality to input

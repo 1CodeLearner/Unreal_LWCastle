@@ -6,6 +6,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include "GameplayTagContainer.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
 
 void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -35,6 +36,8 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			bIsAiming = Gameplay->ActiveGameplayTags.HasTagExact(FGameplayTag::RequestGameplayTag("Combat.Magic")) || player->bSniperAim;
 		}
+
+		bIsDead = !player->GetComponentByClass<UCPlayerAttributeComp>()->IsAlive();
 	}
 }
 
