@@ -18,11 +18,11 @@ bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 		UCGameplayComponent* AppliedGameplayComp = AppliedActor->GetComponentByClass<UCGameplayComponent>();
 		if (AppliedAttComp)
 		{
-			if (AppliedGameplayComp && AppliedGameplayComp->ActiveGameplayTags.HasTagExact(Tag)) 
+			if (AppliedGameplayComp && AppliedGameplayComp->ActiveGameplayTags.HasTagExact(Tag))
 			{
 				auto GameMode = UGameplayStatics::GetGameMode(Invoker);
 				ACGameModeBase* Base = Cast<ACGameModeBase>(GameMode);
-				if (Base) 
+				if (Base)
 				{
 					Base->SlowDownTime(Invoker);
 				}
@@ -30,9 +30,34 @@ bool UCGameplayLibrary::ApplyDamage(AActor* Invoker, AActor* AppliedActor, float
 			else if (AppliedAttComp->IsAlive())
 			{
 				AppliedAttComp->ApplyDamage(Invoker, Damage);
-				return true; 
+				return true;
 			}
 		}
 	}
 	return false;
+}
+
+bool UCGameplayLibrary::ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGameplayTagContainer StunTag)
+{	
+	auto OtherGameplayComp = AppliedActor->GetComponentByClass<UCGameplayComponent>();
+
+	if (OtherGameplayComp)
+	{
+		FVector VectorDir = Invoker->GetActorLocation() - AppliedActor->GetActorLocation();
+
+		VectorDir.Normalize();
+		FRotator Rotation = VectorDir.Rotation();
+		Rotation.Roll = 0.f;
+
+		AppliedActor->SetActorRotation(Rotation);
+
+		if (StunTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
+		{
+			OtherGameplayComp->StartActionByName(Invoker, "StunHard");
+		}
+		else if (StunTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
+		{
+			OtherGameplayComp->StartActionByName(Invoker, "StunLight");
+		}
+	}
 }

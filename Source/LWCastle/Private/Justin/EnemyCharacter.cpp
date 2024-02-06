@@ -5,6 +5,7 @@
 #include "Justin/AComponents/CAttributeComponent.h"
 #include "Components/BoxComponent.h"
 #include "Justin/CGameplayLibrary.h"
+#include "Justin/AComponents/CGameplayComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -28,13 +29,16 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != Cast<AActor>(this))
-		if(ensure(OnMeleeSuccess.IsBound()))
+	{
+		if (ensure(OnMeleeSuccess.IsBound()))
 		{
 			if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -MeleeDamage))
 			{
+				UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
 				OnMeleeSuccess.Broadcast();
 			}
 		}
+	}
 }
 
 // Called every frame

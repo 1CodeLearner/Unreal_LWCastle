@@ -5,7 +5,6 @@
 #include "Components/BoxComponent.h"
 #include "Justin/AComponents/CAttributeComponent.h"
 #include "Justin/CGameplayLibrary.h"
-#include "Justin/AComponents/CGameplayComponent.h"
 
 ACMagicProjectile::ACMagicProjectile()
 {
@@ -32,27 +31,7 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		return;
 	if (UCGameplayLibrary::ApplyDamage(GetInstigator(), OtherActor, GetDamage()))
 	{
-		auto OtherGameplayComp = OtherActor->GetComponentByClass<UCGameplayComponent>();
-
-		if (OtherGameplayComp)
-		{
-			FVector VectorDir = GetInstigator()->GetActorLocation() - OtherActor->GetActorLocation();
-
-			VectorDir.Normalize();
-			FRotator Rotation = VectorDir.Rotation();
-			Rotation.Roll = 0.f;
-
-			OtherActor->SetActorRotation(Rotation);
-
-			if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
-			{
-				OtherGameplayComp->StartActionByName(GetInstigator(), "StunHard");
-			}
-			else if (OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))
-			{
-				OtherGameplayComp->StartActionByName(GetInstigator(), "StunLight");
-			}
-		}
+		UCGameplayLibrary::ApplyStunOn(GetInstigator(), OtherActor, OwnedTag);
 		Destroy();
 	}
 }

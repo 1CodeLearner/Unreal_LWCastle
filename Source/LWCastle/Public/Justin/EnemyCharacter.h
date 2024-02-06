@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagContainer.h"
 #include "EnemyCharacter.generated.h"
 
 class UCAttributeComponent;
@@ -37,6 +38,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	float MeleeDamage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	FGameplayTagContainer OwnedTag;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
