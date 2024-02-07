@@ -7,11 +7,20 @@
 #include "Justin/Actions/CAction_MagicAttack.h"
 #include "Justin/Magic/CMagic.h"
 #include "Justin/AComponents/CGameplayComponent.h"
+#include "Uwol/uwol_test.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 void UCAction_AttackManager::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
 	GetActiveElement()->Press(InstigatorActor);
+
+
+
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
 }
 
 void UCAction_AttackManager::PauseAction_Implementation(AActor* InstigatorActor)
@@ -19,6 +28,9 @@ void UCAction_AttackManager::PauseAction_Implementation(AActor* InstigatorActor)
 	Super::PauseAction_Implementation(InstigatorActor);
 	//Magic will remain paused forever if not set to true
 	GetActiveElement()->Reset(InstigatorActor, true);
+
+	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+	Character->GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 void UCAction_AttackManager::UnPauseAction_Implementation(AActor* InstigatorActor)
@@ -27,7 +39,8 @@ void UCAction_AttackManager::UnPauseAction_Implementation(AActor* InstigatorActo
 	if (IsRunning())
 	{
 		GetActiveElement()->Press(InstigatorActor);
-
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	}
 }
 
@@ -35,6 +48,9 @@ void UCAction_AttackManager::CompleteAction_Implementation(AActor* InstigatorAct
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
 	GetActiveElement()->Release(InstigatorActor);
+
+	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+	Character->GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
 /*
@@ -69,7 +85,9 @@ void UCAction_AttackManager::Initialize_Implementation(UCGameplayComponent* Game
 		if (OwningActor)
 		{
 			auto CombatComp = OwningActor->GetComponentByClass<UCCombatComponent>();
-			if (CombatComp)
+			Character = Cast<Auwol_test>(OwningActor);
+
+			if (CombatComp && ensure(Character))
 			{
 				ActiveElement = CombatComp->GetActiveElement();
 

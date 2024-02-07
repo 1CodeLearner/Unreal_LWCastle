@@ -199,6 +199,14 @@ void UCGameplayComponent::CompleteActionBy(AActor* InstigatorActor, UCAction* Ac
 	}
 }
 
+void UCGameplayComponent::StopAllActions(AActor* InstigatorActor)
+{
+	for(auto Action : Actions)
+	{
+		Action->CompleteAction(InstigatorActor);
+	}
+}
+
 UCGameplayComponent::UCGameplayComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;

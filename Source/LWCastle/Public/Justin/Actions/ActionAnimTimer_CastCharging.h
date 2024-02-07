@@ -33,8 +33,15 @@ public:
 protected:
 	virtual void ExecuteAction(AActor* InstigatorActor) override;
 	virtual void OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload) override;
-	UPROPERTY(EditAnywhere, meta=(ClampMin=1.0))
+	UPROPERTY(EditAnywhere, meta=(ClampMin=1.0), Category = "Charging")
 	float ManaChargingRate;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Sound")
+	TObjectPtr<UAudioComponent> AudioComp;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<USoundBase> ChargingStartSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<USoundBase> ChargingSound;
 
 private:
 	UPROPERTY()
@@ -42,4 +49,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCCombatComponent> CombatComp;
 	bool StartTick = false;
+
+	UFUNCTION()
+	void OnSoundPercent(const USoundWave* PlayingSoundWave, const float PlaybackPercent);
+	bool bIsSoundPaused;
+	float DurationElapsed;
 };

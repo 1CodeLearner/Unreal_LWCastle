@@ -16,6 +16,12 @@ void UCAttributeComponent::BeginPlay()
 	CurrentHealth = MaxHealth;
 }
 
+void UCAttributeComponent::RecoverFullHealth()
+{
+	CurrentHealth = MaxHealth; 
+	OnTakenDamage.Broadcast(GetOwner(), this, CurrentHealth, MaxHealth, 0.f);
+}
+
 float UCAttributeComponent::GetCurrentHealth() const
 {
 	return CurrentHealth;

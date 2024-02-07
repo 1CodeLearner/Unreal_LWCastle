@@ -61,7 +61,7 @@ void UCActionPause_ADS::CompleteAction_Implementation(AActor* Instigator)
 void UCActionPause_ADS::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
-	
+
 	Character->bSniperAim = false;
 	Character->_FocusUI->RemoveFromParent();
 	Character->tpsCamComp->SetFieldOfView(90.0f);

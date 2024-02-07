@@ -125,9 +125,6 @@ void UCActionPause_Sprint::StartRunning()
 		Character->LandedDelegate.AddDynamic(this, &UCActionPause_Sprint::OnLand);
 	}
 
-	PrevSpeed = Character->GetCharacterMovement()->MaxWalkSpeed;
-	Character->GetCharacterMovement()->MaxWalkSpeed = MaxSprintSpeed;
-
 	StartTick = true;
 	isSprinting = true;
 }
@@ -148,8 +145,6 @@ void UCActionPause_Sprint::StopRunning()
 	{
 		Character->LandedDelegate.Remove(this, "OnLand");
 	}
-
-	Character->GetCharacterMovement()->MaxWalkSpeed = PrevSpeed;
 
 	PrevSpeed = 0.f;
 	StartTick = false;

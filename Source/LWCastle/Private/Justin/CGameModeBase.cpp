@@ -4,7 +4,73 @@
 #include "Justin/CGameModeBase.h"
 #include "Justin/CItemBase.h"
 #include "Justin/CGameplayLibrary.h"
-#include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "Engine/TriggerBox.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "Justin/Magic/CMagicProjectile.h"
+#include "Uwol/uwol_test.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "Components/BoxComponent.h"
+#include "Justin/AComponents/CPlayerAttributeComp.h"
+#include "Justin/CPlayerController.h"
+#include "Justin/EnemyCharacter.h"
+#include "CAIController.h"
+#include "Justin/AComponents/CGameplayComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Justin/UserWidget_Gameplay.h"
+#include "Justin/UserWidget_BossHealth.h"
+#include "GameFramework/PlayerStart.h"
+
+void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	for (auto ItemBaseClass : ItemBaseClasses)
+	{
+		if (ItemBaseClass)
+		{
+			//UCItemBase* tempItem = NewObject<UCItemBase>(this, ItemBaseClass);
+			UCItemBase* tempItem = ItemBaseClass.GetDefaultObject();
+			ItemBaseMap.Add(tempItem->TagName, tempItem->GetClass());
+		}
+	}
+
+	for (TActorIterator<ATriggerBox> Iter(GetWorld()); Iter; ++Iter)
+	{
+		TriggerBoxes.Add(*Iter);
+		for (auto Box : TriggerBoxes)
+		{
+			Box->OnActorBeginOverlap.AddDynamic(this, &ACGameModeBase::OnTriggerBoxOverlap);
+		}
+	}
+
+	for (TActorIterator<AEnemyCharacter> Iter(GetWorld()); Iter; ++Iter)
+	{
+		if (*Iter)
+		{
+			BossCharacter = *Iter;
+		}
+	}
+
+	for (TActorIterator<Auwol_test> Iter(GetWorld()); Iter; ++Iter)
+	{
+		if (*Iter)
+		{
+			PlayerCharacter = *Iter;
+		}
+	}
+}
+
+void ACGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		PC->StartFade(true);
+	}
+}
 
 UClass* ACGameModeBase::GetItemClassByName(FName ItemName)
 {
@@ -87,21 +153,6 @@ TArray<FStruct_Level> ACGameModeBase::GetCurrentLevels() const
 	return Stats;
 }
 
-void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
-{
-	Super::InitGame(MapName, Options, ErrorMessage);
-
-	for (auto ItemBaseClass : ItemBaseClasses)
-	{
-		if (ItemBaseClass)
-		{
-			//UCItemBase* tempItem = NewObject<UCItemBase>(this, ItemBaseClass);
-			UCItemBase* tempItem = ItemBaseClass.GetDefaultObject();
-			ItemBaseMap.Add(tempItem->TagName, tempItem->GetClass());
-		}
-	}
-}
-
 FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum)
 {
 	switch (PlayerStatEnum)
@@ -148,6 +199,334 @@ FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum) const
 	}
 }
 
+void ACGameModeBase::IntroFade()
+{
+
+}
+
+void ACGameModeBase::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Overlapping with %s"), *GetNameSafe(OtherActor));
+
+	auto Projectile = Cast<ACMagicProjectile>(OtherActor);
+	if (Projectile && OverlappedActor->ActorHasTag("ProjectileBlockTag"))
+	{
+		Projectile->Destroy();
+		return;
+	}
+
+	auto Player = Cast<Auwol_test>(OtherActor);
+	if (Player)
+	{
+		auto Game = Player->GetComponentByClass<UCGameplayComponent>();
+		if (Game)
+		{
+			Game->StopAllActions(Player);
+		}
+
+		auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+		if (PC)
+		{
+			PlayerCharacter->GetCharacterMovement()->DisableMovement();
+		}
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PlayerPauseOverlapsed, 3.f);
+
+
+	}
+}
+
+void ACGameModeBase::PlayerPauseOverlapsed()
+{
+	//Fade out Screen to black
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		if (PC->OnFadeSuccess.IsBound())
+		{
+			PC->OnFadeSuccess.RemoveAll(this);
+		}
+
+		FScriptDelegate Dele;
+		Dele.BindUFunction(this, "OnFadeSuccess_BattleStart");
+		PC->OnFadeSuccess.Add(Dele);
+		PC->StartFade(false);
+	}
+}
+
+void ACGameModeBase::OnFadeSuccess_BattleStart(AActor* Actor)
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC->OnFadeSuccess.IsBound())
+	{
+		PC->OnFadeSuccess.RemoveAll(this);
+	}
+
+	SetupBindings();
+	if (bIsFirstTimeLoading)
+	{
+		PlayCinematic();
+	}
+	else
+		StartBattle();
+}
+
+void ACGameModeBase::SetupBindings()
+{
+	auto PlayerComp = PlayerCharacter->GetComponentByClass<UCPlayerAttributeComp>();
+	if (PlayerComp)
+	{
+		if (PlayerComp->OnDead.IsBound())
+		{
+			PlayerComp->OnDead.Clear();
+		}
+		FScriptDelegate Delegate;
+		Delegate.BindUFunction(this, "OnPlayerDead");
+		PlayerComp->OnDead.Add(Delegate);
+	}
+
+	auto AttributeComp = BossCharacter->GetComponentByClass<UCAttributeComponent>();
+	if (AttributeComp)
+	{
+		if (AttributeComp->OnDead.IsBound())
+		{
+			AttributeComp->OnDead.Clear();
+		}
+		FScriptDelegate Delegate;
+		Delegate.BindUFunction(this, "OnBossDead");
+		AttributeComp->OnDead.Add(Delegate);
+
+	}
+}
+
+
+void ACGameModeBase::PlayCinematic()
+{
+	//Play Cinematic
+	ALevelSequenceActor* ActorSequence;
+	ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), BossIntroSequence,
+		FMovieSceneSequencePlaybackSettings(), ActorSequence);
+	if (LevelSequencePlayer)
+	{
+		if (LevelSequencePlayer->OnFinished.IsBound())
+		{
+			LevelSequencePlayer->OnFinished.Clear();
+		}
+
+		FScriptDelegate Delegate;
+		Delegate.BindUFunction(this, "OnSequenceFinished");
+		LevelSequencePlayer->OnFinished.Add(Delegate);
+		LevelSequencePlayer->Play();
+	}
+	else
+	{
+		StartBattle();
+	}
+}
+
+void ACGameModeBase::OnSequenceFinished()
+{
+	bIsFirstTimeLoading = false;
+	StartBattle();
+}
+
+void ACGameModeBase::StartBattle()
+{
+	//Relocate player to his/her respective positions
+	PlayerCharacter->SetActorLocation(PlayerLocation_Battle);
+
+	//enable boss battle state 
+	auto AIController = Cast<ACAIController>(BossCharacter->GetController());
+	if (AIController)
+	{
+		AIController->SetBattleState();
+	}
+	//Spawn Blocker that keeps player from leaving
+	if (ensure(BlockingWallClass))
+	{
+		FTransform SpawnTransform;
+		SpawnTransform.SetTranslation(BlockingWallLocation);
+		SpawnTransform.SetRotation(TriggerBoxes[0]->GetActorRotation().Quaternion());
+		BlockingWall = GetWorld()->SpawnActor<AActor>(BlockingWallClass, SpawnTransform);
+	}
+	//fadeout to scene
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		PC->StartFade(true);
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+
+	//Disable Trigger boxes
+	for (auto Box : TriggerBoxes)
+	{
+		Box->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+}
+
+void ACGameModeBase::OnPlayerDead()
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		PlayerCharacter->DisableInput(PC);
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PausePeriod, 2.5f);
+	}
+}
+
+void ACGameModeBase::PausePeriod()
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		Widget_GameOver = CreateWidget<UUserWidget_Gameplay>(PC, Widget_GameOverClass);
+		if (ensure(Widget_GameOver))
+		{
+			Widget_GameOver->AddToViewport(-1);
+			FScriptDelegate Delegate;
+			Delegate.BindUFunction(this, "ButtonClick_BattleReset");
+			Widget_GameOver->OnButtonClicked.Add(Delegate);
+			PC->bShowMouseCursor = true;
+		}
+	}
+}
+
+
+void ACGameModeBase::ButtonClick_BattleReset()
+{
+	//Fade out Screen to black
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		if (PC->OnFadeSuccess.IsBound())
+		{
+			PC->OnFadeSuccess.RemoveAll(this);
+		}
+
+		FScriptDelegate Dele;
+		Dele.BindUFunction(this, "OnFadeSuccess_BattleReset");
+		PC->OnFadeSuccess.Add(Dele);
+		PC->StartFade(false);
+	}
+}
+
+
+void ACGameModeBase::OnFadeSuccess_BattleReset(AActor* Actor)
+{
+	ResetBattle();
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		if (PC->OnFadeSuccess.IsBound())
+		{
+			PC->OnFadeSuccess.RemoveAll(this);
+		}
+		PC->StartFade(true);
+	}
+}
+
+void ACGameModeBase::ResetBattle()
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		//Reset player
+		PlayerCharacter->EnableInput(PC);
+		auto PlayerComp = PlayerCharacter->GetComponentByClass<UCAttributeComponent>();
+		if (PlayerComp)
+		{
+			PlayerComp->RecoverFullHealth();
+		}
+
+		for (TActorIterator<APlayerStart> Iter(GetWorld()); Iter; ++Iter)
+		{
+			PlayerCharacter->SetActorLocation(Iter->GetActorLocation());
+		}
+
+		//Reset Widget Gameover
+		Widget_GameOver->RemoveFromParent();
+		PC->bShowMouseCursor = false;
+
+		//Reset Boss
+		auto AttriComp = BossCharacter->GetComponentByClass<UCAttributeComponent>();
+		if (AttriComp)
+		{
+			AttriComp->RecoverFullHealth();
+		}
+		BossCharacter->SetActorLocation(BossLocation_Battle);
+		auto AIController = Cast<ACAIController>(BossCharacter->GetController());
+		if (AIController)
+		{
+			AIController->SetStartState();
+		}
+
+		//Reset blocking wall
+		if (BlockingWall)
+		{
+			BlockingWall->Destroy();
+		}
+
+		//Re-enable Trigger boxes
+		for (auto Box : TriggerBoxes)
+		{
+			Box->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+	}
+
+}
+
+void ACGameModeBase::OnBossDead()
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		PlayerCharacter->DisableInput(PC);
+		FTimerHandle Handle;
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PausePeriodWon, 2.5f);
+	}
+}
+
+void ACGameModeBase::PausePeriodWon()
+{
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		Widget_Victory = CreateWidget<UUserWidget_Gameplay>(PC, Widget_VictoryClass);
+		if (ensure(Widget_Victory))
+		{
+			Widget_Victory->AddToViewport(-1);
+			FScriptDelegate Delegate;
+			Delegate.BindUFunction(this, "ButtonClick_BattleOver");
+			Widget_Victory->OnButtonClicked.Add(Delegate);
+			PC->bShowMouseCursor = true;
+		}
+	}
+}
+
+void ACGameModeBase::ButtonClick_BattleOver()
+{
+	//Fade out Screen to black
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	if (PC)
+	{
+		if (PC->OnFadeSuccess.IsBound())
+		{
+			PC->OnFadeSuccess.RemoveAll(this);
+		}
+
+		FScriptDelegate Dele;
+		Dele.BindUFunction(this, "OnFadeSuccess_BattleOver");
+		PC->OnFadeSuccess.Add(Dele);
+		PC->StartFade(false);
+	}
+}
+
+void ACGameModeBase::OnFadeSuccess_BattleOver(AActor* Actor)
+{
+	UGameplayStatics::OpenLevel(this, "IntroLev");
+}
 
 void ACGameModeBase::RestoreTime(AActor* ActorContext)
 {

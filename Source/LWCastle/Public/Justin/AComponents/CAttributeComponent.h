@@ -21,6 +21,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UFUNCTION()
+	void RecoverFullHealth();
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHealth() const;
 	UFUNCTION(BlueprintCallable)

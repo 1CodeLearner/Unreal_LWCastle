@@ -57,7 +57,10 @@ void UCActionEffect_ChargedState::CompleteAction_Implementation(AActor* Instigat
 {
 	Super::CompleteAction_Implementation(InstigatorActor);
 	StartTick = false;
-	Widget->ResetWidget();
+	if (Widget)
+	{
+		Widget->ResetWidget();
+	}
 }
 
 void UCActionEffect_ChargedState::InterruptAction_Implementation(AActor* InstigatorActor)

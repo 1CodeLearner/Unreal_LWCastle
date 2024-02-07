@@ -12,6 +12,8 @@ class UCChargeWidget;
  * 
  */
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFadeSuccessDelegate, AActor*, Owner);
+
 UCLASS()
 class LWCASTLE_API ACPlayerController : public APlayerController
 {
@@ -19,6 +21,12 @@ class LWCASTLE_API ACPlayerController : public APlayerController
 	
 public:
 	ACPlayerController();
+
+	UPROPERTY(BlueprintCallable, Category = "UI")
+	FFadeSuccessDelegate OnFadeSuccess;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void StartFade(bool bIsFadeOut);
 
 	virtual void PostInitializeComponents() override;
 	

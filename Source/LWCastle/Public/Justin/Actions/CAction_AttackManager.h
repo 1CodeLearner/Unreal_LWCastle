@@ -18,6 +18,9 @@ class LWCASTLE_API UCAction_AttackManager : public UCActionPause
 public:
 
 	UCAction_AttackManager();
+	
+	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
+
 	virtual void StartAction_Implementation(AActor* InstigatorActor) override;
 
 	virtual void PauseAction_Implementation(AActor* InstigatorActor) override;
@@ -27,7 +30,6 @@ public:
 	virtual void CompleteAction_Implementation(AActor* InstigatorActor) override;
 	//virtual bool CanStart_Implementation(AActor* InstigatorActor) const override;
 
-	virtual void Initialize_Implementation(UCGameplayComponent* GameplayComp) override;
 	virtual bool IsRunning() const override;
 
 protected:
@@ -48,5 +50,8 @@ private:
 	UCMagic* GetActiveElement() const;
 	void SetActiveElement(FElement NewActiveMagic);
 	bool IsSameMagic(FElement SwitchedElement) const;
+	UPROPERTY()
+	ACharacter* Character;
+	FRotator OriginalRotationRate;
 	//void ResetElementTags(FGameplayTagContainer TagsToRemove);
 };

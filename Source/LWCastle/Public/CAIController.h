@@ -7,7 +7,7 @@
 #include "CAIController.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API ACAIController : public AAIController
@@ -16,4 +16,8 @@ class LWCASTLE_API ACAIController : public AAIController
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
 	void SetStunState();
+	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
+	void SetBattleState();
+	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
+	void SetStartState();
 };

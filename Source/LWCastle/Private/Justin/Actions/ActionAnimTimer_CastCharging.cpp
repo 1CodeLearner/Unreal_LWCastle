@@ -5,17 +5,37 @@
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Justin/AComponents/CPlayerAttributeComp.h"
 #include "Justin/AComponents/CCombatComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "AudioDevice.h"
+#include "ActiveSound.h"
 
 UActionAnimTimer_CastCharging::UActionAnimTimer_CastCharging()
 {
 	ManaChargingRate = 1.0f;
+	AudioComp = nullptr;
+	bIsSoundPaused = false;
+	DurationElapsed = 0.f;
 }
 
 void UActionAnimTimer_CastCharging::Tick(float DeltaTime)
 {
 	if (PlayerAttribute && PlayerAttribute->TryChannelMana(ManaChargingRate * DeltaTime))
 	{
+		if (bIsSoundPaused)
+		{
+			bIsSoundPaused = false;
+			AudioComp->SetPaused(false);
+		}
 		CombatComp->AddChannelMana(ManaChargingRate * DeltaTime);
+	}
+	else
+	{
+		if (!bIsSoundPaused)
+		{
+			bIsSoundPaused = true;
+			AudioComp->SetPaused(true);
+		}
 	}
 }
 
@@ -62,6 +82,25 @@ void UActionAnimTimer_CastCharging::StartAction_Implementation(AActor* Instigato
 
 	if (!CombatComp->OnManaCharged.IsBound())
 		CombatComp->OnManaCharged.BindUFunction(this, "ExecuteAction");
+
+	UGameplayStatics::PlaySound2D(this, ChargingStartSound);
+	auto Actor = Cast<AActor>(GetOuter());
+	if (ensure(Actor))
+	{
+		if (AudioComp)
+		{
+			AudioComp = nullptr;
+		}
+
+		AudioComp = UGameplayStatics::SpawnSoundAttached(ChargingSound, Actor->GetRootComponent());
+
+		FScriptDelegate Delegate;
+		Delegate.BindUFunction(this, "OnSoundPercent");
+		AudioComp->OnAudioPlaybackPercent.AddUnique(Delegate);
+
+		AudioComp->SetPaused(true);
+	}
+
 }
 
 void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -70,6 +109,14 @@ void UActionAnimTimer_CastCharging::CompleteAction_Implementation(AActor* Instig
 
 	if (IsMontagePlaying())
 		StopMontage(this);
+
+	if (AudioComp)
+	{
+		AudioComp->Stop();
+		AudioComp->OnAudioPlaybackPercent.RemoveAll(this);
+	}
+
+	DurationElapsed = 0.f;
 }
 
 void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* InstigatorActor)
@@ -77,14 +124,13 @@ void UActionAnimTimer_CastCharging::PauseAction_Implementation(AActor* Instigato
 	Super::PauseAction_Implementation(InstigatorActor);
 	UnbindNotifyEvent(this);
 	StartTick = false;
+	AudioComp->SetPaused(true);
 }
 
 void UActionAnimTimer_CastCharging::UnPauseAction_Implementation(AActor* InstigatorActor)
 {
 	Super::UnPauseAction_Implementation(InstigatorActor);
 	StartMontage(this);
-
-	StartTick = true;
 }
 
 
@@ -98,6 +144,10 @@ void UActionAnimTimer_CastCharging::InterruptAction_Implementation(AActor* Insti
 	PlayerAttribute->CancelChannelingMana();
 	if (CombatComp->OnManaCharged.IsBound())
 		CombatComp->OnManaCharged.Clear();
+
+	AudioComp->Stop();
+	AudioComp->OnAudioPlaybackPercent.RemoveAll(this);
+	DurationElapsed = 0.f;
 }
 
 void UActionAnimTimer_CastCharging::ExecuteAction(AActor* InstigatorActor)
@@ -121,4 +171,14 @@ void UActionAnimTimer_CastCharging::OnNotifyBegin(FName NotifyName, const FBranc
 
 	UnbindNotifyEvent(this);
 	StartTick = true;
+	AudioComp->SetPaused(false);
+}
+
+void UActionAnimTimer_CastCharging::OnSoundPercent(const USoundWave* PlayingSoundWave, const float PlaybackPercent)
+{
+	if (PlaybackPercent == 0.f)
+		return;
+
+	float StartTime = AudioComp->Sound->GetMaxDistance() * PlaybackPercent;
+	AudioComp->FadeIn(.5f, 1.f, StartTime);
 }

@@ -100,6 +100,34 @@ void Auwol_test::Tick(float DeltaTime)
 		return;
 	}
 	Move(DeltaTime);
+
+	static FGameplayTag SprintTag = FGameplayTag::RequestGameplayTag("Movement.Sprint");
+	static FGameplayTag ADSTag = FGameplayTag::RequestGameplayTag("Combat.ADS");
+	static FGameplayTag MagicTag = FGameplayTag::RequestGameplayTag("Combat.Magic");
+
+	static FGameplayTagContainer Container;
+	Container.AddTag(SprintTag);
+	Container.AddTag(ADSTag);
+
+	if (GameplayComp->ActiveGameplayTags.HasAllExact(Container))
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 250.f;
+	}
+	else if(GameplayComp->ActiveGameplayTags.HasTag(ADSTag))
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 150.f;
+	}	
+	else if(GameplayComp->ActiveGameplayTags.HasTag(SprintTag))
+	{
+		if(GameplayComp->ActiveGameplayTags.HasTag(MagicTag))
+			GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		else
+			GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	}
 }
 
 // Called to bind functionality to input
@@ -189,9 +217,9 @@ void Auwol_test::Move(float DeltaTime)
 	direction = direction.Y * right + direction.X * forward;
 	direction.Normalize();
 
-	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag("Movement.Jump");
+	static FGameplayTag JumpTag = FGameplayTag::RequestGameplayTag("Movement.Jump");
 
-	if (!GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags) || GameplayComp->ActiveGameplayTags.HasTagExact(Tag))
+	if (!GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags) || GameplayComp->ActiveGameplayTags.HasTagExact(JumpTag))
 	{
 		AddMovementInput(direction, movespeed);
 	}
@@ -241,13 +269,13 @@ void Auwol_test::InputFireReleased()
 void Auwol_test::SniperAimHold()
 {
 	GameplayComp->StartActionByName(this, "ADS");
+
 }
 
 void Auwol_test::SniperAimRelease()
 {
 	GameplayComp->CompleteActionByName(this, "ADS");
 }
-
 
 void Auwol_test::SwitchElement()
 {
@@ -380,33 +408,24 @@ void Auwol_test::MeleeCombo_Reset()
 
 void Auwol_test::OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted)
 {
+	UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+
+	UE_LOG(LogTemp, Warning, TEXT("ActiveMontage: %s"), *GameplayComp->ActiveGameplayTags.ToString());//*GetNameSafe(Anim->GetCurrentActiveMontage()));
+	if (GameplayComp->ActiveGameplayTags.Num() == 1 && GameplayComp->ActiveGameplayTags.HasTagExact(FGameplayTag::RequestGameplayTag("Combat.Melee")))
+	{
+		GameplayComp->CompleteActionByName(this, "Melee");
+	}
+
 	if (bInterrupted && isDuringAttack)
 	{
 		Attack_Melee_End();
 		MeleeCombo_Reset();
-		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
-		GameplayComp->CompleteActionByName(this, "Melee");/*
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
+		GameplayComp->CompleteActionByName(this, "Melee");
 	}
 	else if (bInterrupted && !isDuringAttack && GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
 	{
-		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
-
-		GameplayComp->CompleteActionByName(this, "Melee");/*
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
+		GameplayComp->CompleteActionByName(this, "Melee");
 	}
-	else
-	{
-		GameplayComp->CompleteActionByName(this, "Melee");/*
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
-	}
-
-	/*UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
-	auto Delegate = Anim->Montage_GetBlendingOutDelegate();
-	if (Delegate && ensureAlways(Delegate->IsBound()))
-	{
-		Delegate->Unbind();
-	}*/
 }
 
 void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -418,7 +437,7 @@ void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
 		UE_LOG(LogTemp, Warning, TEXT("Here %s"), *GetNameSafe(Montage));
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 		GameplayComp->CompleteActionByName(this, "Melee");
-		
+
 		UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	}
 }
