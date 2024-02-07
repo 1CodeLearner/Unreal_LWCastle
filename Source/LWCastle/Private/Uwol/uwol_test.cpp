@@ -31,7 +31,7 @@ Auwol_test::Auwol_test()
 	// Set Camera
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
-	springArmComp->TargetOffset = FVector(0, 20, 30);
+	springArmComp->SocketOffset = FVector(0, 50, 60);
 	springArmComp->TargetArmLength = 200;
 	//springArmComp->bUsePawnControlRotation = true;
 	//springArmComp->bUsePawnControlRotation = false;
@@ -64,6 +64,7 @@ Auwol_test::Auwol_test()
 	}
 
 	PlayerAttributeComp = CreateDefaultSubobject<UCPlayerAttributeComp>("PlayerAttributeComp");
+	PlayerAttributeComp->OnStaminaDepleted.AddDynamic(this, &Auwol_test::OnStaminaDepleted);
 	GameplayComp = CreateDefaultSubobject<UCGameplayComponent>("GameplayComp");
 	CombatComp = CreateDefaultSubobject<UCCombatComponent>("CombatComp");
 }
@@ -99,7 +100,6 @@ void Auwol_test::Tick(float DeltaTime)
 		return;
 	}
 	Move(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -144,6 +144,11 @@ void Auwol_test::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 
 	PlayerInputComponent->BindAction(TEXT("StartCharging"), IE_Released, this, &Auwol_test::StartCharging);
+}
+
+void Auwol_test::OnStaminaDepleted()
+{
+	GameplayComp->AddAction(this, ActionEffectStunClass);
 }
 
 FVector Auwol_test::GetPawnViewLocation() const
@@ -235,12 +240,12 @@ void Auwol_test::InputFireReleased()
 
 void Auwol_test::SniperAimHold()
 {
-	GameplayComp->StartActionByName(this, "ADS");	
+	GameplayComp->StartActionByName(this, "ADS");
 }
 
 void Auwol_test::SniperAimRelease()
 {
-	GameplayComp->CompleteActionByName(this, "ADS");	
+	GameplayComp->CompleteActionByName(this, "ADS");
 }
 
 
@@ -274,24 +279,16 @@ void Auwol_test::speedchange()
 
 void Auwol_test::Dodge()
 {
-	GameplayComp->StartActionByName(this, "Roll");
-
-	/*if (!IsDodging)
+	if (!GameplayComp->ActiveGameplayTags.HasTag(FGameplayTag::RequestGameplayTag("Movement.Roll")) && !bIsStunned)
 	{
-		UAnimInstance* pAnimInst = GetMesh()->GetAnimInstance();
-		if (pAnimInst != nullptr)
+		if (PlayerAttributeComp->GetCurrentStamina() <= 0.f)
 		{
-			IsDodging = true;
-
-			//StartDodgeAnimation();
-
-			const FVector PlayerForward = GetActorForwardVector();
-			//LaunchCharacter(PlayerForward * 2500, true, true);
-
-			FTimerHandle UnusedHandle;
-			GetWorldTimerManager().SetTimer(UnusedHandle, this, &Auwol_test::ResetDodgeState, 1.0f, false);
+			bIsStunned = true;
+			OnStaminaDepleted();
+			return;
 		}
-	}*/
+		GameplayComp->StartActionByName(this, "Roll");
+	}
 }
 
 void Auwol_test::RunP()
@@ -309,20 +306,6 @@ void Auwol_test::RunR()
 	GameplayComp->CompleteActionByName(this, "Sprint");
 }
 */
-
-void Auwol_test::ResetDodgeState()
-{
-	IsDodging = false;
-}
-
-void Auwol_test::StartDodgeAnimation()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance != nullptr)
-	{
-		AnimInstance->Montage_Play(pDodgeMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, false);
-	}
-}
 
 void Auwol_test::Attack_Melee()
 {
@@ -382,7 +365,6 @@ void Auwol_test::Attack_Melee()
 	default:
 		ComboAttack_Num = 0;
 	}
-
 }
 
 void Auwol_test::Attack_Melee_End()
@@ -404,23 +386,27 @@ void Auwol_test::OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted)
 		MeleeCombo_Reset();
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 		GameplayComp->CompleteActionByName(this, "Melee");
-
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
 	else if (bInterrupted && !isDuringAttack && GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
 	{
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 
 		GameplayComp->CompleteActionByName(this, "Melee");
-	}
-	else if (GameplayComp->ActiveGameplayTags.HasAny(MeleeGrantedTags))
-	{
-		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
-		return;
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
 	else
 	{
 		GameplayComp->CompleteActionByName(this, "Melee");
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 	}
+
+	/*UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	auto Delegate = Anim->Montage_GetBlendingOutDelegate();
+	if (Delegate && ensureAlways(Delegate->IsBound()))
+	{
+		Delegate->Unbind();
+	}*/
 }
 
 void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -432,6 +418,8 @@ void Auwol_test::OnEnded(UAnimMontage* Montage, bool bInterrupted)
 		UE_LOG(LogTemp, Warning, TEXT("Here %s"), *GetNameSafe(Montage));
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 		GameplayComp->CompleteActionByName(this, "Melee");
+		
+		UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 	}
 }
 

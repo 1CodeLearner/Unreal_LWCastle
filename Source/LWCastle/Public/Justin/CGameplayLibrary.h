@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "GameplayTagContainer.h"
 #include "CGameplayLibrary.generated.h"
 
 /**
@@ -17,6 +18,11 @@ class LWCASTLE_API UCGameplayLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "GameplayLibrary")
 	static bool ApplyDamage(AActor* Invoker, AActor* AppliedActor, float Damage);
+
+	static bool ApplyStunOn(AActor* Invoker, AActor* AppliedActor, FGameplayTagContainer StunTag);
+	
+	UFUNCTION(BlueprintCallable, Category = "GameplayLibrary")
+	static bool AddCurrency(AActor* ActorWithInventory);
 
 private:
 };

@@ -28,7 +28,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	UCAction* GetActionByName(FName ActionName) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Action")
 	void StartActionByName(AActor* InstigatorActor, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")

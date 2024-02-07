@@ -3,6 +3,7 @@
 
 #include "Justin/CGameModeBase.h"
 #include "Justin/CItemBase.h"
+#include "Justin/CGameplayLibrary.h"
 #include <../../../../../../../Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 UClass* ACGameModeBase::GetItemClassByName(FName ItemName)
@@ -34,23 +35,23 @@ TArray<TSubclassOf<UCItemBase>> ACGameModeBase::GetItems()
 TArray<FStruct_Progression> ACGameModeBase::GetProgressions(EPlayerStat StatType) const
 {
 	TArray<FStruct_Progression*> ProgRows;
-	switch (StatType) 
+	switch (StatType)
 	{
-		case EPlayerStat::HEALTH:
-		{
-			DT_HealthProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
-			break;
-		}
-		case EPlayerStat::MANA:
-		{
-			DT_ManaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
-			break;
-		}
-		case EPlayerStat::STAMINA:
-		{
-			DT_StaminaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
-			break;
-		}
+	case EPlayerStat::HEALTH:
+	{
+		DT_HealthProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+		break;
+	}
+	case EPlayerStat::MANA:
+	{
+		DT_ManaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+		break;
+	}
+	case EPlayerStat::STAMINA:
+	{
+		DT_StaminaProgression->GetAllRows<FStruct_Progression>("String", ProgRows);
+		break;
+	}
 	}
 
 
@@ -89,10 +90,10 @@ TArray<FStruct_Level> ACGameModeBase::GetCurrentLevels() const
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	
-	for (auto ItemBaseClass : ItemBaseClasses) 
+
+	for (auto ItemBaseClass : ItemBaseClasses)
 	{
-		if (ItemBaseClass) 
+		if (ItemBaseClass)
 		{
 			//UCItemBase* tempItem = NewObject<UCItemBase>(this, ItemBaseClass);
 			UCItemBase* tempItem = ItemBaseClass.GetDefaultObject();
@@ -151,15 +152,25 @@ FName ACGameModeBase::GetStatName(EPlayerStat PlayerStatEnum) const
 void ACGameModeBase::RestoreTime(AActor* ActorContext)
 {
 	UGameplayStatics::SetGlobalTimeDilation(ActorContext, 1.f);
+
+	UCGameplayLibrary::AddCurrency(ActorContext);
 }
 
+/*void ACGameModeBase::RespawnPlayer(AController* Controller)
+{
+	if (ensure(Controller))
+	{
+		Controller->UnPossess();
+		RestartPlayer(Controller);
+	}
+}*/
 
 void ACGameModeBase::SlowDownTime(AActor* ActorContext)
 {
 	UGameplayStatics::SetGlobalTimeDilation(ActorContext, .1f);
 	FTimerDelegate Delegate;
 	FTimerHandle Handle;
-	Delegate.BindUFunction(this, "RestoreTime", this);
+	Delegate.BindUFunction(this, "RestoreTime", ActorContext);
 
 	GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, .05f, false);
 }

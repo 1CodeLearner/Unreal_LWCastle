@@ -48,11 +48,16 @@ void UCAPAnimTimer::StartMontage(UCAPAnimTimer* AnimTimer)
 void UCAPAnimTimer::StopMontage(UCAPAnimTimer* AnimTimer)
 {
 	if (AnimInstance) {
-		if (AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
-		{
-			AnimInstance->OnPlayMontageNotifyBegin.Remove(AnimTimer, "OnNotifyBegin");
-		}
+		UnbindNotifyDelegate(AnimTimer);
 		AnimInstance->Montage_Stop(InBlendOutTime, Montage);
+	}
+}
+
+void UCAPAnimTimer::UnbindNotifyDelegate(UCAPAnimTimer* AnimTimer)
+{
+	if (AnimInstance->OnPlayMontageNotifyBegin.Contains(AnimTimer, "OnNotifyBegin"))
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.Remove(AnimTimer, "OnNotifyBegin");
 	}
 }
 
@@ -93,7 +98,7 @@ bool UCAPAnimTimer::IsTimerValid()
 
 void UCAPAnimTimer::StartTimer(UCAPAnimTimer* AnimTimer)
 {
-	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction");
+	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction", GetOuter());
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerDuration, false);
 }
 

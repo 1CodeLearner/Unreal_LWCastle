@@ -117,7 +117,7 @@ float UCActionAnimTimer::GetTimerRemaining()
 
 void UCActionAnimTimer::StartTimer(UCActionAnimTimer* AnimTimer)
 {
-	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction");
+	TimerDelegate.BindUFunction(AnimTimer, "ExecuteAction", GetOuter());
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, TimerDuration, false);
 }
 

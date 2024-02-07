@@ -43,11 +43,6 @@ private:
 	UPROPERTY()
 	ACharacter* Character;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
-	TSubclassOf<UCAction> ActionEffectStunClass;
-
-	UFUNCTION()
-	void OnStaminaDepleted();
 	UFUNCTION()
 	void OnLand( const FHitResult& Hit);
 

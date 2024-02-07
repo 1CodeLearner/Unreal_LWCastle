@@ -3,44 +3,34 @@
 
 #include "Justin/Actions/CActionAnimTimer_StunLight.h"
 #include "Justin/AComponents/CGameplayComponent.h"
-#include "Justin/Actions/CAPAnimTimer_Dodge.h"
-
-void UCActionAnimTimer_StunLight::Initialize_Implementation(UCGameplayComponent* GameplayComp)
-{
-	Super::Initialize_Implementation(GameplayComp);
-	DodgeAction = Cast<UCAPAnimTimer_Dodge>(GetGameplayComponent()->GetActionByName("Roll"));
-	ensure(DodgeAction);
-}
+#include "Uwol/uwol_test.h"
 
 void UCActionAnimTimer_StunLight::StartAction_Implementation(AActor* InstigatorActor)
 {
 	Super::StartAction_Implementation(InstigatorActor);
 
-	if (IsMontagePlaying()) 
+	if (IsMontagePlaying())
 	{
+		UnbindDelegate();
 		StopMontage(this);
-		StartMontage(this);
-		ClearTimer();
-		StartTimer(this);
-		return;
+		//ClearTimer();
 	}
 
-
 	StartMontage(this);
-	FOnMontageEnded MontageEndDelegate;
-	MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
-	GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, Montage);
+	if (ensureAlways(!GetAnimInstance()->Montage_GetBlendingOutDelegate()->IsBound()))
+	{
+		MontageEndDelegate.BindUObject(this, &UCActionAnimTimer_StunLight::OnMontageEnd);
+		GetAnimInstance()->Montage_SetBlendingOutDelegate(MontageEndDelegate, Montage);
+	}
 
-	DodgeAction->AddBlockedTag(GetGrantedTags());
-	StartTimer(this);
+	//StartTimer(this);
 }
 
 void UCActionAnimTimer_StunLight::InterruptAction_Implementation(AActor* InstigatorActor)
 {
 	Super::InterruptAction_Implementation(InstigatorActor);
 	StopMontage(this);
-	DodgeAction->RemoveBlockedTag(GetGrantedTags());
-	ClearTimer();
+	//ClearTimer();
 }
 
 void UCActionAnimTimer_StunLight::CompleteAction_Implementation(AActor* InstigatorActor)
@@ -48,7 +38,7 @@ void UCActionAnimTimer_StunLight::CompleteAction_Implementation(AActor* Instigat
 	Super::CompleteAction_Implementation(InstigatorActor);
 
 	StopMontage(this);
-	ClearTimer();
+	//ClearTimer();
 }
 
 bool UCActionAnimTimer_StunLight::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
@@ -58,13 +48,26 @@ bool UCActionAnimTimer_StunLight::CanStart_Implementation(AActor* InstigatorActo
 
 void UCActionAnimTimer_StunLight::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)
 {
-	if(!bInterrupted)
-	{
-		GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
-	}
+	GetGameplayComponent()->CompleteActionBy(GetGameplayComponent()->GetOwner(), this);
+
+	UnbindDelegate();
 }
 
-void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
+/*void UCActionAnimTimer_StunLight::ExecuteAction(AActor* InstigatorActor)
 {
-	DodgeAction->RemoveBlockedTag(GetGrantedTags());
+	auto Player = Cast<Auwol_test>(InstigatorActor);
+	if(Player)
+	{
+		Player->bIsStunned = false;
+	}
+}*/
+
+void UCActionAnimTimer_StunLight::UnbindDelegate()
+{
+	auto Delegate = GetAnimInstance()->Montage_GetBlendingOutDelegate();
+
+	if (Delegate && Delegate->IsBound())
+	{
+		GetAnimInstance()->Montage_GetBlendingOutDelegate()->Unbind();
+	}
 }

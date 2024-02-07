@@ -125,11 +125,6 @@ void UCActionPause_Sprint::StartRunning()
 		Character->LandedDelegate.AddDynamic(this, &UCActionPause_Sprint::OnLand);
 	}
 
-	if (!AttributeComp->OnStaminaDepleted.Contains(this, "OnStaminaDepleted"))
-	{
-		AttributeComp->OnStaminaDepleted.AddDynamic(this, &UCActionPause_Sprint::OnStaminaDepleted);
-	}
-
 	PrevSpeed = Character->GetCharacterMovement()->MaxWalkSpeed;
 	Character->GetCharacterMovement()->MaxWalkSpeed = MaxSprintSpeed;
 
@@ -154,21 +149,11 @@ void UCActionPause_Sprint::StopRunning()
 		Character->LandedDelegate.Remove(this, "OnLand");
 	}
 
-	if (AttributeComp->OnStaminaDepleted.Contains(this, "OnStaminaDepleted"))
-	{
-		AttributeComp->OnStaminaDepleted.Remove(this, "OnStaminaDepleted");
-	}
-
 	Character->GetCharacterMovement()->MaxWalkSpeed = PrevSpeed;
 
 	PrevSpeed = 0.f;
 	StartTick = false;
 	isSprinting = false;
-}
-
-void UCActionPause_Sprint::OnStaminaDepleted()
-{
-	GetGameplayComponent()->AddAction(GetGameplayComponent()->GetOwner(), ActionEffectStunClass);
 }
 
 void UCActionPause_Sprint::OnLand(const FHitResult& Hit)

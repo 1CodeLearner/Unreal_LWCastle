@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CInventoryComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrencySpentDelegate, int, CurrencyRemaining);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCurrencyValueChangeDelegate, int, CurrentCurrency);
 
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LWCASTLE_API UCInventoryComponent : public UActorComponent
@@ -17,7 +17,7 @@ public:
 
 	UCInventoryComponent();
 	UPROPERTY(BLueprintAssignable, VisibleAnywhere, Category = "InventoryEvent | Currency")
-	FCurrencySpentDelegate OnCurrencySpent;
+	FCurrencyValueChangeDelegate OnCurrencyValueChange;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
 	int GetCurrency() const;
@@ -28,12 +28,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
 	void SpendCurrency(int AmountToSpend);
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
+	void AddCurrency(int AmountToAdd);
+
 protected:
 	virtual void BeginPlay() override;
 
 	friend class UCPlayerAttributeManagerComp;
-	UFUNCTION(BlueprintCallable, Category = "Inventory | Currency")
-	void AddCurrency(int AmountToAdd);
 
 private:
 
