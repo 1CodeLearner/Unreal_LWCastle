@@ -385,20 +385,20 @@ void Auwol_test::OnBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted)
 		Attack_Melee_End();
 		MeleeCombo_Reset();
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
-		GameplayComp->CompleteActionByName(this, "Melee");
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		GameplayComp->CompleteActionByName(this, "Melee");/*
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
 	}
 	else if (bInterrupted && !isDuringAttack && GameplayComp->ActiveGameplayTags.HasAny(MeleeBlockTags))
 	{
 		//GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
 
-		GameplayComp->CompleteActionByName(this, "Melee");
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		GameplayComp->CompleteActionByName(this, "Melee");/*
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
 	}
 	else
 	{
-		GameplayComp->CompleteActionByName(this, "Melee");
-		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);
+		GameplayComp->CompleteActionByName(this, "Melee");/*
+		GameplayComp->ActiveGameplayTags.RemoveTags(MeleeGrantedTags);*/
 	}
 
 	/*UPlayerAnim* Anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());

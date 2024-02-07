@@ -95,6 +95,7 @@ void UCMagic::MagicExecute_Implementation(AActor* InstigatorActor)
 					Magic->OwnedTag.AppendTags(GrantedTags);
 				}
 
+
 				UGameplayStatics::FinishSpawningActor(Projectile, fireposition);
 			}
 

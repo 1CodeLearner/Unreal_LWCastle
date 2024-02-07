@@ -5,11 +5,16 @@
 #include "Components/BoxComponent.h"
 #include "Justin/AComponents/CAttributeComponent.h"
 #include "Justin/CGameplayLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ACMagicProjectile::ACMagicProjectile()
 {
 	BoxComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	BoxComp->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
 }
 
 void ACMagicProjectile::PostInitializeComponents()
@@ -23,6 +28,8 @@ void ACMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	SetLifeSpan(5.f);
+
+	AudioComp = UGameplayStatics::SpawnSoundAtLocation(this, SpawnSound, GetActorLocation());
 }
 
 void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -32,11 +39,14 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	if (UCGameplayLibrary::ApplyDamage(GetInstigator(), OtherActor, GetDamage()))
 	{
 		UCGameplayLibrary::ApplyStunOn(GetInstigator(), OtherActor, OwnedTag);
+		UGameplayStatics::SpawnSoundAtLocation(this, ImpactSound, GetActorLocation()); 
 		Destroy();
 	}
 }
 
 void ACMagicProjectile::OnHitBegin(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UGameplayStatics::SpawnSoundAtLocation(this, ImpactSound, GetActorLocation());
 	Destroy();
+
 }

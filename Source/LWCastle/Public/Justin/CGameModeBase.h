@@ -55,6 +55,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PlayerProgression")
 	TObjectPtr<UDataTable> DT_StaminaProgression;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	USoundBase* DodgeSound;
+
 private:
 	FName GetStatName(EPlayerStat PlayerStatEnum);
 	FName GetStatName(EPlayerStat PlayerStatEnum) const;

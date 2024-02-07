@@ -171,6 +171,6 @@ void ACGameModeBase::SlowDownTime(AActor* ActorContext)
 	FTimerDelegate Delegate;
 	FTimerHandle Handle;
 	Delegate.BindUFunction(this, "RestoreTime", ActorContext);
-
 	GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, .05f, false);
+	UGameplayStatics::PlaySound2D(this, DodgeSound);
 }
