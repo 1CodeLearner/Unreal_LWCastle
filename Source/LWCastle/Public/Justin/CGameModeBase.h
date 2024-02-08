@@ -72,7 +72,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	USoundBase* DodgeSound;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Battle")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Battle")
 	ULevelSequence* BossIntroSequence;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Battle")
@@ -124,7 +124,7 @@ private:
 	UFUNCTION()
 	void PlayerPauseOverlapsed();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnSequenceFinished();
 
 	UFUNCTION()

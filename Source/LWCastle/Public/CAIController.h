@@ -20,4 +20,6 @@ public:
 	void SetBattleState(AActor* ActorToTarget);
 	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
 	void SetStartState();
+	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
+	void SetDeadState();
 };

@@ -39,7 +39,7 @@ void UCAttributeComponent::ApplyDamage(AActor* Instigator, const int Damage)
 	
 	if(IsAlive())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Taken this mouch Damgae %d"), Damage);
+		UE_LOG(LogTemp, Warning, TEXT("Health remaining: %f"), CurrentHealth);
 	}
 	else
 	{

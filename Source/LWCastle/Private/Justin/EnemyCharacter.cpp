@@ -32,14 +32,28 @@ void AEnemyCharacter::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (ensure(OnMeleeSuccess.IsBound()))
 		{
-			if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -MeleeDamage))
+			if(OwnedTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
 			{
-				auto Comp = OtherActor->GetComponentByClass<UCAttributeComponent>();
-				if(Comp && Comp->IsAlive())
+				if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -HardMeleeDamage))
 				{
-					UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+					auto Comp = OtherActor->GetComponentByClass<UCAttributeComponent>();
+					if (Comp && Comp->IsAlive())
+					{
+						UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+					}
+					OnMeleeSuccess.Broadcast();
 				}
-				OnMeleeSuccess.Broadcast();
+			}else
+			{
+				if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -LightMeleeDamage))
+				{
+					auto Comp = OtherActor->GetComponentByClass<UCAttributeComponent>();
+					if (Comp && Comp->IsAlive())
+					{
+						UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+					}
+					OnMeleeSuccess.Broadcast();
+				}
 			}
 		}
 	}

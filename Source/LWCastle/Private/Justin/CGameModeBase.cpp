@@ -20,7 +20,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Justin/UserWidget_Gameplay.h"
 #include "Justin/UserWidget_BossHealth.h"
-#include "GameFramework/PlayerStart.h"
+#include "GameFramework/PlayerStart.h"	
+#include "Blueprint/WidgetLayoutLibrary.h"
 
 void ACGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
@@ -227,10 +228,12 @@ void ACGameModeBase::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherA
 		auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
 		if (PC)
 		{
+			PlayerCharacter->DisableInput(PC);
 			PlayerCharacter->GetCharacterMovement()->DisableMovement();
+			PC->SetIgnoreLookInput(true);
 		}
 		FTimerHandle Handle;
-		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PlayerPauseOverlapsed, 3.f);
+		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PlayerPauseOverlapsed, 1.2f);
 
 
 	}
@@ -266,6 +269,7 @@ void ACGameModeBase::OnFadeSuccess_BattleStart(AActor* Actor)
 	if (bIsFirstTimeLoading)
 	{
 		PlayCinematic();
+		//PlayerCharacter->PlayCinematicInBlueprint();
 	}
 	else
 		StartBattle();
@@ -303,6 +307,7 @@ void ACGameModeBase::SetupBindings()
 void ACGameModeBase::PlayCinematic()
 {
 	//Play Cinematic
+
 	ALevelSequenceActor* ActorSequence;
 	ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), BossIntroSequence,
 		FMovieSceneSequencePlaybackSettings(), ActorSequence);
@@ -368,6 +373,16 @@ void ACGameModeBase::StartBattle()
 	{
 		Box->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	//Re-enable input for player and face boss
+	if (PC->IsLookInputIgnored())
+	{
+		PlayerCharacter->EnableInput(PC);
+		PC->ResetIgnoreLookInput();
+		FVector LookVec = BossCharacter->GetActorLocation() - PlayerCharacter->GetActorLocation();
+		LookVec.Normalize();
+		PC->SetControlRotation(LookVec.Rotation());
+	}
 }
 
 void ACGameModeBase::SetBossStartState()
@@ -385,6 +400,11 @@ void ACGameModeBase::OnPlayerDead()
 	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
 	if (PC)
 	{
+		auto GameplayComp = PlayerCharacter->GetComponentByClass<UCGameplayComponent>();
+		if (GameplayComp)
+		{
+			GameplayComp->StopAllActions(PlayerCharacter);
+		}
 		PlayerCharacter->DisableInput(PC);
 		FTimerHandle Handle;
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PausePeriod, 2.5f);
@@ -496,9 +516,10 @@ void ACGameModeBase::ResetBattle()
 void ACGameModeBase::OnBossDead()
 {
 	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
-	if (PC)
+	auto AIPC = Cast<ACAIController>(BossCharacter->GetController());
+	if (AIPC)
 	{
-		PlayerCharacter->DisableInput(PC);
+		AIPC->SetDeadState();
 		FTimerHandle Handle;
 		GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::PausePeriodWon, 2.5f);
 	}
@@ -509,6 +530,14 @@ void ACGameModeBase::PausePeriodWon()
 	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
 	if (PC)
 	{
+		auto GameplayComp = PlayerCharacter->GetComponentByClass<UCGameplayComponent>();
+		if(GameplayComp)
+		{
+			GameplayComp->StopAllActions(PlayerCharacter);
+		}
+		PlayerCharacter->DisableInput(PC);
+		PC->HideAllWidgets();
+		PlayerCharacter->GetCharacterMovement()->DisableMovement();
 		Widget_Victory = CreateWidget<UUserWidget_Gameplay>(PC, Widget_VictoryClass);
 		if (ensure(Widget_Victory))
 		{

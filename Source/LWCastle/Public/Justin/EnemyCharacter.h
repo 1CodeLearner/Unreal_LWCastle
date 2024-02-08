@@ -37,8 +37,10 @@ protected:
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
-	float MeleeDamage;
-	
+	float HardMeleeDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float LightMeleeDamage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	FGameplayTagContainer OwnedTag;
 
