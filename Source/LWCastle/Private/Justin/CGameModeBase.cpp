@@ -335,12 +335,18 @@ void ACGameModeBase::StartBattle()
 	//Relocate player to his/her respective positions
 	PlayerCharacter->SetActorLocation(PlayerLocation_Battle);
 
-	//enable boss battle state 
 	auto AIController = Cast<ACAIController>(BossCharacter->GetController());
-	if (AIController)
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, this, &ACGameModeBase::SetBossStartState, 1.f);
+
+	//Display Boss Health bar
+	Widget_BossHealth = CreateWidget<UUserWidget_BossHealth>(GetWorld(), Widget_BossHealthClass);
+	if (ensure(Widget_BossHealth))
 	{
-		AIController->SetBattleState();
+		Widget_BossHealth->OwningPlayer = AIController;
+		Widget_BossHealth->AddToViewport(-1);
 	}
+
 	//Spawn Blocker that keeps player from leaving
 	if (ensure(BlockingWallClass))
 	{
@@ -362,7 +368,16 @@ void ACGameModeBase::StartBattle()
 	{
 		Box->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
 
+void ACGameModeBase::SetBossStartState()
+{
+	auto AIController = Cast<ACAIController>(BossCharacter->GetController());
+	//enable boss battle state 
+	if (AIController)
+	{
+		AIController->SetBattleState(PlayerCharacter);
+	}
 }
 
 void ACGameModeBase::OnPlayerDead()
@@ -461,6 +476,7 @@ void ACGameModeBase::ResetBattle()
 		{
 			AIController->SetStartState();
 		}
+		Widget_BossHealth->RemoveFromParent();
 
 		//Reset blocking wall
 		if (BlockingWall)

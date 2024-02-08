@@ -34,7 +34,11 @@ void AEnemyCharacter::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		{
 			if (UCGameplayLibrary::ApplyDamage(this, OtherActor, -MeleeDamage))
 			{
-				UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+				auto Comp = OtherActor->GetComponentByClass<UCAttributeComponent>();
+				if(Comp && Comp->IsAlive())
+				{
+					UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+				}
 				OnMeleeSuccess.Broadcast();
 			}
 		}

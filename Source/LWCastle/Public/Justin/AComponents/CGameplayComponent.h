@@ -16,7 +16,8 @@ class LWCASTLE_API UCGameplayComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-
+	
+	UFUNCTION(BLueprintCallable)
 	void StopAllActions(AActor* InstigatorActor);
 
 	UCGameplayComponent();

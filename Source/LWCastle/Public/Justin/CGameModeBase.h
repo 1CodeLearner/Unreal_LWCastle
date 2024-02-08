@@ -86,8 +86,7 @@ protected:
 	UUserWidget_Gameplay* Widget_Victory;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Battle")
-	UUserWidget_BossHealth* Widget_BossHealthClass;
-
+	TSubclassOf<UUserWidget_BossHealth> Widget_BossHealthClass;
 	UPROPERTY()
 	UUserWidget_BossHealth* Widget_BossHealth;
 
@@ -155,5 +154,7 @@ private:
 	void PlayCinematic();
 	void SetupBindings();
 	void StartBattle();
+	UFUNCTION()
+	void SetBossStartState();
 	void ResetBattle();
 };

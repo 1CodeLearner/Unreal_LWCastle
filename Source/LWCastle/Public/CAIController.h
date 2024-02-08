@@ -17,7 +17,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
 	void SetStunState();
 	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
-	void SetBattleState();
+	void SetBattleState(AActor* ActorToTarget);
 	UFUNCTION(BlueprintImplementableEvent, Category = "AIState")
 	void SetStartState();
 };

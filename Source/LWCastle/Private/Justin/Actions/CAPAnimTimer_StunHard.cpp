@@ -4,6 +4,7 @@
 #include "Justin/Actions/CAPAnimTimer_StunHard.h"
 #include "Justin/AComponents/CGameplayComponent.h"
 #include "Uwol/uwol_test.h"
+#include "Justin/AComponents/CAttributeComponent.h"
 
 void UCAPAnimTimer_StunHard::StartAction_Implementation(AActor* InstigatorActor)
 {
@@ -53,7 +54,12 @@ void UCAPAnimTimer_StunHard::CompleteAction_Implementation(AActor* InstigatorAct
 
 bool UCAPAnimTimer_StunHard::CanStart_Implementation(AActor* InstigatorActor, UCAction* StartingAction) const
 {
-	return StartingAction == this || Super::CanStart_Implementation(InstigatorActor, StartingAction);
+	auto Comp = InstigatorActor->GetComponentByClass<UCAttributeComponent>();
+	if(Comp)
+	{
+		return Comp->IsAlive() && (StartingAction == this || Super::CanStart_Implementation(InstigatorActor, StartingAction));
+	}
+	return false;
 }
 
 void UCAPAnimTimer_StunHard::OnMontageEnd(UAnimMontage* EndedMontage, bool bInterrupted)

@@ -7,11 +7,13 @@
 #include "UserWidget_BossHealth.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class LWCASTLE_API UUserWidget_BossHealth : public UUserWidget
 {
 	GENERATED_BODY()
-	
+public:
+	UPROPERTY(BlueprintReadOnly)
+	AController* OwningPlayer;
 };

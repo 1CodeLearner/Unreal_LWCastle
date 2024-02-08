@@ -38,8 +38,12 @@ void ACMagicProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		return;
 	if (UCGameplayLibrary::ApplyDamage(GetInstigator(), OtherActor, GetDamage()))
 	{
-		UCGameplayLibrary::ApplyStunOn(GetInstigator(), OtherActor, OwnedTag);
-		UGameplayStatics::SpawnSoundAtLocation(this, ImpactSound, GetActorLocation()); 
+		auto Comp = OtherActor->GetComponentByClass<UCAttributeComponent>();
+		if (Comp && Comp->IsAlive())
+		{
+			UCGameplayLibrary::ApplyStunOn(this, OtherActor, OwnedTag);
+		}
+		UGameplayStatics::SpawnSoundAtLocation(this, ImpactSound, GetActorLocation());
 		Destroy();
 	}
 }
