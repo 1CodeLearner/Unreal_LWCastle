@@ -17,7 +17,7 @@ class LWCASTLE_API UCGameplayComponent : public UActorComponent
 
 public:
 	
-	UFUNCTION(BLueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	void StopAllActions(AActor* InstigatorActor);
 
 	UCGameplayComponent();
