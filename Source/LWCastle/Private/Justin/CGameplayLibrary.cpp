@@ -55,6 +55,7 @@ bool UCGameplayLibrary::ApplyStunOn(AActor * Invoker, AActor * AppliedActor, FGa
 
 		if (StunTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Hard")))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("2222"));
 			OtherGameplayComp->StartActionByName(Invoker, "StunHard");
 		}
 		else if (StunTag.HasTagExact(FGameplayTag::RequestGameplayTag("State.Stun.Light")))

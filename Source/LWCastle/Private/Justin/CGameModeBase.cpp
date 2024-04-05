@@ -535,7 +535,7 @@ void ACGameModeBase::PausePeriodWon()
 	if (PC)
 	{
 		auto GameplayComp = PlayerCharacter->GetComponentByClass<UCGameplayComponent>();
-		if(GameplayComp)
+		if (GameplayComp)
 		{
 			GameplayComp->StopAllActions(PlayerCharacter);
 		}

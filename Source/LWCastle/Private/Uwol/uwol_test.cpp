@@ -7,8 +7,6 @@
 #include <GameFramework/SpringArmComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
-
-#include "AssetTypeCategories.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Justin/AComponents/CCombatComponent.h"
 #include "Justin/AComponents/CGameplayComponent.h"

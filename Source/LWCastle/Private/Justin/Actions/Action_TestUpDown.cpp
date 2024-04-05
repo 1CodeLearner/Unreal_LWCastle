@@ -3,7 +3,6 @@
 
 #include "Justin/Actions/Action_TestUpDown.h"
 #include "Justin/AComponents/CGameplayComponent.h"
-#include "AssetTypeCategories.h"
 
 void UAction_TestUpDown::StartAction_Implementation(AActor* InstigatorActor)
 {

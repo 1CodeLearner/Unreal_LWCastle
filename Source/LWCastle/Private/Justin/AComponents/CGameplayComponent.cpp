@@ -201,9 +201,10 @@ void UCGameplayComponent::CompleteActionBy(AActor* InstigatorActor, UCAction* Ac
 
 void UCGameplayComponent::StopAllActions(AActor* InstigatorActor)
 {
-	for(auto Action : Actions)
+	for (auto Action : Actions)
 	{
-		Action->CompleteAction(InstigatorActor);
+		if (IsValid(Action))
+			Action->CompleteAction(InstigatorActor);
 	}
 }
 
@@ -233,14 +234,14 @@ void UCGameplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 
 	//Draw All Actions
-	for (auto* Action : Actions)
-	{
-		FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Actions Owned: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Magenta, ActionMsg);
+	//for (auto* Action : Actions)
+	//{
+	//	FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+	//	FString ActionMsg = FString::Printf(TEXT("[%s] Actions Owned: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Magenta, ActionMsg);
 
-		//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
-	}
+	//	//LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+	//}
 }
 
 
