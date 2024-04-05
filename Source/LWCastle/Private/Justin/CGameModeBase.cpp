@@ -269,6 +269,8 @@ void ACGameModeBase::OnFadeSuccess_BattleStart(AActor* Actor)
 	if (bIsFirstTimeLoading)
 	{
 		PlayCinematic();
+		PC->StartFade(true);
+		PC->HideAllWidgets();
 		//PlayerCharacter->PlayCinematicInBlueprint();
 	}
 	else
@@ -333,6 +335,8 @@ void ACGameModeBase::OnSequenceFinished()
 {
 	bIsFirstTimeLoading = false;
 	StartBattle();
+	auto PC = Cast<ACPlayerController>(PlayerCharacter->GetController());
+	PC->DisplayAllWidgets();
 }
 
 void ACGameModeBase::StartBattle()
